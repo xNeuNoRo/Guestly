@@ -79,7 +79,7 @@ public class Reservation : BaseEntity
         DateTime currentTime
     )
     {
-        ValidateReservation(checkInDate, checkOutDate, currentTime);
+        ValidateReservation(propertyPricePerNight, checkInDate, checkOutDate, currentTime);
 
         PropertyId = propertyId;
         GuestId = guestId;
@@ -102,11 +102,21 @@ public class Reservation : BaseEntity
     /// <param name="currentTime">La fecha y hora actuales.</param>
     /// <exception cref="ArgumentException">Se lanza cuando las fechas de la reserva no son válidas.</exception>
     private static void ValidateReservation(
+        decimal propertyPricePerNight,
         DateTime checkInDate,
         DateTime checkOutDate,
         DateTime currentTime
     )
     {
+        if (propertyPricePerNight <= 0)
+        {
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
+                "El precio por noche de la propiedad debe ser mayor que cero."
+            );
+        }
+
         if (checkInDate.Date >= checkOutDate.Date)
         {
             throw new AppException(
