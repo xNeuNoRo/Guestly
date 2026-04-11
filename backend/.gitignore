@@ -1,0 +1,3 @@
+# Ignorar los archivos de compilacion y objetos generados por el compilador de C#
+**/obj/
+**/bin/
