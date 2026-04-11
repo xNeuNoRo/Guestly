@@ -30,7 +30,7 @@ public class User : BaseEntity
 
     /// <summary>
     /// Contraseña del usuario, que es un campo obligatorio y no puede ser nulo.
-    /// Es hasheada antes de ser almacenada en la base de datos para garantizar la seguridad de las credenciales del usuario.q
+    /// Es hasheada antes de ser almacenada en la base de datos para garantizar la seguridad de las credenciales del usuario.
     /// </summary>
     public string Password { get; private set; } = null!;
 
