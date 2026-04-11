@@ -1,5 +1,6 @@
 using Guestly.Domain.Entities.Base;
 using Guestly.Domain.Entities.Properties;
+using Guestly.Domain.Exceptions;
 
 namespace Guestly.Domain.Entities.Reservations;
 
@@ -71,7 +72,11 @@ public class PropertyBlock : BaseEntity
     private static void ValidateBlock(DateTime startDate, DateTime endDate)
     {
         if (startDate.Date >= endDate.Date)
-            throw new ArgumentException("La fecha de fin debe ser posterior a la fecha de inicio.");
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
+                "La fecha de fin debe ser posterior a la fecha de inicio."
+            );
     }
 
     /// <summary>

@@ -1,6 +1,7 @@
 using Guestly.Domain.Entities.Base;
 using Guestly.Domain.Entities.Properties;
 using Guestly.Domain.Enums;
+using Guestly.Domain.Exceptions;
 
 namespace Guestly.Domain.Entities.Reservations;
 
@@ -102,14 +103,18 @@ public class Reservation : BaseEntity
     {
         if (checkInDate.Date >= checkOutDate.Date)
         {
-            throw new ArgumentException(
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
                 "La fecha de salida debe ser posterior a la fecha de entrada."
             );
         }
 
         if (checkInDate.Date < currentTime.Date)
         {
-            throw new ArgumentException(
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
                 "La fecha de entrada no puede ser anterior a la fecha actual."
             );
         }
@@ -139,7 +144,9 @@ public class Reservation : BaseEntity
     {
         if (Status != ReservationStatus.Pending)
         {
-            throw new InvalidOperationException(
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
                 $"No se puede confirmar una reserva en estado: {Status}."
             );
         }
@@ -155,7 +162,9 @@ public class Reservation : BaseEntity
     {
         if (Status == ReservationStatus.Completed || Status == ReservationStatus.Cancelled)
         {
-            throw new InvalidOperationException(
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
                 $"No se puede cancelar una reserva que ya está {Status}."
             );
         }
@@ -174,14 +183,18 @@ public class Reservation : BaseEntity
     {
         if (Status != ReservationStatus.Confirmed)
         {
-            throw new InvalidOperationException(
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
                 "Solo las reservas confirmadas pueden marcarse como completadas."
             );
         }
 
         if (currentTime.Date <= CheckOutDate.Date)
         {
-            throw new InvalidOperationException(
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
                 "La reserva aún no ha finalizado, no se puede marcar como completada."
             );
         }

@@ -1,5 +1,6 @@
 using Guestly.Domain.Entities.Base;
 using Guestly.Domain.Enums;
+using Guestly.Domain.Exceptions;
 
 namespace Guestly.Domain.Entities.User;
 
@@ -90,7 +91,11 @@ public class User : BaseEntity
     public void ConfirmEmail()
     {
         if (IsEmailConfirmed)
-            throw new InvalidOperationException("La cuenta ya está confirmada.");
+            throw new AppException(
+                ErrorCodes.AccountAlreadyConfirmed,
+                400,
+                "La cuenta ya está confirmada."
+            );
 
         IsEmailConfirmed = true;
     }

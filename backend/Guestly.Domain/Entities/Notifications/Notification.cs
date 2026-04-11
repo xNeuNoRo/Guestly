@@ -1,5 +1,6 @@
 using Guestly.Domain.Entities.Base;
 using Guestly.Domain.Enums;
+using Guestly.Domain.Exceptions;
 
 namespace Guestly.Domain.Entities.Notifications;
 
@@ -89,12 +90,20 @@ public class Notification : BaseEntity
     {
         if (string.IsNullOrWhiteSpace(title))
         {
-            throw new ArgumentException("El título de la notificación no puede estar vacío.");
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
+                "El título de la notificación no puede estar vacío."
+            );
         }
 
         if (string.IsNullOrWhiteSpace(message))
         {
-            throw new ArgumentException("El mensaje de la notificación no puede estar vacío.");
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
+                "El mensaje de la notificación no puede estar vacío."
+            );
         }
     }
 

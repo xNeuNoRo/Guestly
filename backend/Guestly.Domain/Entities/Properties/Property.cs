@@ -1,5 +1,6 @@
 using Guestly.Domain.Entities.Base;
 using Guestly.Domain.Entities.Reservations;
+using Guestly.Domain.Exceptions;
 
 namespace Guestly.Domain.Entities.Properties;
 
@@ -150,13 +151,18 @@ public class Property : BaseEntity
     private static void ValidateProperty(decimal pricePerNight, int capacity)
     {
         if (pricePerNight <= 0)
-            throw new ArgumentException(
-                "El precio por noche debe ser mayor que cero.",
-                nameof(pricePerNight)
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
+                "El precio por noche debe ser mayor que cero."
             );
 
         if (capacity <= 0)
-            throw new ArgumentException("La capacidad debe ser mayor que cero.", nameof(capacity));
+            throw new AppException(
+                ErrorCodes.ValidationError,
+                400,
+                "La capacidad debe ser mayor que cero."
+            );
     }
 
     /// <summary>
