@@ -59,6 +59,11 @@ public class Reservation : BaseEntity
     public ReservationStatus Status { get; private set; }
 
     /// <summary>
+    /// Constructor privado para Entity Framework, que es necesario para que EF pueda crear instancias de la clase Reservation.
+    /// </summary>
+    private Reservation() { }
+
+    /// <summary>
     /// Constructor público para crear una nueva reserva,
     /// que recibe como parámetros el identificador de la propiedad reservada, el
     /// identificador del huésped, las fechas de entrada y salida, el precio por noche de la propiedad

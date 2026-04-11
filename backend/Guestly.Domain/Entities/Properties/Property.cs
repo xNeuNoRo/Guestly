@@ -94,9 +94,9 @@ public class Property : BaseEntity
     public virtual IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();
 
     /// <summary>
-    /// Constructor protegido para Entity Framework, que es necesario para que EF pueda crear instancias de la clase Property
+    /// Constructor privado para Entity Framework, que es necesario para que EF pueda crear instancias de la clase Property
     /// </summary>
-    protected Property() { }
+    private Property() { }
 
     /// <summary>
     /// Constructor público para crear una nueva instancia de la clase Property, que requiere todos los campos obligatorios

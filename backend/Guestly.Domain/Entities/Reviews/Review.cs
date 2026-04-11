@@ -31,9 +31,9 @@ public class Review : BaseEntity
     public string? Comment { get; private set; }
 
     /// <summary>
-    /// Constructor protegido para Entity Framework, que es necesario para que EF pueda crear instancias de la clase Review.
+    /// Constructor privado para Entity Framework, que es necesario para que EF pueda crear instancias de la clase Review.
     /// </summary>
-    protected Review() { }
+    private Review() { }
 
     /// <summary>
     /// Constructor público para crear una nueva reseña, que recibe como parámetros el
@@ -46,15 +46,7 @@ public class Review : BaseEntity
     /// <param name="guestId">ID del huésped</param>
     /// <param name="rating">Calificación de la propiedad</param>
     /// <param name="comment">Comentario de la reseña</param>
-    /// <param name="currentTime">Fecha y hora actuales</param>
-    public Review(
-        Guid propertyId,
-        Guid reservationId,
-        Guid guestId,
-        int rating,
-        string comment,
-        DateTime currentTime
-    )
+    public Review(Guid propertyId, Guid reservationId, Guid guestId, int rating, string comment)
     {
         ValidateReview(rating, comment);
 
@@ -63,7 +55,6 @@ public class Review : BaseEntity
         GuestId = guestId;
         Rating = rating;
         Comment = comment;
-        CreatedAt = currentTime;
     }
 
     /// <summary>

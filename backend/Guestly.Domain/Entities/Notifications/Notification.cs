@@ -53,9 +53,9 @@ public class Notification : BaseEntity
     public DateTime? ReadAt { get; private set; }
 
     /// <summary>
-    /// Constructor protegido para EF Core, que es necesario para que EF pueda crear instancias de la clase Notification.
+    /// Constructor privado para EF Core, que es necesario para que EF pueda crear instancias de la clase Notification.
     /// </summary>
-    protected Notification() { }
+    private Notification() { }
 
     /// <summary>
     /// Constructor público para crear una nueva notificación, que requiere el

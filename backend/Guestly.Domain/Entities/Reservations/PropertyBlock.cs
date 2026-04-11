@@ -40,6 +40,11 @@ public class PropertyBlock : BaseEntity
     public string? Reason { get; private set; }
 
     /// <summary>
+    /// Constructor privado para Entity Framework, que es necesario para que EF pueda crear instancias de la clase PropertyBlock.
+    /// </summary>
+    private PropertyBlock() { }
+
+    /// <summary>
     /// Constructor público para crear un nuevo bloque de fechas para una propiedad,
     /// que recibe como parámetros el identificador de la propiedad bloqueada,
     /// las fechas de inicio y fin del bloque, y una razón opcional para el bloque de fechas.
