@@ -42,6 +42,11 @@ public class Reservation : BaseEntity
     public DateTime CheckOutDate { get; private set; }
 
     /// <summary>
+    /// Precio por noche de la propiedad al momento de la reserva, que es un campo obligatorio y debe ser mayor que cero.
+    /// </summary>
+    public decimal PricePerNightAtBooking { get; private set; }
+
+    /// <summary>
     /// Precio total de la reserva, que es un campo obligatorio y debe ser mayor que cero.
     /// Se calcula multiplicando el número de noches por el precio por noche de la propiedad reservada.
     /// </summary>
@@ -80,6 +85,7 @@ public class Reservation : BaseEntity
         GuestId = guestId;
         CheckInDate = checkInDate.Date;
         CheckOutDate = checkOutDate.Date;
+        PricePerNightAtBooking = propertyPricePerNight;
         TotalPrice = CalculateTotalPrice(
             (checkOutDate.Date - checkInDate.Date).Days,
             propertyPricePerNight
