@@ -22,7 +22,7 @@ public class UserToken : BaseEntity
     /// <summary>
     /// Tipo de token, definido por la enumeración TokenType, que indica el propósito del token (por ejemplo, confirmación de correo electrónico o restablecimiento de contraseña).
     /// </summary>
-    public TokenType Type { get; private set; }
+    public TokenTypes Type { get; private set; }
 
     /// <summary>
     /// Fecha y hora de expiración del token, después de la cual el token ya no
@@ -58,7 +58,7 @@ public class UserToken : BaseEntity
     /// <param name="token">El valor del token.</param>
     /// <param name="type">El tipo de token.</param>
     /// <param name="expiresAt">La fecha y hora de expiración del token.</param>
-    public UserToken(Guid userId, string token, TokenType type, DateTime expiresAt)
+    public UserToken(Guid userId, string token, TokenTypes type, DateTime expiresAt)
     {
         UserId = userId;
         Token = token;
