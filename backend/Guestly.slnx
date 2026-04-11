@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Guestly.API/Guestly.API.csproj" />
+  <Project Path="Guestly.Application/Guestly.Application.csproj" />
+  <Project Path="Guestly.Domain/Guestly.Domain.csproj" />
+  <Project Path="Guestly.Infrastructure/Guestly.Infrastructure.csproj" />
+</Solution>

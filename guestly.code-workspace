@@ -1,0 +1,28 @@
+{
+  "folders": [
+    {
+      "name": "root",
+      "path": ".",
+    },
+    {
+      "path": "frontend",
+    },
+    {
+      "path": "backend",
+    },
+  ],
+  "settings": {
+    "jest.disabledWorkspaceFolders": ["root", "frontend"],
+    "files.exclude": {
+      "**/.git": true,
+      "**/node_modules": true,
+      "**/*.code-workspace": true,
+      "**/bin": true,
+      "**/obj": true,
+    },
+    "dotnet.defaultSolution": "backend/Guestly.sln",
+    "omnisharp.enableEditorConfigSupport": true, // Esto es para que Omnisharp respete las reglas de .editorconfig
+    "omnisharp.useModernNet": true, // Esto es para que Omnisharp use .NET 6 o superior, lo cual mejora el rendimiento y la compatibilidad
+    "typescript.tsdk": "frontend/node_modules/typescript/lib",
+  },
+}
