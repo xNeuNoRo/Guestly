@@ -160,22 +160,14 @@ public class Property : BaseEntity
     /// </summary>
     /// <param name="pricePerNight">El precio por noche de la propiedad</param>
     /// <param name="capacity">La capacidad de la propiedad</param>
-    /// <exception cref="ArgumentException">Se lanza cuando el precio por noche o la capacidad no son válidos.</exception>
+    /// <exception cref="DomainException">Se lanza cuando el precio por noche o la capacidad no son válidos.</exception>
     private static void ValidateProperty(decimal pricePerNight, int capacity)
     {
         if (pricePerNight <= 0)
-            throw new AppException(
-                ErrorCodes.ValidationError,
-                400,
-                "El precio por noche debe ser mayor que cero."
-            );
+            throw new DomainException("El precio por noche debe ser mayor que cero.");
 
         if (capacity <= 0)
-            throw new AppException(
-                ErrorCodes.ValidationError,
-                400,
-                "La capacidad debe ser mayor que cero."
-            );
+            throw new DomainException("La capacidad debe ser mayor que cero.");
     }
 
     /// <summary>
@@ -183,14 +175,11 @@ public class Property : BaseEntity
     /// que verifica que la URL de la imagen no esté vacía o nula.
     /// </summary>
     /// <param name="imageUrl">La URL de la imagen a agregar</param>
-    /// <exception cref="ArgumentException">Se lanza cuando la URL de la imagen está vacía o nula.</exception>
+    /// <exception cref="DomainException">Se lanza cuando la URL de la imagen está vacía o nula.</exception>
     public void AddImage(string imageUrl)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
-            throw new ArgumentException(
-                "La URL de la imagen no puede estar vacía.",
-                nameof(imageUrl)
-            );
+            throw new DomainException("La URL de la imagen no puede estar vacía.");
 
         _images.Add(imageUrl);
     }

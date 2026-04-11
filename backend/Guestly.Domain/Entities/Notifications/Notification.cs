@@ -85,25 +85,17 @@ public class Notification : BaseEntity
     /// </summary>
     /// <param name="title">El título de la notificación.</param>
     /// <param name="message">El mensaje de la notificación.</param>
-    /// <exception cref="ArgumentException">Se lanza cuando el título o el mensaje están vacíos o contienen solo espacios en blanco.</exception>
+    /// <exception cref="DomainException">Se lanza cuando el título o el mensaje están vacíos o contienen solo espacios en blanco.</exception>
     private static void ValidateNotification(string title, string message)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
-            throw new AppException(
-                ErrorCodes.ValidationError,
-                400,
-                "El título de la notificación no puede estar vacío."
-            );
+            throw new DomainException("El título de la notificación no puede estar vacío.");
         }
 
         if (string.IsNullOrWhiteSpace(message))
         {
-            throw new AppException(
-                ErrorCodes.ValidationError,
-                400,
-                "El mensaje de la notificación no puede estar vacío."
-            );
+            throw new DomainException("El mensaje de la notificación no puede estar vacío.");
         }
     }
 

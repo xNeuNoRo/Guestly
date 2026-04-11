@@ -72,25 +72,17 @@ public class Review : BaseEntity
     /// </summary>
     /// <param name="rating">Calificación de la propiedad</param>
     /// <param name="comment">Comentario de la reseña</param>
-    /// <exception cref="AppException">Excepción de validación</exception>
+    /// <exception cref="DomainException">Excepción de validación</exception>
     private static void ValidateReview(int rating, string comment)
     {
         if (rating < 1 || rating > 5)
         {
-            throw new AppException(
-                ErrorCodes.ValidationError,
-                400,
-                "La calificación debe ser un número entero entre 1 y 5."
-            );
+            throw new DomainException("La calificación debe ser un número entero entre 1 y 5.");
         }
 
         if (string.IsNullOrWhiteSpace(comment))
         {
-            throw new AppException(
-                ErrorCodes.ValidationError,
-                400,
-                "El comentario no puede estar vacío."
-            );
+            throw new DomainException("El comentario no puede estar vacío.");
         }
     }
 }
