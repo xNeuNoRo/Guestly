@@ -49,7 +49,7 @@ public class Notification : BaseEntity
     /// <summary>
     /// Fecha y hora en que la notificación fue leída por el usuario. Si la notificación no ha sido leída, este valor será null.
     /// </summary>
-    public DateTime ReadAt { get; private set; }
+    public DateTime? ReadAt { get; private set; }
 
     /// <summary>
     /// Constructor protegido para EF Core, que es necesario para que EF pueda crear instancias de la clase Notification.
@@ -75,6 +75,7 @@ public class Notification : BaseEntity
         Message = message;
         Type = type;
         IsRead = false;
+        ReadAt = null;
     }
 
     /// <summary>
@@ -110,5 +111,19 @@ public class Notification : BaseEntity
 
         IsRead = true;
         ReadAt = currentTime;
+    }
+
+    /// <summary>
+    /// Método para marcar la notificación como no leída, estableciendo el indicador IsRead
+    /// a false y borrando la fecha y hora de lectura (estableciéndola en null).
+    /// </summary>
+    public void MarkAsUnread()
+    {
+        // Si ya esta sin leer, no es necesario que hagamos algo mas.
+        if (!IsRead)
+            return;
+
+        IsRead = false;
+        ReadAt = null;
     }
 }
