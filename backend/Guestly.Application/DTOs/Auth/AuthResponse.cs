@@ -1,5 +1,9 @@
 namespace Guestly.Application.DTOs.Auth;
 
+/// <summary>
+/// Representa la respuesta de una operación de autenticación,
+/// como el inicio de sesión o el registro de un nuevo usuario.
+/// </summary>
 public record AuthResponse()
 {
     /// <summary>
