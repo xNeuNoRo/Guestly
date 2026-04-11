@@ -1,4 +1,5 @@
 using Guestly.Domain.Entities.Base;
+using Guestly.Domain.Entities.Reservations;
 
 namespace Guestly.Domain.Entities.Properties;
 
@@ -53,6 +54,30 @@ public class Property : BaseEntity
     /// permitiendo acceder a las imágenes sin permitir modificaciones directas a la colección desde fuera de la clase Property.
     /// </summary>
     public virtual IReadOnlyCollection<string> Images => _images.AsReadOnly();
+
+    /// <summary>
+    /// Colección de reservas asociadas a la propiedad, que se utiliza para gestionar las reservas realizadas para esta propiedad.
+    /// </summary>
+    private readonly List<Reservation> _reservations = new();
+
+    /// <summary>
+    /// Propiedad de solo lectura que expone la colección de reservas asociadas a la propiedad,
+    /// permitiendo acceder a las reservas sin permitir modificaciones directas a la colección desde fuera de la clase Property.
+    /// </summary>
+    public virtual IReadOnlyCollection<Reservation> Reservations => _reservations.AsReadOnly();
+
+    /// <summary>
+    /// Colección de bloques de fechas asociados a la propiedad,
+    /// que se utiliza para marcar fechas en las que la propiedad no está disponible para reservas,
+    /// ya sea por mantenimiento, ocupación del anfitrión u otras razones.
+    /// </summary>
+    private readonly List<PropertyBlock> _blocks = new();
+
+    /// <summary>
+    /// Propiedad de solo lectura que expone la colección de bloques de fechas asociados a la propiedad,
+    /// permitiendo acceder a los bloques sin permitir modificaciones directas a la colección desde fuera de la clase Property.
+    /// </summary>
+    public virtual IReadOnlyCollection<PropertyBlock> Blocks => _blocks.AsReadOnly();
 
     /// <summary>
     /// Constructor protegido para Entity Framework, que es necesario para que EF pueda crear instancias de la clase Property
