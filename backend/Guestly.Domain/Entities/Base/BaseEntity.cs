@@ -13,12 +13,15 @@ public abstract class BaseEntity
 
     /// <summary>
     /// Fecha y hora en que se creó la entidad, establecida automáticamente al crear una instancia de la entidad.
+    /// No inicializar aquí: Su valor es asignado automáticamente por el interceptor
+    /// de Entity Framework Core en la capa de Infraestructura utilizando IDateTimeProvider.
     /// </summary>
     /// <example>2026-06-01T12:00:00Z</example>
     public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Fecha y hora en que se actualizó por última vez la entidad, establecida automáticamente al actualizar la entidad.
+    /// Su valor es asignado automáticamente por el interceptor de Entity Framework Core.
     /// </summary>
     /// <example>2026-06-01T12:00:00Z</example>
     public DateTime? UpdatedAt { get; set; }
