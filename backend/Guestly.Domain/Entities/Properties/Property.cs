@@ -1,5 +1,6 @@
 using Guestly.Domain.Entities.Base;
 using Guestly.Domain.Entities.Reservations;
+using Guestly.Domain.Entities.Reviews;
 using Guestly.Domain.Exceptions;
 
 namespace Guestly.Domain.Entities.Properties;
@@ -79,6 +80,18 @@ public class Property : BaseEntity
     /// permitiendo acceder a los bloques sin permitir modificaciones directas a la colección desde fuera de la clase Property.
     /// </summary>
     public virtual IReadOnlyCollection<PropertyBlock> Blocks => _blocks.AsReadOnly();
+
+    /// <summary>
+    /// Colección de reseñas asociadas a la propiedad, que se utiliza para mostrar
+    /// las opiniones y calificaciones de los huéspedes que han reservado la propiedad.
+    /// </summary>
+    private readonly List<Review> _reviews = new();
+
+    /// <summary>
+    /// Propiedad de solo lectura que expone la colección de reseñas asociadas a la propiedad,
+    /// permitiendo acceder a las reseñas sin permitir modificaciones directas a la colección desde fuera de la clase Property.
+    /// </summary>
+    public virtual IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();
 
     /// <summary>
     /// Constructor protegido para Entity Framework, que es necesario para que EF pueda crear instancias de la clase Property
