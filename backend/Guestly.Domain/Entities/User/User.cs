@@ -137,4 +137,36 @@ public class User : BaseEntity
         FirstName = firstName;
         LastName = lastName;
     }
+
+    /// <summary>
+    /// Añade el rol de anfitrión (Host) al usuario, permitiéndole publicar propiedades
+    /// sin perder su capacidad de ser huésped.
+    /// </summary>
+    /// <exception cref="DomainException">Se lanza cuando el usuario ya tiene permisos de anfitrión.</exception>
+    public void AddHostRole()
+    {
+        if (Role.HasFlag(UserRoles.Host))
+        {
+            throw new DomainException("El usuario ya tiene permisos de anfitrión.");
+        }
+
+        // Suma el rol de anfitrión al rol actual del usuario
+        Role |= UserRoles.Host;
+    }
+
+    /// <summary>
+    /// Añade el rol de invitado (Guest) al usuario, permitiéndole reservar propiedades
+    /// sin perder su capacidad de ser anfitrión.
+    /// </summary>
+    /// <exception cref="DomainException">Se lanza cuando el usuario ya tiene permisos de invitado.</exception>
+    public void AddGuestRole()
+    {
+        if (Role.HasFlag(UserRoles.Guest))
+        {
+            throw new DomainException("El usuario ya tiene permisos de invitado.");
+        }
+
+        // Suma el rol de huésped al rol actual del usuario
+        Role |= UserRoles.Guest;
+    }
 }
