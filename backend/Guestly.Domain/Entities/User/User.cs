@@ -114,4 +114,16 @@ public class User : BaseEntity
     {
         Password = hashedPassword;
     }
+
+    /// <summary>
+    /// Método para actualizar el perfil del usuario, estableciendo las propiedades FirstName y LastName
+    /// a los nuevos valores proporcionados.
+    /// </summary>
+    /// <param name="firstName">El nuevo nombre del usuario.</param>
+    /// <param name="lastName">El nuevo apellido del usuario.</param>
+    public void UpdateProfile(string firstName, string lastName)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+    }
 }
