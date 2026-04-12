@@ -3,6 +3,10 @@ using Guestly.Application.DTOs.Properties;
 
 namespace Guestly.Application.Validators.Properties;
 
+/// <summary>
+/// Valida las propiedades del UpdatePropertyRequest para asegurar que el título, descripción, ubicación,
+/// precio por noche y capacidad sean proporcionados y tengan un formato válido.
+/// </summary>
 public class UpdatePropertyRequestValidator : AbstractValidator<UpdatePropertyRequest>
 {
     public UpdatePropertyRequestValidator()
