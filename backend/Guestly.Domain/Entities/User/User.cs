@@ -105,4 +105,13 @@ public class User : BaseEntity
     {
         _tokens.Add(token);
     }
+
+    /// <summary>
+    /// Método para actualizar la contraseña del usuario, estableciendo la propiedad Password al nuevo valor hasheado.
+    /// </summary>
+    /// <param name="hashedPassword">La contraseña hasheada del usuario.</param>
+    public void UpdatePassword(string hashedPassword)
+    {
+        Password = hashedPassword;
+    }
 }
