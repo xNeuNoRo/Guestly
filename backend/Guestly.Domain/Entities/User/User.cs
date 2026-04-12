@@ -61,9 +61,9 @@ public class User : BaseEntity
     public virtual IReadOnlyCollection<UserToken> Tokens => _tokens.AsReadOnly();
 
     /// <summary>
-    /// Constructor protegido para EF Core, que es necesario para que EF Core pueda crear instancias de la entidad User
+    /// Constructor privado para EF Core, que es necesario para que EF Core pueda crear instancias de la entidad User
     /// </summary>
-    protected User() { }
+    private User() { }
 
     /// <summary>
     /// Constructor público para crear una nueva instancia de User,
@@ -87,15 +87,11 @@ public class User : BaseEntity
     /// <summary>
     /// Método para confirmar el correo electrónico del usuario, estableciendo la propiedad IsEmailConfirmed a true.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Se lanza cuando el correo electrónico ya ha sido confirmado.</exception>
+    /// <exception cref="DomainException">Se lanza cuando el correo electrónico ya ha sido confirmado.</exception>
     public void ConfirmEmail()
     {
         if (IsEmailConfirmed)
-            throw new AppException(
-                ErrorCodes.AccountAlreadyConfirmed,
-                400,
-                "La cuenta ya está confirmada."
-            );
+            throw new DomainException("La cuenta ya está confirmada.");
 
         IsEmailConfirmed = true;
     }

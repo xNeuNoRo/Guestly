@@ -1,5 +1,6 @@
 using Guestly.Domain.Entities.Base;
 using Guestly.Domain.Entities.Reservations;
+using Guestly.Domain.Entities.Reviews;
 using Guestly.Domain.Exceptions;
 
 namespace Guestly.Domain.Entities.Properties;
@@ -81,9 +82,21 @@ public class Property : BaseEntity
     public virtual IReadOnlyCollection<PropertyBlock> Blocks => _blocks.AsReadOnly();
 
     /// <summary>
-    /// Constructor protegido para Entity Framework, que es necesario para que EF pueda crear instancias de la clase Property
+    /// Colección de reseñas asociadas a la propiedad, que se utiliza para mostrar
+    /// las opiniones y calificaciones de los huéspedes que han reservado la propiedad.
     /// </summary>
-    protected Property() { }
+    private readonly List<Review> _reviews = new();
+
+    /// <summary>
+    /// Propiedad de solo lectura que expone la colección de reseñas asociadas a la propiedad,
+    /// permitiendo acceder a las reseñas sin permitir modificaciones directas a la colección desde fuera de la clase Property.
+    /// </summary>
+    public virtual IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();
+
+    /// <summary>
+    /// Constructor privado para Entity Framework, que es necesario para que EF pueda crear instancias de la clase Property
+    /// </summary>
+    private Property() { }
 
     /// <summary>
     /// Constructor público para crear una nueva instancia de la clase Property, que requiere todos los campos obligatorios
@@ -143,26 +156,18 @@ public class Property : BaseEntity
     /// <summary>
     /// Método privado para validar los detalles de la propiedad, que verifica que el precio
     /// por noche y la capacidad sean mayores que cero, lanzando una excepción
-    /// ArgumentException si alguna de las validaciones falla.
+    /// DomainException si alguna de las validaciones falla.
     /// </summary>
     /// <param name="pricePerNight">El precio por noche de la propiedad</param>
     /// <param name="capacity">La capacidad de la propiedad</param>
-    /// <exception cref="ArgumentException">Se lanza cuando el precio por noche o la capacidad no son válidos.</exception>
+    /// <exception cref="DomainException">Se lanza cuando el precio por noche o la capacidad no son válidos.</exception>
     private static void ValidateProperty(decimal pricePerNight, int capacity)
     {
         if (pricePerNight <= 0)
-            throw new AppException(
-                ErrorCodes.ValidationError,
-                400,
-                "El precio por noche debe ser mayor que cero."
-            );
+            throw new DomainException("El precio por noche debe ser mayor que cero.");
 
         if (capacity <= 0)
-            throw new AppException(
-                ErrorCodes.ValidationError,
-                400,
-                "La capacidad debe ser mayor que cero."
-            );
+            throw new DomainException("La capacidad debe ser mayor que cero.");
     }
 
     /// <summary>
@@ -170,14 +175,11 @@ public class Property : BaseEntity
     /// que verifica que la URL de la imagen no esté vacía o nula.
     /// </summary>
     /// <param name="imageUrl">La URL de la imagen a agregar</param>
-    /// <exception cref="ArgumentException">Se lanza cuando la URL de la imagen está vacía o nula.</exception>
+    /// <exception cref="DomainException">Se lanza cuando la URL de la imagen está vacía o nula.</exception>
     public void AddImage(string imageUrl)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
-            throw new ArgumentException(
-                "La URL de la imagen no puede estar vacía.",
-                nameof(imageUrl)
-            );
+            throw new DomainException("La URL de la imagen no puede estar vacía.");
 
         _images.Add(imageUrl);
     }

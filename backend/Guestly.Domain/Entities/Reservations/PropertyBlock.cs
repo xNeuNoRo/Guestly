@@ -40,6 +40,11 @@ public class PropertyBlock : BaseEntity
     public string? Reason { get; private set; }
 
     /// <summary>
+    /// Constructor privado para Entity Framework, que es necesario para que EF pueda crear instancias de la clase PropertyBlock.
+    /// </summary>
+    private PropertyBlock() { }
+
+    /// <summary>
     /// Constructor público para crear un nuevo bloque de fechas para una propiedad,
     /// que recibe como parámetros el identificador de la propiedad bloqueada,
     /// las fechas de inicio y fin del bloque, y una razón opcional para el bloque de fechas.
@@ -68,15 +73,11 @@ public class PropertyBlock : BaseEntity
     /// </summary>
     /// <param name="startDate">La fecha de inicio del bloque.</param>
     /// <param name="endDate">La fecha de fin del bloque.</param>
-    /// <exception cref="ArgumentException">Se lanza cuando las fechas del bloque no son válidas.</exception>
+    /// <exception cref="DomainException">Se lanza cuando las fechas del bloque no son válidas.</exception>
     private static void ValidateBlock(DateTime startDate, DateTime endDate)
     {
         if (startDate.Date >= endDate.Date)
-            throw new AppException(
-                ErrorCodes.ValidationError,
-                400,
-                "La fecha de fin debe ser posterior a la fecha de inicio."
-            );
+            throw new DomainException("La fecha de fin debe ser posterior a la fecha de inicio.");
     }
 
     /// <summary>

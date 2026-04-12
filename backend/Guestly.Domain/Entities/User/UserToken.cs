@@ -43,9 +43,9 @@ public class UserToken : BaseEntity
     public virtual User? User { get; }
 
     /// <summary>
-    /// Constructor protegido para EF Core, que inicializa el valor del token como una cadena vacía.
+    /// Constructor privado para EF Core, que inicializa el valor del token como una cadena vacía.
     /// </summary>
-    protected UserToken()
+    private UserToken()
     {
         Token = string.Empty;
     }
