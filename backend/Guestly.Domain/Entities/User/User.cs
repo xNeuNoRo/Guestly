@@ -107,6 +107,17 @@ public class User : BaseEntity
     }
 
     /// <summary>
+    /// Método para actualizar el correo electrónico del usuario, estableciendo la propiedad Email al nuevo valor proporcionado
+    /// y restableciendo IsEmailConfirmed a false, ya que el nuevo correo electrónico aún no ha sido confirmado.
+    /// </summary>
+    /// <param name="newEmail">El nuevo correo electrónico del usuario.</param>
+    public void UpdateEmail(string newEmail)
+    {
+        Email = newEmail;
+        IsEmailConfirmed = false;
+    }
+
+    /// <summary>
     /// Método para actualizar la contraseña del usuario, estableciendo la propiedad Password al nuevo valor hasheado.
     /// </summary>
     /// <param name="hashedPassword">La contraseña hasheada del usuario.</param>
