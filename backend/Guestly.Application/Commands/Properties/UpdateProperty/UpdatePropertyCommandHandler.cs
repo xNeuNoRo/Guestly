@@ -106,7 +106,9 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
                 HostName = $"{host.FirstName} {host.LastName}",
             },
             ImageUrls = property.Images.ToList(),
-            AverageRating = property.Reviews.Any() ? property.Reviews.Average(r => r.Rating) : 0.0,
+            AverageRating = property.Reviews.Any()
+                ? Math.Round(property.Reviews.Average(r => r.Rating), 1)
+                : 0.0,
             TotalReviews = property.Reviews.Count,
         };
     }
