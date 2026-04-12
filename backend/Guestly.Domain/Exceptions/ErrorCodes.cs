@@ -48,6 +48,7 @@ public static class ErrorCodes
     // Reservas y Fechas
     // -----------------------------
     public const string ReservationNotFound = "RESERVATION_NOT_FOUND";
+    public const string ReservationAccessDenied = "RESERVATION_ACCESS_DENIED";
     public const string InvalidDateRange = "INVALID_DATE_RANGE";
     public const string PastDateNotAllowed = "PAST_DATE_NOT_ALLOWED";
     public const string DatesUnavailable = "DATES_UNAVAILABLE";
