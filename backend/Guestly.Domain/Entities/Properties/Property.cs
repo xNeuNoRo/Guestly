@@ -156,7 +156,7 @@ public class Property : BaseEntity
     /// <summary>
     /// Método privado para validar los detalles de la propiedad, que verifica que el precio
     /// por noche y la capacidad sean mayores que cero, lanzando una excepción
-    /// ArgumentException si alguna de las validaciones falla.
+    /// DomainException si alguna de las validaciones falla.
     /// </summary>
     /// <param name="pricePerNight">El precio por noche de la propiedad</param>
     /// <param name="capacity">La capacidad de la propiedad</param>
