@@ -13,6 +13,7 @@ public interface IPropertyBlockRepository
         Guid propertyId,
         DateTime startDate,
         DateTime endDate,
+        Guid? excludeBlockId = null,
         CancellationToken cancellationToken = default
     );
     Task AddAsync(PropertyBlock block, CancellationToken cancellationToken = default);

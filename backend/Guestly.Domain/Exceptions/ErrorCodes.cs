@@ -40,6 +40,11 @@ public static class ErrorCodes
     public const string PropertyAccessDenied = "PROPERTY_ACCESS_DENIED";
 
     // -----------------------------
+    // Bloques de Fechas
+    // -----------------------------
+    public const string PropertyBlockNotFound = "PROPERTY_BLOCK_NOT_FOUND";
+
+    // -----------------------------
     // Reservas y Fechas
     // -----------------------------
     public const string ReservationNotFound = "RESERVATION_NOT_FOUND";
