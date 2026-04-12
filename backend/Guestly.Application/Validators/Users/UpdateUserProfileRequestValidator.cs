@@ -3,6 +3,10 @@ using Guestly.Application.DTOs.Users;
 
 namespace Guestly.Application.Validators.Users;
 
+/// <summary>
+/// Valida las propiedades del UpdateUserProfileRequest para asegurar que el nombre y apellido del usuario
+/// sean proporcionados y no excedan los 255 caracteres.
+/// </summary>
 public class UpdateUserProfileRequestValidator : AbstractValidator<UpdateUserProfileRequest>
 {
     public UpdateUserProfileRequestValidator()

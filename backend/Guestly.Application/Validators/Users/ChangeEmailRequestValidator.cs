@@ -3,6 +3,10 @@ using Guestly.Application.DTOs.Users;
 
 namespace Guestly.Application.Validators.Users;
 
+/// <summary>
+/// Valida las propiedades del ChangeEmailRequest para asegurar que el nuevo correo electrónico tenga un formato válido
+/// y que la contraseña sea proporcionada para autorizar el cambio de correo electrónico.
+/// </summary>
 public class ChangeEmailRequestValidator : AbstractValidator<ChangeEmailRequest>
 {
     public ChangeEmailRequestValidator()

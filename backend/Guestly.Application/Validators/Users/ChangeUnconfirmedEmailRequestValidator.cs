@@ -3,6 +3,10 @@ using Guestly.Application.DTOs.Users;
 
 namespace Guestly.Application.Validators.Users;
 
+/// <summary>
+/// Valida las propiedades del ChangeUnconfirmedEmailRequest para asegurar que el nuevo correo electrónico
+/// tenga un formato válido y no exceda los 255 caracteres.
+/// </summary>
 public class ChangeUnconfirmedEmailRequestValidator
     : AbstractValidator<ChangeUnconfirmedEmailRequest>
 {

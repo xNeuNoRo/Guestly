@@ -3,6 +3,12 @@ using Guestly.Application.DTOs.Users;
 
 namespace Guestly.Application.Validators.Users;
 
+/// <summary>
+/// Valida las propiedades del ResetPasswordRequest para asegurar que el correo electrónico tenga un formato válido,
+/// que el token de restablecimiento de contraseña sea proporcionado, y que la nueva contraseña
+/// cumpla con los requisitos de seguridad, incluyendo longitud mínima, uso de mayúsculas, minúsculas,
+/// números y caracteres especiales.
+/// </summary>
 public class ResetPasswordRequestValidator : AbstractValidator<ResetPasswordRequest>
 {
     public ResetPasswordRequestValidator()

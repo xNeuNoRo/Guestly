@@ -3,6 +3,10 @@ using Guestly.Application.DTOs.Reservations;
 
 namespace Guestly.Application.Validators.Reservations;
 
+/// <summary>
+/// Valida las propiedades del ReservationSearchRequest para asegurar que el estado de la reserva sea válido
+/// y que las fechas de inicio y fin, si se proporcionan, tengan un formato válido y cumplan con las reglas lógicas para las fechas.
+/// </summary>
 public class ReservationSearchRequestValidator : AbstractValidator<ReservationSearchRequest>
 {
     public ReservationSearchRequestValidator()

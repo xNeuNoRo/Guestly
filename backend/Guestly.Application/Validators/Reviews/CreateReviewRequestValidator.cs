@@ -3,6 +3,10 @@ using Guestly.Application.DTOs.Reviews;
 
 namespace Guestly.Application.Validators.Reviews;
 
+/// <summary>
+/// Valida las propiedades del CreateReviewRequest para asegurar que se proporcionen la propiedad, 
+/// la reserva, la calificación y el comentario, y que tengan un formato válido.
+/// </summary>
 public class CreateReviewRequestValidator : AbstractValidator<CreateReviewRequest>
 {
     public CreateReviewRequestValidator()

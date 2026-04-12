@@ -3,6 +3,12 @@ using Guestly.Application.DTOs.Users;
 
 namespace Guestly.Application.Validators.Users;
 
+/// <summary>
+/// Valida las propiedades del ChangePasswordRequest para asegurar que la contraseña actual sea proporcionada,
+/// que la nueva contraseña cumpla con los requisitos de seguridad (longitud mínima, inclusión de
+/// mayúsculas, minúsculas, números y caracteres especiales), y que la confirmación de la nueva contraseña
+/// coincida con la nueva contraseña.
+/// </summary>
 public class ChangePasswordRequestValidator : AbstractValidator<ChangePasswordRequest>
 {
     public ChangePasswordRequestValidator()
