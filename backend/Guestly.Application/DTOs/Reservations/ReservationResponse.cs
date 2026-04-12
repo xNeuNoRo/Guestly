@@ -85,5 +85,5 @@ public record ReservationResponse()
     /// <summary>
     /// La fecha de actualización de la reserva.
     /// </summary>
-    public DateTime UpdatedAt { get; init; }
+    public DateTime? UpdatedAt { get; init; }
 }
