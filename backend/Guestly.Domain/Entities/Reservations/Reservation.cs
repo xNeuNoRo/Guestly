@@ -184,8 +184,8 @@ public class Reservation : BaseEntity
     /// si actualmente está en estado Confirmed y la fecha actual es posterior a la fecha de salida de la reserva.
     /// No se puede completar una reserva que no esté confirmada o que aún no haya finalizado.
     /// </summary>
-    /// <param name="currentTime"></param>
-    /// <exception cref="DomainException"></exception>
+    /// <param name="currentTime">La fecha y hora actuales.</param>
+    /// <exception cref="DomainException">Se lanza cuando se intenta completar una reserva que no cumple con los criterios.</exception>
     public void Complete(DateTime currentTime)
     {
         if (Status != ReservationStatus.Confirmed)

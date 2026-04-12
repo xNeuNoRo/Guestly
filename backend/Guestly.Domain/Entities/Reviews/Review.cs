@@ -28,7 +28,7 @@ public class Review : BaseEntity
     /// <summary>
     /// Comentario de la reseña, que es un campo obligatorio y no puede estar vacío.
     /// </summary>
-    public string? Comment { get; private set; }
+    public string Comment { get; private set; } = null!;
 
     /// <summary>
     /// Constructor privado para Entity Framework, que es necesario para que EF pueda crear instancias de la clase Review.
