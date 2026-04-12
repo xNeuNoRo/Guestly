@@ -38,7 +38,7 @@ public record ReviewResponse()
     /// <summary>
     /// La fecha y hora en que se actualizó la reseña
     /// </summary>
-    public required DateTime UpdatedAt { get; init; }
+    public DateTime? UpdatedAt { get; init; }
 
     /// <summary>
     /// El identificador único del huésped que dejó la reseña

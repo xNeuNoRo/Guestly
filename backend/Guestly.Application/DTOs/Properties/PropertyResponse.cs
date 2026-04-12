@@ -78,9 +78,9 @@ public record PropertyResponse()
 
     /// <summary>
     /// La fecha y hora en que se actualizó la propiedad.
-    /// Es un campo obligatorio que indica cuándo se realizó la última actualización de la propiedad en el sistema.
+    /// Puede ser nulo si la propiedad no ha sido actualizada desde su creación.
     /// </summary>
-    public required DateTime UpdatedAt { get; init; }
+    public required DateTime? UpdatedAt { get; init; }
 
     /// <summary>
     /// El anfitrión de la propiedad. Es un campo obligatorio que contiene información resumida sobre el anfitrión de la propiedad,
