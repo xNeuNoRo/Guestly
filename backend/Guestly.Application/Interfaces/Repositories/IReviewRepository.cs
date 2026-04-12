@@ -1,0 +1,18 @@
+using Guestly.Domain.Entities.Reviews;
+
+namespace Guestly.Application.Interfaces.Repositories;
+
+public interface IReviewRepository
+{
+    Task<Review?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
+    // Valida si ya existe una reseña para una reserva específica antes de craar una nueva
+    Task<bool> ExistsByReservationIdAsync(
+        Guid reservationId,
+        CancellationToken cancellationToken = default
+    );
+
+    Task AddAsync(Review review, CancellationToken cancellationToken = default);
+    void Update(Review review);
+    void Delete(Review review);
+}
