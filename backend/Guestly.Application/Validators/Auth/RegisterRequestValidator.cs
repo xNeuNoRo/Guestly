@@ -14,14 +14,14 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
         RuleFor(x => x.FirstName)
             .NotEmpty()
             .WithMessage("El nombre es obligatorio.")
-            .MaximumLength(100)
-            .WithMessage("El nombre no puede exceder los 100 caracteres.");
+            .MaximumLength(255)
+            .WithMessage("El nombre no puede exceder los 255 caracteres.");
 
         RuleFor(x => x.LastName)
             .NotEmpty()
             .WithMessage("El apellido es obligatorio.")
-            .MaximumLength(100)
-            .WithMessage("El apellido no puede exceder los 100 caracteres.");
+            .MaximumLength(255)
+            .WithMessage("El apellido no puede exceder los 255 caracteres.");
 
         RuleFor(x => x.Email)
             .NotEmpty()
