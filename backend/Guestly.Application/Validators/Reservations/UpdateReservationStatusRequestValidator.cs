@@ -1,5 +1,6 @@
 using FluentValidation;
 using Guestly.Application.DTOs.Reservations;
+using Guestly.Domain.Enums;
 
 namespace Guestly.Application.Validators.Reservations;
 
@@ -16,6 +17,12 @@ public class UpdateReservationStatusRequestValidator
             .IsInEnum()
             .WithMessage(
                 "El nuevo estado de la reserva no es válido. Debe ser 'Pending', 'Confirmed' o 'Cancelled'."
+            )
+            .Must(status =>
+                status == ReservationStatus.Confirmed || status == ReservationStatus.Cancelled
+            )
+            .WithMessage(
+                "No puedes marcar una reserva como Completada o Pendiente manualmente. El sistema lo gestionará automáticamente."
             );
     }
 }
