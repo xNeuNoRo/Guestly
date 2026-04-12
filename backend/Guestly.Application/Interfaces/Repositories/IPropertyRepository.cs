@@ -5,6 +5,10 @@ namespace Guestly.Application.Interfaces.Repositories;
 public interface IPropertyRepository
 {
     Task<Property?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Property>> GetByHostIdAsync(
+        Guid hostId,
+        CancellationToken cancellationToken = default
+    );
     Task<IEnumerable<Property>> SearchAsync(
         string? location,
         DateTime? startDate,
