@@ -5,8 +5,7 @@ namespace Guestly.Application.Validators.Properties;
 
 /// <summary>
 /// Valida las propiedades del CreatePropertyRequest para asegurar que el título, descripción, ubicación,
-/// precio por noche, capacidad y las imágenes sean proporcionados y tengan un formato válido,
-/// además de cumplir con los requisitos de seguridad para la contraseña.
+/// precio por noche, capacidad y las imágenes sean proporcionados y tengan un formato válido.
 /// </summary>
 public class CreatePropertyRequestValidator : AbstractValidator<CreatePropertyRequest>
 {

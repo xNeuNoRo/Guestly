@@ -29,7 +29,7 @@ public record UserProfileResponse
     public required string Email { get; init; }
 
     /// <summary>
-    /// El rol del usuario cuyo perfil se está obteniendo, representado como un número entero.
+    /// El rol del usuario cuyo perfil se está obteniendo, que puede ser "Guest" o "Host".
     /// </summary>
     public required UserRoles Role { get; init; }
 
