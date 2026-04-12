@@ -1,3 +1,5 @@
+using Guestly.Domain.Enums;
+
 namespace Guestly.Application.DTOs.Reservations;
 
 /// <summary>
@@ -6,7 +8,8 @@ namespace Guestly.Application.DTOs.Reservations;
 public record UpdateReservationStatusRequest()
 {
     /// <summary>
-    /// El nuevo estado de la reserva, representado como un entero que corresponde a un valor del enum ReservationStatus.
+    /// El nuevo estado de la reserva, que debe ser uno de los valores definidos en el enum ReservationStatus
+    /// (Pending, Confirmed, Cancelled).
     /// </summary>
-    public required int NewStatus { get; init; }
+    public required ReservationStatus NewStatus { get; init; }
 }

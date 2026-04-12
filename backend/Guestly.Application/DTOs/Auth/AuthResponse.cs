@@ -1,3 +1,5 @@
+using Guestly.Domain.Enums;
+
 namespace Guestly.Application.DTOs.Auth;
 
 /// <summary>
@@ -29,7 +31,7 @@ public record AuthResponse()
     /// <summary>
     /// El rol del usuario autenticado.
     /// </summary>
-    public required int Role { get; init; }
+    public required UserRoles Role { get; init; }
 
     /// <summary>
     /// El token de acceso JWT (Access Token) utilizado para autorizar las peticiones del usuario autenticado.

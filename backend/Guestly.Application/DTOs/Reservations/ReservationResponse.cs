@@ -1,3 +1,5 @@
+using Guestly.Domain.Enums;
+
 namespace Guestly.Application.DTOs.Reservations;
 
 /// <summary>
@@ -75,7 +77,7 @@ public record ReservationResponse()
     /// <summary>
     /// El estado de la reserva.
     /// </summary>
-    public required int Status { get; init; }
+    public required ReservationStatus Status { get; init; }
 
     /// <summary>
     /// La fecha de creación de la reserva.

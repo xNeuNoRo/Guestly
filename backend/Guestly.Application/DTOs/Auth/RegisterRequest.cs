@@ -1,3 +1,5 @@
+using Guestly.Domain.Enums;
+
 namespace Guestly.Application.DTOs.Auth;
 
 /// <summary>
@@ -28,5 +30,5 @@ public record RegisterRequest()
     /// <summary>
     /// El rol del nuevo usuario.
     /// </summary>
-    public required int Role { get; init; }
+    public required UserRoles Role { get; init; }
 }
