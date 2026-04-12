@@ -1,3 +1,5 @@
+using Guestly.Domain.Enums;
+
 namespace Guestly.Application.DTOs.Users;
 
 /// <summary>
@@ -29,7 +31,7 @@ public record UserProfileResponse
     /// <summary>
     /// El rol del usuario cuyo perfil se está obteniendo, representado como un número entero.
     /// </summary>
-    public required int Role { get; init; }
+    public required UserRoles Role { get; init; }
 
     /// <summary>
     /// La fecha y hora en que se creó el usuario autenticado

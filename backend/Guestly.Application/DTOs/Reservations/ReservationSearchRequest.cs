@@ -1,3 +1,5 @@
+using Guestly.Domain.Enums;
+
 namespace Guestly.Application.DTOs.Reservations;
 
 public record ReservationSearchRequest()
@@ -14,7 +16,7 @@ public record ReservationSearchRequest()
     /// solo se devolverán las reservas que coincidan con este estado. Si es null,
     /// se devolverán todas las reservas sin filtrar por estado.
     /// </summary>
-    public int? Status { get; init; }
+    public ReservationStatus? Status { get; init; }
 
     /// <summary>
     /// La fecha de inicio para filtrar las reservas. Si se proporciona, solo se devolverán
