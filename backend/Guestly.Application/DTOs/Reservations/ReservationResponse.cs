@@ -43,6 +43,16 @@ public record ReservationResponse()
     public required string GuestName { get; init; }
 
     /// <summary>
+    /// El id del anfitrión.
+    /// </summary>
+    public required Guid HostId { get; init; }
+
+    /// <summary>
+    /// El nombre del anfitrión.
+    /// </summary>
+    public required string HostName { get; init; }
+
+    /// <summary>
     /// La fecha de inicio de la reserva.
     /// </summary>
     public required DateTime StartDate { get; init; }
@@ -71,4 +81,9 @@ public record ReservationResponse()
     /// La fecha de creación de la reserva.
     /// </summary>
     public required DateTime CreatedAt { get; init; }
+
+    /// <summary>
+    /// La fecha de actualización de la reserva.
+    /// </summary>
+    public DateTime UpdatedAt { get; init; }
 }

@@ -30,4 +30,14 @@ public record UserProfileResponse
     /// El rol del usuario cuyo perfil se está obteniendo, representado como un número entero.
     /// </summary>
     public required int Role { get; init; }
+
+    /// <summary>
+    /// La fecha y hora en que se creó el usuario autenticado
+    /// </summary>
+    public required DateTime CreatedAt { get; init; }
+
+    /// <summary>
+    /// Indica si el correo electrónico del usuario autenticado ha sido confirmado o no.
+    /// </summary>
+    public required bool IsEmailConfirmed { get; init; }
 }

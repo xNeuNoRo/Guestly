@@ -59,6 +59,30 @@ public record PropertyResponse()
     public required int Capacity { get; init; }
 
     /// <summary>
+    /// El promedio de calificaciones de la propiedad.
+    /// Es un campo obligatorio que representa la calificación promedio de la propiedad basada en las reseñas de los huéspedes
+    /// </summary>
+    public required double AverageRating { get; init; }
+
+    /// <summary>
+    /// El número total de reseñas que ha recibido la propiedad
+    /// Es un campo obligatorio que indica cuántas reseñas ha recibido la propiedad
+    /// </summary>
+    public required int TotalReviews { get; init; }
+
+    /// <summary>
+    /// La fecha y hora en que se creó la propiedad.
+    /// Es un campo obligatorio que indica cuándo se agregó la propiedad al sistema
+    /// </summary>
+    public required DateTime CreatedAt { get; init; }
+
+    /// <summary>
+    /// La fecha y hora en que se actualizó la propiedad.
+    /// Es un campo obligatorio que indica cuándo se realizó la última actualización de la propiedad en el sistema.
+    /// </summary>
+    public required DateTime UpdatedAt { get; init; }
+
+    /// <summary>
     /// El anfitrión de la propiedad. Es un campo obligatorio que contiene información resumida sobre el anfitrión de la propiedad,
     /// incluyendo su ID y nombre, lo cual permite a los huéspedes potenciales
     /// conocer quién es el anfitrión antes de tomar una decisión de reserva.

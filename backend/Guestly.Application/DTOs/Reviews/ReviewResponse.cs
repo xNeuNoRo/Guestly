@@ -11,6 +11,16 @@ public record ReviewResponse()
     public required Guid Id { get; init; }
 
     /// <summary>
+    /// El identificador único de la propiedad a la que se refiere la reseña
+    /// </summary>
+    public required Guid PropertyId { get; init; }
+
+    /// <summary>
+    /// El título de la propiedad a la que se refiere la reseña
+    /// </summary>
+    public required string PropertyTitle { get; init; }
+
+    /// <summary>
     /// La calificación otorgada por el usuario a la propiedad, representada como un número entero entre 1 y 5.
     /// </summary>
     public required int Rating { get; init; }
