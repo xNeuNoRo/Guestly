@@ -1,7 +1,6 @@
 using Guestly.Application.Commands.Properties.Search;
 using Guestly.Application.DTOs.Properties;
 using Guestly.Application.Interfaces.Repositories;
-using Guestly.Domain.Entities.Properties;
 using Mapster;
 using MediatR;
 
