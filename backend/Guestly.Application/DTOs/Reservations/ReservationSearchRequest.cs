@@ -7,7 +7,7 @@ public record ReservationSearchRequest()
     /// solo se devolverán las reservas asociadas a esta propiedad. Si es null,
     /// se devolverán todas las reservas sin filtrar por propiedad.
     /// </summary>
-    public required Guid? PropertyId { get; init; }
+    public Guid? PropertyId { get; init; }
 
     /// <summary>
     /// El estado de la reserva para filtrar las reservas. Si se proporciona,
