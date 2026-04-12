@@ -16,7 +16,7 @@ public class UpdateReservationStatusRequestValidator
         RuleFor(x => x.NewStatus)
             .IsInEnum()
             .WithMessage(
-                "El nuevo estado de la reserva no es válido. Debe ser 'Pending', 'Confirmed' o 'Cancelled'."
+                "El estado de la reserva debe ser valido. Los estados permitidos son: Confirmada o Cancelada."
             )
             .Must(status =>
                 status == ReservationStatus.Confirmed || status == ReservationStatus.Cancelled
