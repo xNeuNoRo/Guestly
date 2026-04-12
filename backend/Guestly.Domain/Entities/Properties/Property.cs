@@ -1,6 +1,7 @@
 using Guestly.Domain.Entities.Base;
 using Guestly.Domain.Entities.Reservations;
 using Guestly.Domain.Entities.Reviews;
+using Guestly.Domain.Enums;
 using Guestly.Domain.Exceptions;
 
 namespace Guestly.Domain.Entities.Properties;
@@ -191,5 +192,25 @@ public class Property : BaseEntity
     public void RemoveImage(string imageUrl)
     {
         _images.Remove(imageUrl);
+    }
+
+    /// <summary>
+    /// Método para validar si la propiedad puede ser eliminada, que verifica si existen reservas pendientes o confirmadas
+    /// asociadas a la propiedad, y lanza una excepción DomainException si se encuentra alguna
+    /// reserva que impida la eliminación de la propiedad.
+    /// </summary>
+    /// <exception cref="DomainException">Se lanza cuando la propiedad tiene reservas activas.</exception>
+    public void ValidateForDeletion()
+    {
+        var hasActiveReservations = _reservations.Any(r =>
+            r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Confirmed
+        );
+
+        if (hasActiveReservations)
+        {
+            throw new DomainException(
+                "No se puede eliminar la propiedad porque tiene reservas pendientes o confirmadas en curso."
+            );
+        }
     }
 }
