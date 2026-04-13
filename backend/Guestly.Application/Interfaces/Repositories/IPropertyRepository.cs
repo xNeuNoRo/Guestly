@@ -18,6 +18,7 @@ public interface IPropertyRepository
         decimal? maxPrice,
         CancellationToken cancellationToken = default
     );
+    Task<int> CountByHostIdAsync(Guid hostId, CancellationToken cancellationToken = default);
     Task AddAsync(Property property, CancellationToken cancellationToken = default);
     void Update(Property property);
     void Delete(Property property);

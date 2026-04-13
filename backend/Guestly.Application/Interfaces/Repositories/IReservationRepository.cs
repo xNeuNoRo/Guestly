@@ -21,6 +21,15 @@ public interface IReservationRepository
         DateTime checkOut,
         CancellationToken cancellationToken = default
     );
+    Task<int> CountByHostIdAsync(
+        Guid hostId,
+        ReservationStatus? status = null,
+        CancellationToken cancellationToken = default
+    );
+    Task<decimal> GetTotalRevenueByHostIdAsync(
+        Guid hostId,
+        CancellationToken cancellationToken = default
+    );
     Task AddAsync(Reservation reservation, CancellationToken cancellationToken = default);
     void Update(Reservation reservation);
 }
