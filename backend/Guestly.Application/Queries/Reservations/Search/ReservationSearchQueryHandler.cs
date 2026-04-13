@@ -33,6 +33,8 @@ public class ReservationSearchQueryHandler
     {
         var reservations = await _reservationRepository.SearchAsync(
             request.PropertyId,
+            request.GuestId,
+            request.HostId,
             request.Status,
             request.StartDate,
             request.EndDate,

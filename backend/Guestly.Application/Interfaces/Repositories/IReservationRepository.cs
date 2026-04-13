@@ -8,6 +8,8 @@ public interface IReservationRepository
     Task<Reservation?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IEnumerable<Reservation>> SearchAsync(
         Guid? propertyId,
+        Guid? guestId,
+        Guid? hostId,
         ReservationStatus? status,
         DateTime? startDate,
         DateTime? endDate,

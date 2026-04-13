@@ -9,6 +9,8 @@ namespace Guestly.Application.Queries.Reservations.Search;
 /// </summary>
 public record ReservationSearchQuery(
     Guid? PropertyId,
+    Guid? GuestId,
+    Guid? HostId,
     ReservationStatus? Status,
     DateTime? StartDate,
     DateTime? EndDate
