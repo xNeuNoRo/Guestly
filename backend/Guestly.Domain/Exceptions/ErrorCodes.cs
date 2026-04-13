@@ -59,6 +59,7 @@ public static class ErrorCodes
     // -----------------------------
     public const string ReviewNotFound = "REVIEW_NOT_FOUND";
     public const string ReviewAlreadyExists = "REVIEW_ALREADY_EXISTS";
+    public const string ReviewAccessDenied = "REVIEW_ACCESS_DENIED";
 
     // -----------------------------
     // Notificaciones
