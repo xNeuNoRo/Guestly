@@ -58,6 +58,20 @@ public class Review : BaseEntity
     }
 
     /// <summary>
+    /// Método para actualizar los detalles de la reseña, que actualiza la calificación y el comentario de
+    /// la reseña con los nuevos valores proporcionados.
+    /// </summary>
+    /// <param name="rating">Nueva calificación de la propiedad</param>
+    /// <param name="comment">Nuevo comentario de la reseña</param>
+    public void UpdateDetails(int rating, string comment)
+    {
+        ValidateReview(rating, comment);
+
+        Rating = rating;
+        Comment = comment;
+    }
+
+    /// <summary>
     /// Método privado para validar los datos de la reseña,
     /// que verifica que la calificación sea un número entero entre 1 y 5 y que el comentario no esté vacío
     /// </summary>
