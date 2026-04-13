@@ -7,6 +7,11 @@ using MediatR;
 
 namespace Guestly.Application.Commands.Notifications.CreateNotification;
 
+/// <summary>
+/// Manejador del comando para crear una nueva notificación en el sistema.
+/// Este manejador se encarga de validar la existencia del usuario destinatario,
+/// crear la notificación y guardarla en el repositorio correspondiente.
+/// </summary>
 public class CreateNotificationCommandHandler
     : IRequestHandler<CreateNotificationCommand, NotificationResponse>
 {
@@ -22,6 +27,10 @@ public class CreateNotificationCommandHandler
         _userRepository = userRepository;
     }
 
+    /// <summary>
+    /// Maneja la lógica para crear una nueva notificación, incluyendo la validación del usuario destinatario,
+    /// la creación de la notificación y su almacenamiento en el repositorio.
+    /// </summary>
     public async Task<NotificationResponse> Handle(
         CreateNotificationCommand request,
         CancellationToken cancellationToken
