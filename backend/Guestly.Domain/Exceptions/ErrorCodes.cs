@@ -55,6 +55,12 @@ public static class ErrorCodes
     public const string InvalidReservationStatus = "INVALID_RESERVATION_STATUS";
 
     // -----------------------------
+    // Reseñas
+    // -----------------------------
+    public const string ReviewNotFound = "REVIEW_NOT_FOUND";
+    public const string ReviewAlreadyExists = "REVIEW_ALREADY_EXISTS";
+
+    // -----------------------------
     // Notificaciones
     // -----------------------------
     public const string NotificationNotFound = "NOTIFICATION_NOT_FOUND";
