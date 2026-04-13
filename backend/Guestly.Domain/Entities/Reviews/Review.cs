@@ -21,6 +21,11 @@ public class Review : BaseEntity
     public Guid GuestId { get; private set; }
 
     /// <summary>
+    /// Referencia al huésped que hizo la reseña.
+    /// </summary>
+    public virtual User.User? Guest { get; }
+
+    /// <summary>
     /// Calificación de la propiedad, que es un campo obligatorio y debe ser un número entero entre 1 y 5.
     /// </summary>
     public int Rating { get; private set; }

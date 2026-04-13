@@ -6,6 +6,12 @@ public interface IReviewRepository
 {
     Task<Review?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
+    // Obtiene todas las reseñas asociadas a una propiedad específica
+    Task<IEnumerable<Review>> GetByPropertyIdAsync(
+        Guid propertyId,
+        CancellationToken cancellationToken = default
+    );
+
     // Valida si ya existe una reseña para una reserva específica antes de craar una nueva
     Task<bool> ExistsByReservationIdAsync(
         Guid reservationId,
