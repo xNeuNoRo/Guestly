@@ -72,7 +72,7 @@ public class UpdatePropertyBlockCommandHandler
             );
         }
 
-        var hasOtherBocks = await _propertyBlockRepository.HasOverlappingBlocksAsync(
+        var hasOtherBlocks = await _propertyBlockRepository.HasOverlappingBlocksAsync(
             block.PropertyId,
             request.StartDate,
             request.EndDate,
@@ -80,7 +80,7 @@ public class UpdatePropertyBlockCommandHandler
             cancellationToken
         );
 
-        if (hasOtherBocks)
+        if (hasOtherBlocks)
         {
             throw AppException.Conflict(
                 "Ya existe otro bloqueo programado para estas fechas.",
