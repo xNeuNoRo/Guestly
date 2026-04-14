@@ -3,6 +3,7 @@ using Guestly.Application.Interfaces.Repositories;
 using Guestly.Domain.Entities.Reservations;
 using Guestly.Domain.Exceptions;
 using Guestly.Domain.Interfaces;
+using Guestly.Domain.ValueObjects;
 using Mapster;
 using MediatR;
 
@@ -103,23 +104,22 @@ public class CreateReservationCommandHandler
                 );
             }
 
-            // Calculamos el precio total de la reserva en base a las fechas
-            // y el precio por noche de la propiedad, además de las tarifas adicionales
-            var totalNights = (request.EndDate.Date - request.StartDate.Date).Days;
-            var subtotal = totalNights * property.PricePerNight;
-            var cleaningFee = property.CleaningFee;
-            var serviceFee = Math.Round(subtotal * 0.05m, 2); // 5% de tarifa de servicio
-            var taxes = Math.Round((subtotal + cleaningFee + serviceFee) * 0.18m, 2); // 18% de impuestos (ITBIS)
+            var breakdown = ReservationPriceBreakdown.Calculate(
+                request.StartDate,
+                request.EndDate,
+                property.PricePerNight,
+                property.CleaningFee
+            );
 
             var reservation = new Reservation(
                 propertyId: request.PropertyId,
                 guestId: request.GuestId,
                 checkInDate: request.StartDate,
                 checkOutDate: request.EndDate,
-                propertyPricePerNight: property.PricePerNight,
-                cleaningFee,
-                serviceFee,
-                taxes,
+                propertyPricePerNight: breakdown.PricePerNight,
+                cleaningFee: breakdown.CleaningFee,
+                serviceFee: breakdown.ServiceFee,
+                taxes: breakdown.Taxes,
                 currentTime: _dateTimeProvider.UtcNow
             );
 

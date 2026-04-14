@@ -1,6 +1,7 @@
 using Guestly.Application.DTOs.Reservations;
 using Guestly.Application.Interfaces.Repositories;
 using Guestly.Domain.Exceptions;
+using Guestly.Domain.ValueObjects;
 using MediatR;
 
 namespace Guestly.Application.Queries.Reservations.GetPricePreview;
@@ -46,23 +47,22 @@ public class GetReservationPricePreviewQueryHandler
             throw AppException.NotFound("Propiedad no encontrada.", ErrorCodes.PropertyNotFound);
         }
 
-        var totalNights = (request.EndDate.Date - request.StartDate.Date).Days;
-        var subtotal = totalNights * property.PricePerNight;
-
-        var cleaningFee = property.CleaningFee;
-        var serviceFee = subtotal * 0.05m; // Cobraremos una comisión del 5% sobre el subtotal como tarifa de servicio
-        var taxes = (subtotal + cleaningFee + serviceFee) * 0.18m; // 18% de impuestos (ITBIS)
-        var grandTotal = subtotal + cleaningFee + serviceFee + taxes;
+        var breakdown = ReservationPriceBreakdown.Calculate(
+            request.StartDate,
+            request.EndDate,
+            property.PricePerNight,
+            property.CleaningFee
+        );
 
         return new PricePreviewResponse
         {
-            TotalNights = totalNights,
-            PricePerNight = property.PricePerNight,
-            Subtotal = Math.Round(subtotal, 2),
-            CleaningFee = Math.Round(cleaningFee, 2),
-            ServiceFee = Math.Round(serviceFee, 2),
-            Taxes = Math.Round(taxes, 2),
-            GrandTotal = Math.Round(grandTotal, 2),
+            TotalNights = breakdown.TotalNights,
+            PricePerNight = breakdown.PricePerNight,
+            Subtotal = breakdown.Subtotal,
+            CleaningFee = breakdown.CleaningFee,
+            ServiceFee = breakdown.ServiceFee,
+            Taxes = breakdown.Taxes,
+            GrandTotal = breakdown.GrandTotal,
         };
     }
 }
