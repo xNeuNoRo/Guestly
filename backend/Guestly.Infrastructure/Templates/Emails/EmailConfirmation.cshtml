@@ -1,0 +1,72 @@
+@using Guestly.Application.Models.Emails
+@model ConfirmEmailModel
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a Guestly</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f0f4f8; color: #1a202c;">
+    
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+        
+        <tr>
+            <td align="center" style="padding: 60px 40px; background: #1e293b; background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);">
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="background-color: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 12px;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 800; letter-spacing: -1px; font-style: italic;">GUESTLY</h1>
+                        </td>
+                    </tr>
+                </table>
+                <p style="margin: 20px 0 0; color: #e2e8f0; font-size: 16px; font-weight: 400;">Tu próximo destino empieza aquí.</p>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 50px 40px;">
+                <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 28px; font-weight: 700; line-height: 1.2;">¡Hola, @Model.FirstName! 👋</h2>
+                <p style="margin: 0 0 30px; line-height: 1.7; color: #475569; font-size: 17px;">
+                    Gracias por unirte a la red más exclusiva de alojamientos. Estamos listos para ayudarte a encontrar el lugar perfecto, pero antes, necesitamos verificar tu identidad con un solo clic.
+                </p>
+                
+                <table align="left" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
+                    <tr>
+                        <td align="center" style="border-radius: 14px;" bgcolor="#7c3aed">
+                            <a href="@Model.ConfirmationLink" target="_blank" style="padding: 18px 40px; display: inline-block; font-size: 16px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 14px; letter-spacing: 0.5px;">
+                                Confirmar mi cuenta ahora
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+
+                <div style="clear: both; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e2e8f0;">
+                    <p style="margin: 0; line-height: 1.6; color: #94a3b8; font-size: 14px;">
+                        ¿El botón no responde? Copia este enlace en tu navegador:
+                        <br>
+                        <a href="@Model.ConfirmationLink" style="color: #7c3aed; text-decoration: none; font-weight: 600; word-break: break-all;">@Model.ConfirmationLink</a>
+                    </p>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 40px; background-color: #f8fafc; text-align: center;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;">
+                    <tr>
+                        <td style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                            Explora • Reserva • Disfruta
+                        </td>
+                    </tr>
+                </table>
+                <p style="margin: 0 0 8px; color: #94a3b8; font-size: 12px;">&copy; @DateTime.Now.Year Guestly Inc. Distrito Nacional, RD.</p>
+                <p style="margin: 0; color: #cbd5e1; font-size: 11px;">
+                    Recibiste este correo porque te registraste en nuestra plataforma. Si no fuiste tú, no necesitas realizar ninguna acción.
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

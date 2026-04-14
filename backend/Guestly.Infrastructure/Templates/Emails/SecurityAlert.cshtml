@@ -1,0 +1,78 @@
+@using Guestly.Application.Models.Emails
+@model SecurityAlertModel
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerta de Seguridad - Guestly</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f0f4f8; color: #1a202c;">
+    
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+        
+        <tr>
+            <td align="center" style="padding: 60px 40px; background: #1e293b; background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);">
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="background-color: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 12px;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 800; letter-spacing: -1px; font-style: italic;">GUESTLY</h1>
+                        </td>
+                    </tr>
+                </table>
+                <p style="margin: 20px 0 0; color: #e2e8f0; font-size: 16px; font-weight: 400;">Notificación de Seguridad</p>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 50px 40px;">
+                <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 26px; font-weight: 700; line-height: 1.2;">Hola, @Model.FirstName</h2>
+                <p style="margin: 0 0 30px; line-height: 1.7; color: #475569; font-size: 17px;">
+                    Te informamos que se ha realizado un cambio importante en la seguridad de tu cuenta.
+                </p>
+
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f1f5f9; border-radius: 16px; margin-bottom: 30px;">
+                    <tr>
+                        <td style="padding: 25px;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding-bottom: 10px; color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Actividad:</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-bottom: 20px; color: #1e293b; font-size: 18px; font-weight: 700;">@Model.ActionPerformed</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Fecha y hora:</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #1e293b; font-size: 16px; font-weight: 500;">@Model.Date</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <div style="padding: 20px; background-color: #fef2f2; border-left: 4px solid #ef4444; border-radius: 8px; margin-bottom: 30px;">
+                    <p style="margin: 0; color: #991b1b; font-size: 14px; line-height: 1.6;">
+                        <strong>¿No reconoces esta actividad?</strong> Si no realizaste este cambio, alguien podría tener acceso a tu cuenta. Por favor, <strong>restablece tu contraseña inmediatamente</strong> y contacta a nuestro equipo de soporte.
+                    </p>
+                </div>
+
+                <p style="margin: 0; line-height: 1.7; color: #64748b; font-size: 15px;">
+                    Mantenemos tu cuenta protegida mediante monitoreo constante. No es necesario realizar ninguna acción si tú hiciste este cambio.
+                </p>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 40px; background-color: #f8fafc; text-align: center;">
+                <p style="margin: 0 0 8px; color: #94a3b8; font-size: 12px;">&copy; @DateTime.Now.Year Guestly Inc. Distrito Nacional, RD.</p>
+                <p style="margin: 0; color: #cbd5e1; font-size: 11px;">
+                    Este es un aviso automático de seguridad.
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
