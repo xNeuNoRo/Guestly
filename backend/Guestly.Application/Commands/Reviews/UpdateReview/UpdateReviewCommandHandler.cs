@@ -62,6 +62,13 @@ public class UpdateReviewCommandHandler : IRequestHandler<UpdateReviewCommand, R
 
         var property = await _propertyRepository.GetByIdAsync(review.PropertyId, cancellationToken);
         var guest = await _userRepository.GetByIdAsync(review.GuestId, cancellationToken);
+        if (property is null || guest is null)
+        {
+            throw AppException.NotFound(
+                "No se pudo encontrar la propiedad o el huésped asociado a esta reseña.",
+                ErrorCodes.NotFound
+            );
+        }
 
         var response = review.Adapt<ReviewResponse>();
 
