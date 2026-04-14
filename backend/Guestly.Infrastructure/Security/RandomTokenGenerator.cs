@@ -18,6 +18,14 @@ public class RandomTokenGenerator : IRandomTokenGenerator
     /// <returns>El token en formato string URL-safe.</returns>
     public string Generate(int length = 32)
     {
+        if (length <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(length),
+                "La longitud debe ser un número positivo."
+            );
+        }
+
         // Creamos un buffer de bytes del tamaño solicitado
         var buffer = new byte[length];
 
