@@ -42,16 +42,23 @@ public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, AuthRespons
             throw AppException.NotFound("Usuario no encontrado.", ErrorCodes.UserNotFound);
         }
 
-        switch (request.RoleToAdd)
+        try
         {
-            case UserRoles.Host:
-                user.AddHostRole();
-                break;
-            case UserRoles.Guest:
-                user.AddGuestRole();
-                break;
-            default:
-                throw AppException.BadRequest("Rol no válido para esta operación.");
+            switch (request.RoleToAdd)
+            {
+                case UserRoles.Host:
+                    user.AddHostRole();
+                    break;
+                case UserRoles.Guest:
+                    user.AddGuestRole();
+                    break;
+                default:
+                    throw AppException.BadRequest("Rol no válido para esta operación.");
+            }
+        }
+        catch (DomainException ex)
+        {
+            throw AppException.BadRequest(ex.Message, "ROLE_ALREADY_ASSIGNED");
         }
 
         _userRepository.Update(user);
