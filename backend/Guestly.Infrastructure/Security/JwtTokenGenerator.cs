@@ -36,6 +36,15 @@ public class JwtTokenGenerator : IJwtTokenGenerator
                 "JWT Secret no configurado. Verifica tu appsettings.json o variables de entorno."
             );
 
+        // Validación de seguridad crítica: El secreto debe tener al menos 32 bytes
+        // (caracteres) de longitud para garantizar la fortaleza criptográfica del algoritmo HS256.
+        if (Encoding.UTF8.GetByteCount(secret) < 32)
+        {
+            throw new InvalidOperationException(
+                "Seguridad Crítica: El JWT Secret debe tener al menos 32 bytes (caracteres) de longitud para garantizar la fortaleza criptográfica del algoritmo HS256."
+            );
+        }
+
         // Fallbacks para Issuer y Audience
         // Issuer es el emisor del token
         var issuer = _configuration["JwtSettings:Issuer"] ?? "GuestlyAPI";
