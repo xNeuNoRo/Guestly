@@ -49,7 +49,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
 
         if (!host.Role.HasFlag(UserRoles.Host))
         {
-            throw AppException.BadRequest(
+            throw AppException.Forbidden(
                 "No tienes permisos de anfitrión para crear una propiedad.",
                 ErrorCodes.PropertyAccessDenied
             );
