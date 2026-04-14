@@ -69,6 +69,22 @@ public class PropertyBlock : BaseEntity
     }
 
     /// <summary>
+    /// Método para actualizar las fechas y la razón de un bloque de fechas existente, que recibe como parámetros
+    /// las nuevas fechas de inicio y fin del bloque, y una nueva razón opcional para el bloque de fechas.
+    /// </summary>
+    /// <param name="startDate">La fecha de inicio del bloque.</param>
+    /// <param name="endDate">La fecha de fin del bloque.</param>
+    /// <param name="reason">La razón opcional para el bloque de fechas.</param>
+    public void Update(DateTime startDate, DateTime endDate, string? reason)
+    {
+        ValidateBlock(startDate, endDate);
+
+        StartDate = startDate.Date;
+        EndDate = endDate.Date;
+        Reason = reason;
+    }
+
+    /// <summary>
     /// Método privado para validar las fechas del bloque, asegurándose de que la fecha de fin sea posterior a la fecha de inicio.
     /// </summary>
     /// <param name="startDate">La fecha de inicio del bloque.</param>

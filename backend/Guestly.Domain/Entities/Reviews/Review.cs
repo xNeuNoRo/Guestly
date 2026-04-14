@@ -21,6 +21,11 @@ public class Review : BaseEntity
     public Guid GuestId { get; private set; }
 
     /// <summary>
+    /// Referencia al huésped que hizo la reseña.
+    /// </summary>
+    public virtual User.User? Guest { get; }
+
+    /// <summary>
     /// Calificación de la propiedad, que es un campo obligatorio y debe ser un número entero entre 1 y 5.
     /// </summary>
     public int Rating { get; private set; }
@@ -53,6 +58,20 @@ public class Review : BaseEntity
         PropertyId = propertyId;
         ReservationId = reservationId;
         GuestId = guestId;
+        Rating = rating;
+        Comment = comment;
+    }
+
+    /// <summary>
+    /// Método para actualizar los detalles de la reseña, que actualiza la calificación y el comentario de
+    /// la reseña con los nuevos valores proporcionados.
+    /// </summary>
+    /// <param name="rating">Nueva calificación de la propiedad</param>
+    /// <param name="comment">Nuevo comentario de la reseña</param>
+    public void UpdateDetails(int rating, string comment)
+    {
+        ValidateReview(rating, comment);
+
         Rating = rating;
         Comment = comment;
     }

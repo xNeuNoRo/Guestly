@@ -47,6 +47,21 @@ public class Reservation : BaseEntity
     public decimal PricePerNightAtBooking { get; private set; }
 
     /// <summary>
+    /// Tarifa de limpieza de la propiedad luego de la reserva, que es un campo obligatorio y debe ser mayor o igual a cero.
+    /// </summary>
+    public decimal CleaningFeeAtBooking { get; private set; }
+
+    /// <summary>
+    /// Tarifa de servicio de la propiedad luego de la reserva, que es un campo obligatorio (5% del subtotal).
+    /// </summary>
+    public decimal ServiceFeeAtBooking { get; private set; }
+
+    /// <summary>
+    /// Impuestos de la propiedad luego de la reserva, que es un campo obligatorio (18% de el precio calculado).
+    /// </summary>
+    public decimal TaxesAtBooking { get; private set; }
+
+    /// <summary>
     /// Precio total de la reserva, que es un campo obligatorio y debe ser mayor que cero.
     /// Se calcula multiplicando el número de noches por el precio por noche de la propiedad reservada.
     /// </summary>
@@ -81,19 +96,30 @@ public class Reservation : BaseEntity
         DateTime checkInDate,
         DateTime checkOutDate,
         decimal propertyPricePerNight,
+        decimal cleaningFee,
+        decimal serviceFee,
+        decimal taxes,
         DateTime currentTime
     )
     {
-        ValidateReservation(propertyPricePerNight, checkInDate, checkOutDate, currentTime);
+        ValidateReservation(propertyPricePerNight, cleaningFee, serviceFee, taxes, checkInDate, checkOutDate, currentTime);
 
         PropertyId = propertyId;
         GuestId = guestId;
         CheckInDate = checkInDate.Date;
         CheckOutDate = checkOutDate.Date;
         PricePerNightAtBooking = propertyPricePerNight;
+        CleaningFeeAtBooking = cleaningFee;
+        ServiceFeeAtBooking = serviceFee;
+        TaxesAtBooking = taxes;
+
+        int nights = (checkOutDate.Date - checkInDate.Date).Days;
         TotalPrice = CalculateTotalPrice(
-            (checkOutDate.Date - checkInDate.Date).Days,
-            propertyPricePerNight
+            nights,
+            propertyPricePerNight,
+            cleaningFee,
+            serviceFee,
+            taxes
         );
         Status = ReservationStatus.Pending;
     }
@@ -102,12 +128,19 @@ public class Reservation : BaseEntity
     /// Método privado para validar las fechas de la reserva, asegurándose de que la
     /// fecha de salida sea posterior a la fecha de entrada y que la fecha de entrada no sea anterior a la fecha actual.
     /// </summary>
+    /// <param name="propertyPricePerNight">El precio por noche de la propiedad.</param>
+    /// <param name="cleaningFee">La tarifa de limpieza de la propiedad.</param>
+    /// <param name="serviceFee">La tarifa de servicio de la propiedad.</param>
+    /// <param name="taxes">Los impuestos de la propiedad.</param>
     /// <param name="checkInDate">La fecha de entrada a la propiedad.</param>
     /// <param name="checkOutDate">La fecha de salida de la propiedad.</param>
     /// <param name="currentTime">La fecha y hora actuales.</param>
     /// <exception cref="DomainException">Se lanza cuando las fechas de la reserva no son válidas.</exception>
     private static void ValidateReservation(
         decimal propertyPricePerNight,
+        decimal cleaningFee,
+        decimal serviceFee,
+        decimal taxes,
         DateTime checkInDate,
         DateTime checkOutDate,
         DateTime currentTime
@@ -118,6 +151,21 @@ public class Reservation : BaseEntity
             throw new DomainException(
                 "El precio por noche de la propiedad debe ser mayor que cero."
             );
+        }
+
+        if (cleaningFee < 0)
+        {
+            throw new DomainException("La tarifa de limpieza no puede ser negativa.");
+        }
+
+        if (serviceFee < 0)
+        {
+            throw new DomainException("La tarifa de servicio no puede ser negativa.");
+        }
+
+        if (taxes < 0)
+        {
+            throw new DomainException("Los impuestos no pueden ser negativos.");
         }
 
         if (checkInDate.Date >= checkOutDate.Date)
@@ -141,10 +189,19 @@ public class Reservation : BaseEntity
     /// </summary>
     /// <param name="totalDays">El número de días de la reserva.</param>
     /// <param name="pricePerNight">El precio por noche de la propiedad.</param>
+    /// <param name="cleaning">La tarifa de limpieza de la propiedad.</param>
+    /// <param name="service">La tarifa de servicio de la propiedad.</param>
+    /// <param name="taxes">Los impuestos (ITBIS)</param>
     /// <returns>El precio total de la reserva.</returns>
-    private static decimal CalculateTotalPrice(int totalDays, decimal pricePerNight)
+    private static decimal CalculateTotalPrice(
+        int totalDays,
+        decimal pricePerNight,
+        decimal cleaning,
+        decimal service,
+        decimal taxes
+    )
     {
-        return totalDays * pricePerNight;
+        return Math.Round((totalDays * pricePerNight) + cleaning + service + taxes, 2);
     }
 
     // ------------------------------------------------------

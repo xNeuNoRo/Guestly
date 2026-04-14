@@ -105,4 +105,68 @@ public class User : BaseEntity
     {
         _tokens.Add(token);
     }
+
+    /// <summary>
+    /// Método para actualizar el correo electrónico del usuario, estableciendo la propiedad Email al nuevo valor proporcionado
+    /// y restableciendo IsEmailConfirmed a false, ya que el nuevo correo electrónico aún no ha sido confirmado.
+    /// </summary>
+    /// <param name="newEmail">El nuevo correo electrónico del usuario.</param>
+    public void UpdateEmail(string newEmail)
+    {
+        Email = newEmail;
+        IsEmailConfirmed = false;
+    }
+
+    /// <summary>
+    /// Método para actualizar la contraseña del usuario, estableciendo la propiedad Password al nuevo valor hasheado.
+    /// </summary>
+    /// <param name="hashedPassword">La contraseña hasheada del usuario.</param>
+    public void UpdatePassword(string hashedPassword)
+    {
+        Password = hashedPassword;
+    }
+
+    /// <summary>
+    /// Método para actualizar el perfil del usuario, estableciendo las propiedades FirstName y LastName
+    /// a los nuevos valores proporcionados.
+    /// </summary>
+    /// <param name="firstName">El nuevo nombre del usuario.</param>
+    /// <param name="lastName">El nuevo apellido del usuario.</param>
+    public void UpdateProfile(string firstName, string lastName)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+    }
+
+    /// <summary>
+    /// Añade el rol de anfitrión (Host) al usuario, permitiéndole publicar propiedades
+    /// sin perder su capacidad de ser huésped.
+    /// </summary>
+    /// <exception cref="DomainException">Se lanza cuando el usuario ya tiene permisos de anfitrión.</exception>
+    public void AddHostRole()
+    {
+        if (Role.HasFlag(UserRoles.Host))
+        {
+            throw new DomainException("El usuario ya tiene permisos de anfitrión.");
+        }
+
+        // Suma el rol de anfitrión al rol actual del usuario
+        Role |= UserRoles.Host;
+    }
+
+    /// <summary>
+    /// Añade el rol de invitado (Guest) al usuario, permitiéndole reservar propiedades
+    /// sin perder su capacidad de ser anfitrión.
+    /// </summary>
+    /// <exception cref="DomainException">Se lanza cuando el usuario ya tiene permisos de invitado.</exception>
+    public void AddGuestRole()
+    {
+        if (Role.HasFlag(UserRoles.Guest))
+        {
+            throw new DomainException("El usuario ya tiene permisos de invitado.");
+        }
+
+        // Suma el rol de huésped al rol actual del usuario
+        Role |= UserRoles.Guest;
+    }
 }

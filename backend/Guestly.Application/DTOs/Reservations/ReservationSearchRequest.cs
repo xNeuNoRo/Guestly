@@ -12,6 +12,18 @@ public record ReservationSearchRequest()
     public Guid? PropertyId { get; init; }
 
     /// <summary>
+    /// El id del huésped para filtrar las reservas. Si se proporciona, solo se devolverán
+    /// las reservas asociadas a este huésped. Si es null, se devolverán todas las reservas sin filtrar por huésped.
+    /// </summary>
+    public Guid? GuestId { get; init; }
+
+    /// <summary>
+    /// El id del anfitrión para filtrar las reservas. Si se proporciona, solo se devolverán
+    /// las reservas asociadas a este anfitrión. Si es null, se devolverán todas las reservas sin filtrar por anfitrión.
+    /// </summary>
+    public Guid? HostId { get; init; }
+
+    /// <summary>
     /// El estado de la reserva para filtrar las reservas. Si se proporciona,
     /// solo se devolverán las reservas que coincidan con este estado. Si es null,
     /// se devolverán todas las reservas sin filtrar por estado.

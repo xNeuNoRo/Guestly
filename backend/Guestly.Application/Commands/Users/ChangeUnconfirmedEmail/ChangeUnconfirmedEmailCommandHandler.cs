@@ -1,0 +1,95 @@
+using Guestly.Application.Interfaces.Repositories;
+using Guestly.Application.Interfaces.Security;
+using Guestly.Domain.Entities.User;
+using Guestly.Domain.Enums;
+using Guestly.Domain.Exceptions;
+using Guestly.Domain.Interfaces;
+using MediatR;
+
+namespace Guestly.Application.Commands.Users.ChangeUnconfirmedEmail;
+
+/// <summary>
+/// Manejador del comando ChangeUnconfirmedEmailCommand, responsable de procesar la solicitud de
+/// cambio de correo electrónico no confirmado de un usuario.
+/// </summary>
+public class ChangeUnconfirmedEmailCommandHandler
+    : IRequestHandler<ChangeUnconfirmedEmailCommand, bool>
+{
+    private readonly IUserRepository _userRepository;
+    private readonly IUserTokenRepository _userTokenRepository;
+    private readonly IRandomTokenGenerator _tokenGenerator;
+    private readonly IDateTimeProvider _dateTimeProvider;
+
+    public ChangeUnconfirmedEmailCommandHandler(
+        IUserRepository userRepository,
+        IUserTokenRepository userTokenRepository,
+        IRandomTokenGenerator tokenGenerator,
+        IDateTimeProvider dateTimeProvider
+    )
+    {
+        _userRepository = userRepository;
+        _userTokenRepository = userTokenRepository;
+        _tokenGenerator = tokenGenerator;
+        _dateTimeProvider = dateTimeProvider;
+    }
+
+    /// <summary>
+    /// Manejador del comando ChangeUnconfirmedEmailCommand, que procesa la solicitud de
+    /// cambio de correo electrónico no confirmado de un usuario.
+    /// </summary>
+    public async Task<bool> Handle(
+        ChangeUnconfirmedEmailCommand request,
+        CancellationToken cancellationToken
+    )
+    {
+        var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
+        if (user is null)
+        {
+            throw AppException.NotFound("Usuario no encontrado.", ErrorCodes.UserNotFound);
+        }
+
+        if (user.IsEmailConfirmed)
+        {
+            throw AppException.Forbidden(
+                "La cuenta ya está confirmada. Utiliza la opción de cambio de correo que requiere contraseña.",
+                ErrorCodes.Forbidden
+            );
+        }
+
+        var emailExists = await _userRepository.GetByEmailAsync(
+            request.NewEmail,
+            cancellationToken
+        );
+        if (emailExists is not null)
+        {
+            throw AppException.Conflict(
+                "El nuevo correo electrónico ya está en uso.",
+                ErrorCodes.EmailAlreadyExists
+            );
+        }
+
+        user.UpdateEmail(request.NewEmail);
+        await _userTokenRepository.RemoveExistingTokensAsync(
+            user.Id,
+            TokenTypes.EmailConfirmation,
+            cancellationToken
+        );
+
+        var tokenString = _tokenGenerator.Generate();
+        var expiresAt = _dateTimeProvider.UtcNow.AddHours(24);
+        var userToken = new UserToken(
+            user.Id,
+            tokenString,
+            TokenTypes.EmailConfirmation,
+            expiresAt
+        );
+
+        await _userTokenRepository.AddAsync(userToken, cancellationToken);
+
+        _userRepository.Update(user);
+
+        // TODO: Enviar correo de confirmación al nuevo correo electrónico con el token generado
+
+        return true;
+    }
+}

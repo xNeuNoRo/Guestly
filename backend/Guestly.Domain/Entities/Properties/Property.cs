@@ -1,6 +1,7 @@
 using Guestly.Domain.Entities.Base;
 using Guestly.Domain.Entities.Reservations;
 using Guestly.Domain.Entities.Reviews;
+using Guestly.Domain.Enums;
 using Guestly.Domain.Exceptions;
 
 namespace Guestly.Domain.Entities.Properties;
@@ -30,6 +31,11 @@ public class Property : BaseEntity
     /// Precio por noche de la propiedad, que es un campo obligatorio y debe ser mayor que cero.
     /// </summary>
     public decimal PricePerNight { get; private set; }
+
+    /// <summary>
+    /// Tarifa de limpieza para la propiedad, que es un campo obligatorio
+    /// </summary>
+    public decimal CleaningFee { get; private set; }
 
     /// <summary>
     /// Capacidad de la propiedad, que es un campo obligatorio y debe ser mayor que cero.
@@ -105,6 +111,7 @@ public class Property : BaseEntity
     /// <param name="description">La descripción de la propiedad</param>
     /// <param name="location">La ubicación de la propiedad</param>
     /// <param name="pricePerNight">El precio por noche de la propiedad</param>
+    /// <param name="cleaningFee">La tarifa de limpieza de la propiedad</param>
     /// <param name="capacity">La capacidad de la propiedad</param>
     /// <param name="hostId">El identificador del anfitrión que posee la propiedad</param>
     public Property(
@@ -112,16 +119,18 @@ public class Property : BaseEntity
         string description,
         string location,
         decimal pricePerNight,
+        decimal cleaningFee,
         int capacity,
         Guid hostId
     )
     {
-        ValidateProperty(pricePerNight, capacity);
+        ValidateProperty(pricePerNight, cleaningFee, capacity);
 
         Title = title;
         Description = description;
         Location = location;
         PricePerNight = pricePerNight;
+        CleaningFee = cleaningFee;
         Capacity = capacity;
         HostId = hostId;
     }
@@ -141,15 +150,17 @@ public class Property : BaseEntity
         string description,
         string location,
         decimal pricePerNight,
+        decimal cleaningFee,
         int capacity
     )
     {
-        ValidateProperty(pricePerNight, capacity);
+        ValidateProperty(pricePerNight, cleaningFee, capacity);
 
         Title = title;
         Description = description;
         Location = location;
         PricePerNight = pricePerNight;
+        CleaningFee = cleaningFee;
         Capacity = capacity;
     }
 
@@ -159,12 +170,20 @@ public class Property : BaseEntity
     /// DomainException si alguna de las validaciones falla.
     /// </summary>
     /// <param name="pricePerNight">El precio por noche de la propiedad</param>
+    /// <param name="cleaningFee">La tarifa de limpieza de la propiedad</param>
     /// <param name="capacity">La capacidad de la propiedad</param>
     /// <exception cref="DomainException">Se lanza cuando el precio por noche o la capacidad no son válidos.</exception>
-    private static void ValidateProperty(decimal pricePerNight, int capacity)
+    private static void ValidateProperty(
+        decimal pricePerNight,
+        decimal cleaningFee,
+        int capacity
+    )
     {
         if (pricePerNight <= 0)
             throw new DomainException("El precio por noche debe ser mayor que cero.");
+
+        if (cleaningFee < 0)
+            throw new DomainException("La tarifa de limpieza no puede ser negativa.");
 
         if (capacity <= 0)
             throw new DomainException("La capacidad debe ser mayor que cero.");
@@ -191,5 +210,25 @@ public class Property : BaseEntity
     public void RemoveImage(string imageUrl)
     {
         _images.Remove(imageUrl);
+    }
+
+    /// <summary>
+    /// Método para validar si la propiedad puede ser eliminada, que verifica si existen reservas pendientes o confirmadas
+    /// asociadas a la propiedad, y lanza una excepción DomainException si se encuentra alguna
+    /// reserva que impida la eliminación de la propiedad.
+    /// </summary>
+    /// <exception cref="DomainException">Se lanza cuando la propiedad tiene reservas activas.</exception>
+    public void ValidateForDeletion()
+    {
+        var hasActiveReservations = _reservations.Any(r =>
+            r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Confirmed
+        );
+
+        if (hasActiveReservations)
+        {
+            throw new DomainException(
+                "No se puede eliminar la propiedad porque tiene reservas pendientes o confirmadas en curso."
+            );
+        }
     }
 }

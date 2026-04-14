@@ -57,17 +57,32 @@ public record ReservationResponse()
     /// <summary>
     /// La fecha de inicio de la reserva.
     /// </summary>
-    public required DateTime StartDate { get; init; }
+    public required DateTime CheckInDate { get; init; }
 
     /// <summary>
     /// La fecha de finalización de la reserva.
     /// </summary>
-    public required DateTime EndDate { get; init; }
+    public required DateTime CheckOutDate { get; init; }
 
     /// <summary>
     /// El precio por noche al momento de la reserva.
     /// </summary>
     public required decimal PricePerNightAtBooking { get; init; }
+
+    /// <summary>
+    /// Tarifa de limpieza al momento de la reserva.
+    /// </summary>
+    public required decimal CleaningFeeAtBooking { get; init; }
+
+    /// <summary>
+    /// Tarifa de servicio al momento de la reserva.
+    /// </summary>
+    public required decimal ServiceFeeAtBooking { get; init; }
+
+    /// <summary>
+    /// Impuestos al momento de la reserva.
+    /// </summary>
+    public required decimal TaxesAtBooking { get; init; }
 
     /// <summary>
     /// El precio total de la reserva, calculado como el precio por noche multiplicado por el número de noches reservadas.
