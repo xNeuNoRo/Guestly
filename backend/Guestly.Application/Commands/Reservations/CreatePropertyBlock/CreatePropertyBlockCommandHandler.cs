@@ -39,7 +39,10 @@ public class CreatePropertyBlockCommandHandler
         CancellationToken cancellationToken
     )
     {
-        var property = await _propertyRepository.GetByIdAsync(request.PropertyId);
+        var property = await _propertyRepository.GetByIdAsync(
+            request.PropertyId,
+            cancellationToken
+        );
         if (property is null)
         {
             throw AppException.NotFound("Propiedad no encontrada.", ErrorCodes.PropertyNotFound);

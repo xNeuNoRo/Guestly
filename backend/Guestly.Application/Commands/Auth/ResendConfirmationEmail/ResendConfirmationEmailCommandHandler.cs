@@ -44,7 +44,7 @@ public class ResendConfirmationEmailCommandHandler
         CancellationToken cancellationToken
     )
     {
-        var user = await _userRepository.GetByEmailAsync(request.Email);
+        var user = await _userRepository.GetByEmailAsync(request.Email, cancellationToken);
         // Si el usuario no existe o ya ha confirmado su email,
         // retornamos true para evitar revelar información sobre la existencia del usuario
         if (user is null || user.IsEmailConfirmed)

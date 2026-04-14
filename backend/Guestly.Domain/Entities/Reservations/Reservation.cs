@@ -47,7 +47,7 @@ public class Reservation : BaseEntity
     public decimal PricePerNightAtBooking { get; private set; }
 
     /// <summary>
-    /// Tarifa de limpieza de la propiedad luego de la reserva, que es un campo opcional.
+    /// Tarifa de limpieza de la propiedad luego de la reserva, que es un campo obligatorio y debe ser mayor o igual a cero.
     /// </summary>
     public decimal CleaningFeeAtBooking { get; private set; }
 
