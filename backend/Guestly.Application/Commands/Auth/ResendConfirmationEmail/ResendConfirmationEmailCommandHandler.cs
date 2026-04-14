@@ -56,6 +56,13 @@ public class ResendConfirmationEmailCommandHandler
 
         try
         {
+            // Revocamos cualquier token de confirmación de email existente para el usuario
+            await _userTokenRepository.RemoveExistingTokensAsync(
+                user.Id,
+                TokenTypes.EmailConfirmation,
+                cancellationToken
+            );
+
             var tokenString = _tokenGenerator.Generate();
 
             var userToken = new UserToken(

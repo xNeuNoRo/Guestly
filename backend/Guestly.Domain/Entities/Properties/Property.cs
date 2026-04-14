@@ -177,7 +177,7 @@ public class Property : BaseEntity
     private static void ValidateProperty(
         decimal pricePerNight,
         decimal cleaningFee,
-        decimal capacity
+        int capacity
     )
     {
         if (pricePerNight <= 0)
