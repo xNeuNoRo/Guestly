@@ -12,9 +12,20 @@ public enum EmailTemplate
     EmailConfirmation,
 
     /// <summary>
+    /// Correo enviado para confirmar que el usuario ha solicitado un cambio de correo electrónico.
+    /// </summary>
+    EmailChangeConfirmation,
+
+    /// <summary>
     /// Correo con el token o enlace para restablecer una contraseña olvidada.
     /// </summary>
     PasswordReset,
+
+    /// <summary>
+    /// Correo de alerta de seguridad para notificar al usuario sobre cambios importantes en su cuenta,
+    /// como un cambio de contraseña o correo electrónico.
+    /// </summary>
+    SecurityAlert,
 
     /// <summary>
     /// Confirmación de que una reserva ha sido pagada y confirmada.
