@@ -9,14 +9,17 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IUnitOfWork _unitOfWork;
 
     public ChangePasswordCommandHandler(
         IUserRepository userRepository,
-        IPasswordHasher passwordHasher
+        IPasswordHasher passwordHasher,
+        IUnitOfWork unitOfWork
     )
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<bool> Handle(
@@ -41,6 +44,10 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
         var hashedNewPassword = _passwordHasher.HashPassword(request.NewPassword);
         user.UpdatePassword(hashedNewPassword);
         _userRepository.Update(user);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return true;
     }

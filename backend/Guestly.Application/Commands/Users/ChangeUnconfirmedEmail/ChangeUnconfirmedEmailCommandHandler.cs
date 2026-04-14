@@ -19,18 +19,21 @@ public class ChangeUnconfirmedEmailCommandHandler
     private readonly IUserTokenRepository _userTokenRepository;
     private readonly IRandomTokenGenerator _tokenGenerator;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IUnitOfWork _unitOfWork;
 
     public ChangeUnconfirmedEmailCommandHandler(
         IUserRepository userRepository,
         IUserTokenRepository userTokenRepository,
         IRandomTokenGenerator tokenGenerator,
-        IDateTimeProvider dateTimeProvider
+        IDateTimeProvider dateTimeProvider,
+        IUnitOfWork unitOfWork
     )
     {
         _userRepository = userRepository;
         _userTokenRepository = userTokenRepository;
         _tokenGenerator = tokenGenerator;
         _dateTimeProvider = dateTimeProvider;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -87,6 +90,10 @@ public class ChangeUnconfirmedEmailCommandHandler
         await _userTokenRepository.AddAsync(userToken, cancellationToken);
 
         _userRepository.Update(user);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         // TODO: Enviar correo de confirmación al nuevo correo electrónico con el token generado
 

@@ -20,16 +20,19 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
     private readonly IPropertyRepository _propertyRepository;
     private readonly IUserRepository _userRepository;
     private readonly IImageUploadService _imageUploadService;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreatePropertyCommandHandler(
         IPropertyRepository propertyRepository,
         IUserRepository userRepository,
-        IImageUploadService imageUploadService
+        IImageUploadService imageUploadService,
+        IUnitOfWork unitOfWork
     )
     {
         _propertyRepository = propertyRepository;
         _userRepository = userRepository;
         _imageUploadService = imageUploadService;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -74,6 +77,10 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
 
         // Guardamos la propiedad en la base de datos
         await _propertyRepository.AddAsync(property, cancellationToken);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         // Mapeamos la propiedad a PropertyResponse
         var response = property.Adapt<PropertyResponse>();

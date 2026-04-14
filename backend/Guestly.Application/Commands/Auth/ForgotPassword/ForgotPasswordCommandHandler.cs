@@ -20,18 +20,21 @@ public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordComman
     private readonly IUserTokenRepository _userTokenRepository;
     private readonly IRandomTokenGenerator _tokenGenerator;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IUnitOfWork _unitOfWork;
 
     public ForgotPasswordCommandHandler(
         IUserRepository userRepository,
         IUserTokenRepository userTokenRepository,
         IRandomTokenGenerator tokenGenerator,
-        IDateTimeProvider dateTimeProvider
+        IDateTimeProvider dateTimeProvider,
+        IUnitOfWork unitOfWork
     )
     {
         _userRepository = userRepository;
         _userTokenRepository = userTokenRepository;
         _tokenGenerator = tokenGenerator;
         _dateTimeProvider = dateTimeProvider;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -64,6 +67,10 @@ public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordComman
         var expiresAt = _dateTimeProvider.UtcNow.AddHours(1);
         var userToken = new UserToken(user.Id, tokenString, TokenTypes.PasswordReset, expiresAt);
         await _userTokenRepository.AddAsync(userToken, cancellationToken);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         // TODO: Enviar url con el token al correo electrónico del usuario para que pueda restablecer su contraseña.
         // algo tipo: https://frontend/reset-password?token=abc123

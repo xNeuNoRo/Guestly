@@ -15,14 +15,17 @@ public class DeletePropertyCommandHandler : IRequestHandler<DeletePropertyComman
 {
     private readonly IPropertyRepository _propertyRepository;
     private readonly IImageUploadService _imageUploadService;
+    private readonly IUnitOfWork _unitOfWork;
 
     public DeletePropertyCommandHandler(
         IPropertyRepository propertyRepository,
-        IImageUploadService imageUploadService
+        IImageUploadService imageUploadService,
+        IUnitOfWork unitOfWork
     )
     {
         _propertyRepository = propertyRepository;
         _imageUploadService = imageUploadService;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -72,6 +75,10 @@ public class DeletePropertyCommandHandler : IRequestHandler<DeletePropertyComman
 
         // Eliminar la propiedad
         _propertyRepository.Delete(property);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return true;
     }

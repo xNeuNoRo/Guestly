@@ -16,14 +16,17 @@ public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, AuthRespons
 {
     private readonly IUserRepository _userRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IUnitOfWork _unitOfWork;
 
     public AddRoleCommandHandler(
         IUserRepository userRepository,
-        IJwtTokenGenerator jwtTokenGenerator
+        IJwtTokenGenerator jwtTokenGenerator,
+        IUnitOfWork unitOfWork
     )
     {
         _userRepository = userRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -62,6 +65,11 @@ public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, AuthRespons
         }
 
         _userRepository.Update(user);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
+
         var newToken = _jwtTokenGenerator.GenerateToken(user);
         var response = user.Adapt<AuthResponse>();
 

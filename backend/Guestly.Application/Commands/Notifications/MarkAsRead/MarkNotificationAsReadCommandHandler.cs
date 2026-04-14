@@ -13,14 +13,17 @@ public class MarkNotificationAsReadCommandHandler
 {
     private readonly INotificationRepository _notificationRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IUnitOfWork _unitOfWork;
 
     public MarkNotificationAsReadCommandHandler(
         INotificationRepository notificationRepository,
-        IDateTimeProvider dateTimeProvider
+        IDateTimeProvider dateTimeProvider,
+        IUnitOfWork unitOfWork
     )
     {
         _notificationRepository = notificationRepository;
         _dateTimeProvider = dateTimeProvider;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -54,6 +57,10 @@ public class MarkNotificationAsReadCommandHandler
 
         notification.MarkAsRead(_dateTimeProvider.UtcNow);
         _notificationRepository.Update(notification);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return true;
     }

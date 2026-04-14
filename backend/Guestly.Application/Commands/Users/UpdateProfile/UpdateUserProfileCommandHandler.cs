@@ -16,10 +16,12 @@ public class UpdateUserProfileCommandHandler
     : IRequestHandler<UpdateUserProfileCommand, UserProfileResponse>
 {
     private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateUserProfileCommandHandler(IUserRepository userRepository)
+    public UpdateUserProfileCommandHandler(IUserRepository userRepository, IUnitOfWork unitOfWork)
     {
         _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -38,6 +40,11 @@ public class UpdateUserProfileCommandHandler
 
         user.UpdateProfile(request.FirstName, request.LastName);
         _userRepository.Update(user);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
+
         return user.Adapt<UserProfileResponse>();
     }
 }

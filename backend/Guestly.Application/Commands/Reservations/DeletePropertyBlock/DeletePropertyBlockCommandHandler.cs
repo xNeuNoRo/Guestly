@@ -14,14 +14,17 @@ public class DeletePropertyBlockCommandHandler : IRequestHandler<DeletePropertyB
 {
     private readonly IPropertyBlockRepository _propertyBlockRepository;
     private readonly IPropertyRepository _propertyRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public DeletePropertyBlockCommandHandler(
         IPropertyBlockRepository propertyBlockRepository,
-        IPropertyRepository propertyRepository
+        IPropertyRepository propertyRepository,
+        IUnitOfWork unitOfWork
     )
     {
         _propertyBlockRepository = propertyBlockRepository;
         _propertyRepository = propertyRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -54,6 +57,10 @@ public class DeletePropertyBlockCommandHandler : IRequestHandler<DeletePropertyB
         }
 
         _propertyBlockRepository.Delete(block);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return true;
     }

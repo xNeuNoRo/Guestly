@@ -18,16 +18,19 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
     private readonly IPropertyRepository _propertyRepository;
     private readonly IUserRepository _userRepository;
     private readonly IImageUploadService _imageUploadService;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UpdatePropertyCommandHandler(
         IPropertyRepository propertyRepository,
         IUserRepository userRepository,
-        IImageUploadService imageUploadService
+        IImageUploadService imageUploadService,
+        IUnitOfWork unitOfWork
     )
     {
         _propertyRepository = propertyRepository;
         _userRepository = userRepository;
         _imageUploadService = imageUploadService;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -109,6 +112,10 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
 
         // Guardar los cambios en la propiedad
         _propertyRepository.Update(property);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         // Obtener los datos del host para incluirlos en la respuesta
         var host = await _userRepository.GetByIdAsync(property.HostId, cancellationToken);

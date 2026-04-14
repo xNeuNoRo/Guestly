@@ -18,16 +18,19 @@ public class UpdateReservationStatusCommandHandler
     private readonly IReservationRepository _reservationRepository;
     private readonly IPropertyRepository _propertyRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UpdateReservationStatusCommandHandler(
         IReservationRepository reservationRepository,
         IPropertyRepository propertyRepository,
-        IUserRepository userRepository
+        IUserRepository userRepository,
+        IUnitOfWork unitOfWork
     )
     {
         _reservationRepository = reservationRepository;
         _propertyRepository = propertyRepository;
         _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -97,6 +100,10 @@ public class UpdateReservationStatusCommandHandler
         }
 
         _reservationRepository.Update(reservation);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         var guest = await _userRepository.GetByIdAsync(reservation.GuestId, cancellationToken);
         var host = await _userRepository.GetByIdAsync(property!.HostId, cancellationToken);

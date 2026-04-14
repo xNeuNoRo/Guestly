@@ -16,16 +16,19 @@ public class UpdateReviewCommandHandler : IRequestHandler<UpdateReviewCommand, R
     private readonly IReviewRepository _reviewRepository;
     private readonly IPropertyRepository _propertyRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UpdateReviewCommandHandler(
         IReviewRepository reviewRepository,
         IPropertyRepository propertyRepository,
-        IUserRepository userRepository
+        IUserRepository userRepository,
+        IUnitOfWork unitOfWork
     )
     {
         _reviewRepository = reviewRepository;
         _propertyRepository = propertyRepository;
         _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -59,6 +62,10 @@ public class UpdateReviewCommandHandler : IRequestHandler<UpdateReviewCommand, R
         review.UpdateDetails(request.Rating, request.Comment);
 
         _reviewRepository.Update(review);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         var property = await _propertyRepository.GetByIdAsync(review.PropertyId, cancellationToken);
         var guest = await _userRepository.GetByIdAsync(review.GuestId, cancellationToken);

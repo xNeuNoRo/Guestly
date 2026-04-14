@@ -18,16 +18,19 @@ public class CreatePropertyBlockCommandHandler
     private readonly IPropertyRepository _propertyRepository;
     private readonly IReservationRepository _reservationRepository;
     private readonly IPropertyBlockRepository _propertyBlockRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreatePropertyBlockCommandHandler(
         IPropertyRepository propertyRepository,
         IReservationRepository reservationRepository,
-        IPropertyBlockRepository propertyBlockRepository
+        IPropertyBlockRepository propertyBlockRepository,
+        IUnitOfWork unitOfWork
     )
     {
         _propertyRepository = propertyRepository;
         _reservationRepository = reservationRepository;
         _propertyBlockRepository = propertyBlockRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -95,6 +98,10 @@ public class CreatePropertyBlockCommandHandler
         );
 
         await _propertyBlockRepository.AddAsync(block, cancellationToken);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return block.Adapt<PropertyBlockResponse>();
     }

@@ -19,16 +19,19 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, A
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IUnitOfWork _unitOfWork;
 
     public RegisterUserCommandHandler(
         IUserRepository userRepository,
         IPasswordHasher passwordHasher,
-        IJwtTokenGenerator jwtTokenGenerator
+        IJwtTokenGenerator jwtTokenGenerator,
+        IUnitOfWork unitOfWork
     )
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -68,6 +71,10 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, A
             request.Role
         );
         await _userRepository.AddAsync(user, cancellationToken);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync() 
+        // solamente si es que no detecta una transaccion activa
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         // Generamos el token JWT para el nuevo usuario
         var token = _jwtTokenGenerator.GenerateToken(user);
