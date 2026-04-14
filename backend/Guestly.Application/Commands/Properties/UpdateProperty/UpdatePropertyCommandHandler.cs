@@ -73,8 +73,24 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
         {
             foreach (var imageUrl in request.ImagesToDelete)
             {
-                await _imageUploadService.DeleteImageAsync(imageUrl, cancellationToken);
-                property.RemoveImage(imageUrl);
+                try
+                {
+                    var wasDeleted = await _imageUploadService.DeleteImageAsync(
+                        imageUrl,
+                        cancellationToken
+                    );
+                    if (!wasDeleted)
+                    {
+                        throw AppException.InternalServer(
+                            $"No se pudo eliminar la imagen: {imageUrl}"
+                        );
+                    }
+                    property.RemoveImage(imageUrl);
+                }
+                catch (Exception ex) when (ex is not AppException)
+                {
+                    throw AppException.InternalServer($"Error al eliminar la imagen: {imageUrl}.");
+                }
             }
         }
 
