@@ -16,6 +16,7 @@ public record UpdatePropertyCommand(
     string Description,
     string Location,
     decimal PricePerNight,
+    decimal CleaningFee,
     int Capacity,
     List<IFormFile>? Images,
     List<string>? ImagesToDelete

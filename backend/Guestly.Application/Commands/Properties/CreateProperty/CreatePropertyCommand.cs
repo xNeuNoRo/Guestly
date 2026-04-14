@@ -7,7 +7,7 @@ namespace Guestly.Application.Commands.Properties.CreateProperty;
 /// <summary>
 /// Comando para crear una nueva propiedad. Contiene toda la información necesaria
 /// para registrar una propiedad en el sistema, incluyendo detalles como el título,
-/// descripción, ubicación, precio por noche, capacidad y las imágenes asociadas a la propiedad.
+/// descripción, ubicación, precio por noche, tarifa de limpieza, capacidad y las imágenes asociadas a la propiedad.
 /// </summary>
 public record CreatePropertyCommand(
     Guid HostId,
@@ -15,6 +15,7 @@ public record CreatePropertyCommand(
     string Description,
     string Location,
     decimal PricePerNight,
+    decimal CleaningFee,
     int Capacity,
     List<IFormFile> Images
 ) : IRequest<PropertyResponse>;

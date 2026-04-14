@@ -4,7 +4,7 @@ namespace Guestly.Application.DTOs.Properties;
 
 /// <summary>
 /// Representa la solicitud para actualizar una propiedad existente en el sistema.
-/// Contiene información como el título, descripción, ubicación, precio por noche, capacidad
+/// Contiene información como el título, descripción, ubicación, precio por noche, tarifa de limpieza, capacidad
 /// y las imágenes asociadas a la propiedad. Además, permite especificar qué imágenes se desean eliminar de la propiedad
 /// </summary>
 public record UpdatePropertyRequest()
@@ -31,6 +31,12 @@ public record UpdatePropertyRequest()
     /// que especifica el costo de hospedarse en la propiedad por noche.
     /// </summary>
     public required decimal PricePerNight { get; init; }
+
+    /// <summary>
+    /// La tarifa de limpieza de la propiedad. Es un campo opcional que puede ser un monto fijo o un porcentaje del subtotal,
+    /// dependiendo de la política de la propiedad.
+    /// </summary>
+    public required decimal CleaningFee { get; init; }
 
     /// <summary>
     /// La capacidad de la propiedad. Es un campo obligatorio

@@ -33,6 +33,10 @@ public class UpdatePropertyRequestValidator : AbstractValidator<UpdatePropertyRe
             .GreaterThan(0)
             .WithMessage("El precio por noche debe ser un valor positivo.");
 
+        RuleFor(x => x.CleaningFee)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("La tarifa de limpieza no puede ser un valor negativo.");
+
         RuleFor(x => x.Capacity)
             .GreaterThan(0)
             .WithMessage("La capacidad debe ser de al menos 1 huésped.")

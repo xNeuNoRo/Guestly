@@ -60,6 +60,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             request.Description,
             request.Location,
             request.PricePerNight,
+            request.CleaningFee,
             request.Capacity,
             request.HostId
         );

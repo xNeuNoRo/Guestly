@@ -103,12 +103,23 @@ public class CreateReservationCommandHandler
                 );
             }
 
+            // Calculamos el precio total de la reserva en base a las fechas
+            // y el precio por noche de la propiedad, además de las tarifas adicionales
+            var totalNights = (request.EndDate.Date - request.StartDate.Date).Days;
+            var subtotal = totalNights * property.PricePerNight;
+            var cleaningFee = property.CleaningFee;
+            var serviceFee = Math.Round(subtotal * 0.10m, 2); // 10% de tarifa de servicio
+            var taxes = Math.Round((subtotal + cleaningFee + serviceFee) * 0.18m, 2); // 18% de impuestos (ITBIS)
+
             var reservation = new Reservation(
                 propertyId: request.PropertyId,
                 guestId: request.GuestId,
                 checkInDate: request.StartDate,
                 checkOutDate: request.EndDate,
                 propertyPricePerNight: property.PricePerNight,
+                cleaningFee,
+                serviceFee,
+                taxes,
                 currentTime: _dateTimeProvider.UtcNow
             );
 

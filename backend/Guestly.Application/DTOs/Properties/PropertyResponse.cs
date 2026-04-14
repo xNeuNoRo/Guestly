@@ -19,7 +19,7 @@ public record HostSummaryResponse()
 /// <summary>
 /// Representa la respuesta que se devuelve al cliente después de realizar operaciones relacionadas con las propiedades,
 /// como crear, actualizar o consultar una propiedad. Contiene información detallada sobre la propiedad,
-/// incluyendo su ID, título, descripción, ubicación, precio por noche, capacidad, ID del anfitrión
+/// incluyendo su ID, título, descripción, ubicación, precio por noche, tarifa de limpieza, capacidad, ID del anfitrión
 /// y las URLs de las imágenes asociadas a la propiedad.
 /// </summary>
 public record PropertyResponse()
@@ -51,6 +51,12 @@ public record PropertyResponse()
     /// que especifica el costo de hospedarse en la propiedad por noche.
     /// </summary>
     public required decimal PricePerNight { get; init; }
+
+    /// <summary>
+    /// La tarifa de limpieza de la propiedad. Es un campo opcional que puede ser un monto fijo o un porcentaje del subtotal,
+    /// dependiendo de la política de la propiedad.
+    /// </summary>
+    public required decimal CleaningFee { get; init; }
 
     /// <summary>
     /// La capacidad de la propiedad. Es un campo obligatorio

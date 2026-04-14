@@ -47,6 +47,21 @@ public class Reservation : BaseEntity
     public decimal PricePerNightAtBooking { get; private set; }
 
     /// <summary>
+    /// Tarifa de limpieza de la propiedad luego de la reserva, que es un campo opcional.
+    /// </summary>
+    public decimal CleaningFeeAtBooking { get; private set; }
+
+    /// <summary>
+    /// Tarifa de servicio de la propiedad luego de la reserva, que es un campo obligatorio (5% del subtotal).
+    /// </summary>
+    public decimal ServiceFeeAtBooking { get; private set; }
+
+    /// <summary>
+    /// Impuestos de la propiedad luego de la reserva, que es un campo obligatorio (18% de el precio calculado).
+    /// </summary>
+    public decimal TaxesAtBooking { get; private set; }
+
+    /// <summary>
     /// Precio total de la reserva, que es un campo obligatorio y debe ser mayor que cero.
     /// Se calcula multiplicando el número de noches por el precio por noche de la propiedad reservada.
     /// </summary>
@@ -81,6 +96,9 @@ public class Reservation : BaseEntity
         DateTime checkInDate,
         DateTime checkOutDate,
         decimal propertyPricePerNight,
+        decimal cleaningFee,
+        decimal serviceFee,
+        decimal taxes,
         DateTime currentTime
     )
     {
@@ -91,9 +109,17 @@ public class Reservation : BaseEntity
         CheckInDate = checkInDate.Date;
         CheckOutDate = checkOutDate.Date;
         PricePerNightAtBooking = propertyPricePerNight;
+        CleaningFeeAtBooking = cleaningFee;
+        ServiceFeeAtBooking = serviceFee;
+        TaxesAtBooking = taxes;
+
+        int nights = (checkOutDate.Date - checkInDate.Date).Days;
         TotalPrice = CalculateTotalPrice(
-            (checkOutDate.Date - checkInDate.Date).Days,
-            propertyPricePerNight
+            nights,
+            propertyPricePerNight,
+            cleaningFee,
+            serviceFee,
+            taxes
         );
         Status = ReservationStatus.Pending;
     }
@@ -141,10 +167,19 @@ public class Reservation : BaseEntity
     /// </summary>
     /// <param name="totalDays">El número de días de la reserva.</param>
     /// <param name="pricePerNight">El precio por noche de la propiedad.</param>
+    /// <param name="cleaning">La tarifa de limpieza de la propiedad.</param>
+    /// <param name="service">La tarifa de servicio de la propiedad.</param>
+    /// <param name="taxes">Los impuestos (ITBIS)</param>
     /// <returns>El precio total de la reserva.</returns>
-    private static decimal CalculateTotalPrice(int totalDays, decimal pricePerNight)
+    private static decimal CalculateTotalPrice(
+        int totalDays,
+        decimal pricePerNight,
+        decimal cleaning,
+        decimal service,
+        decimal taxes
+    )
     {
-        return totalDays * pricePerNight;
+        return Math.Round((totalDays * pricePerNight) + cleaning + service + taxes, 2);
     }
 
     // ------------------------------------------------------

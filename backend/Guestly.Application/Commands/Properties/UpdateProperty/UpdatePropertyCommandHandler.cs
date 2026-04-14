@@ -64,6 +64,7 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
             request.Description,
             request.Location,
             request.PricePerNight,
+            request.CleaningFee,
             request.Capacity
         );
 

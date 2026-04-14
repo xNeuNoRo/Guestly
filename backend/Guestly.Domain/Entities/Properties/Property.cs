@@ -33,6 +33,12 @@ public class Property : BaseEntity
     public decimal PricePerNight { get; private set; }
 
     /// <summary>
+    /// Tarifa de limpieza para la propiedad, que es un campo opcional 
+    /// y puede ser un monto fijo o un porcentaje del subtotal, dependiendo de la política de la propiedad.
+    /// </summary>
+    public decimal CleaningFee { get; private set; }
+
+    /// <summary>
     /// Capacidad de la propiedad, que es un campo obligatorio y debe ser mayor que cero.
     /// </summary>
     public int Capacity { get; private set; }
@@ -106,6 +112,7 @@ public class Property : BaseEntity
     /// <param name="description">La descripción de la propiedad</param>
     /// <param name="location">La ubicación de la propiedad</param>
     /// <param name="pricePerNight">El precio por noche de la propiedad</param>
+    /// <param name="cleaningFee">La tarifa de limpieza de la propiedad</param>
     /// <param name="capacity">La capacidad de la propiedad</param>
     /// <param name="hostId">El identificador del anfitrión que posee la propiedad</param>
     public Property(
@@ -113,6 +120,7 @@ public class Property : BaseEntity
         string description,
         string location,
         decimal pricePerNight,
+        decimal cleaningFee,
         int capacity,
         Guid hostId
     )
@@ -123,6 +131,7 @@ public class Property : BaseEntity
         Description = description;
         Location = location;
         PricePerNight = pricePerNight;
+        CleaningFee = cleaningFee;
         Capacity = capacity;
         HostId = hostId;
     }
@@ -142,6 +151,7 @@ public class Property : BaseEntity
         string description,
         string location,
         decimal pricePerNight,
+        decimal cleaningFee,
         int capacity
     )
     {
@@ -151,6 +161,7 @@ public class Property : BaseEntity
         Description = description;
         Location = location;
         PricePerNight = pricePerNight;
+        CleaningFee = cleaningFee;
         Capacity = capacity;
     }
 
