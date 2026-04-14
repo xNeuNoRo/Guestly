@@ -72,6 +72,13 @@ public class GetReservationByIdQueryHandler
 
         var guestUser = await _userRepository.GetByIdAsync(reservation.GuestId, cancellationToken);
         var hostUser = await _userRepository.GetByIdAsync(property!.HostId, cancellationToken);
+        if (guestUser is null || hostUser is null)
+        {
+            throw AppException.NotFound(
+                "El huésped o el anfitrión asociado a esta reserva no existe.",
+                ErrorCodes.UserNotFound
+            );
+        }
 
         var response = reservation.Adapt<ReservationResponse>();
 
