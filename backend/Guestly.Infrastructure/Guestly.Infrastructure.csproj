@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
     <ProjectReference Include="..\Guestly.Application\Guestly.Application.csproj" />
     <ProjectReference Include="..\Guestly.Domain\Guestly.Domain.csproj" />
@@ -25,4 +24,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Copiamos las plantillas de correo al directorio de salida -->
+    <None Update="Templates\Emails\*.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
