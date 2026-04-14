@@ -76,9 +76,9 @@ public class User : BaseEntity
     /// <param name="role">El rol del usuario.</param>
     public User(string firstName, string lastName, string email, string password, UserRoles role)
     {
-        FirstName = firstName;
-        LastName = lastName;
-        Email = email;
+        FirstName = firstName.Trim();
+        LastName = lastName.Trim();
+        Email = email.Trim().ToLowerInvariant();
         Password = password;
         Role = role;
         IsEmailConfirmed = false;
@@ -113,7 +113,7 @@ public class User : BaseEntity
     /// <param name="newEmail">El nuevo correo electrónico del usuario.</param>
     public void UpdateEmail(string newEmail)
     {
-        Email = newEmail;
+        Email = newEmail.Trim().ToLowerInvariant();
         IsEmailConfirmed = false;
     }
 
@@ -134,8 +134,8 @@ public class User : BaseEntity
     /// <param name="lastName">El nuevo apellido del usuario.</param>
     public void UpdateProfile(string firstName, string lastName)
     {
-        FirstName = firstName;
-        LastName = lastName;
+        FirstName = firstName.Trim();
+        LastName = lastName.Trim();
     }
 
     /// <summary>

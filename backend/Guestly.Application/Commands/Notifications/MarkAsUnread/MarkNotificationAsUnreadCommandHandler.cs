@@ -11,10 +11,15 @@ public class MarkNotificationAsUnreadCommandHandler
     : IRequestHandler<MarkNotificationAsUnreadCommand, bool>
 {
     private readonly INotificationRepository _notificationRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public MarkNotificationAsUnreadCommandHandler(INotificationRepository notificationRepository)
+    public MarkNotificationAsUnreadCommandHandler(
+        INotificationRepository notificationRepository,
+        IUnitOfWork unitOfWork
+    )
     {
         _notificationRepository = notificationRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -47,6 +52,10 @@ public class MarkNotificationAsUnreadCommandHandler
 
         notification.MarkAsUnread();
         _notificationRepository.Update(notification);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // siempre, de esa siempre se persisten los cambios.
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return true;
     }

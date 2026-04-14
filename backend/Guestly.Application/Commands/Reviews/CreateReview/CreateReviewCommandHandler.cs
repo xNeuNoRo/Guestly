@@ -23,18 +23,21 @@ public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, R
     private readonly IReservationRepository _reservationRepository;
     private readonly IPropertyRepository _propertyRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreateReviewCommandHandler(
         IReviewRepository reviewRepository,
         IReservationRepository reservationRepository,
         IPropertyRepository propertyRepository,
-        IUserRepository userRepository
+        IUserRepository userRepository,
+        IUnitOfWork unitOfWork
     )
     {
         _reviewRepository = reviewRepository;
         _reservationRepository = reservationRepository;
         _propertyRepository = propertyRepository;
         _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -106,6 +109,10 @@ public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, R
         );
 
         await _reviewRepository.AddAsync(review, cancellationToken);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // siempre, de esa siempre se persisten los cambios.
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         var property = await _propertyRepository.GetByIdAsync(
             request.PropertyId,

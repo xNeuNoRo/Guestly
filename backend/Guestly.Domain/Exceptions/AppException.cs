@@ -104,4 +104,15 @@ public class AppException : Exception
         string message,
         string code = ErrorCodes.InternalServerError
     ) => new(code, 500, message);
+
+    /// <summary>
+    /// Método estático para crear una excepción de tipo ExternalServiceError (502)
+    /// </summary>
+    /// <param name="message">Mensaje de error para la excepción</param>
+    /// <param name="code">Código de error específico de la aplicación</param>
+    /// <returns>Instancia de AppException</returns>
+    public static AppException ExternalServiceError(
+        string message,
+        string code = ErrorCodes.ExternalServiceError
+    ) => new(code, 502, message);
 }

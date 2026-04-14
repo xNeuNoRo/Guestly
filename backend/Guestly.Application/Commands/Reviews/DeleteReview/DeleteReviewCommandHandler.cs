@@ -11,10 +11,12 @@ namespace Guestly.Application.Commands.Reviews.DeleteReview;
 public class DeleteReviewCommandHandler : IRequestHandler<DeleteReviewCommand, bool>
 {
     private readonly IReviewRepository _reviewRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteReviewCommandHandler(IReviewRepository reviewRepository)
+    public DeleteReviewCommandHandler(IReviewRepository reviewRepository, IUnitOfWork unitOfWork)
     {
         _reviewRepository = reviewRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -37,6 +39,10 @@ public class DeleteReviewCommandHandler : IRequestHandler<DeleteReviewCommand, b
         }
 
         _reviewRepository.Delete(review);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // siempre, de esa siempre se persisten los cambios.
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return true;
     }

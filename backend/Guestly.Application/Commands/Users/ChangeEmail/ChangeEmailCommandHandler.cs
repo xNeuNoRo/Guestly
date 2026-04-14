@@ -22,13 +22,15 @@ public class ChangeEmailCommandHandler : IRequestHandler<ChangeEmailCommand, boo
     private readonly IPasswordHasher _passwordHasher;
     private readonly IRandomTokenGenerator _tokenGenerator;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IUnitOfWork _unitOfWork;
 
     public ChangeEmailCommandHandler(
         IUserRepository userRepository,
         IUserTokenRepository userTokenRepository,
         IPasswordHasher passwordHasher,
         IRandomTokenGenerator tokenGenerator,
-        IDateTimeProvider dateTimeProvider
+        IDateTimeProvider dateTimeProvider,
+        IUnitOfWork unitOfWork
     )
     {
         _userRepository = userRepository;
@@ -36,6 +38,7 @@ public class ChangeEmailCommandHandler : IRequestHandler<ChangeEmailCommand, boo
         _passwordHasher = passwordHasher;
         _tokenGenerator = tokenGenerator;
         _dateTimeProvider = dateTimeProvider;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -96,6 +99,10 @@ public class ChangeEmailCommandHandler : IRequestHandler<ChangeEmailCommand, boo
         await _userTokenRepository.AddAsync(userToken, cancellationToken);
 
         _userRepository.Update(user);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // siempre, de esa siempre se persisten los cambios.
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         // TODO: Enviar correo de confirmación al nuevo correo electrónico con el token generado
 

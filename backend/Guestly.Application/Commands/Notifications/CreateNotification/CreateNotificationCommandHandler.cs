@@ -17,14 +17,17 @@ public class CreateNotificationCommandHandler
 {
     private readonly INotificationRepository _notificationRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreateNotificationCommandHandler(
         INotificationRepository notificationRepository,
-        IUserRepository userRepository
+        IUserRepository userRepository,
+        IUnitOfWork unitOfWork
     )
     {
         _notificationRepository = notificationRepository;
         _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -53,6 +56,10 @@ public class CreateNotificationCommandHandler
         );
 
         await _notificationRepository.AddAsync(notification, cancellationToken);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // siempre, de esa siempre se persisten los cambios.
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         var response = notification.Adapt<NotificationResponse>();
 

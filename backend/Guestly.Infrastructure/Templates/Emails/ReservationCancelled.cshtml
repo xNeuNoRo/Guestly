@@ -1,0 +1,87 @@
+@using Guestly.Application.Models.Emails
+@model ReservationCancelledModel
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancelación de Reserva - Guestly</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f0f4f8; color: #1a202c;">
+    
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+        
+        <tr>
+            <td align="center" style="padding: 50px 40px; background: #1e293b; background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);">
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="background-color: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 12px;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 800; letter-spacing: -1px; font-style: italic;">GUESTLY</h1>
+                        </td>
+                    </tr>
+                </table>
+                <p style="margin: 15px 0 0; color: #e2e8f0; font-size: 16px; font-weight: 400;">Actualización de tu Reserva</p>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 40px;">
+                <h2 style="margin: 0 0 10px; color: #0f172a; font-size: 24px; font-weight: 700;">Tu reserva ha sido cancelada</h2>
+                <p style="margin: 0 0 30px; line-height: 1.6; color: #64748b; font-size: 16px;">
+                    Hola, @Model.UserName. Te confirmamos que la reserva para <strong>@Model.PropertyTitle</strong> ha sido cancelada exitosamente y las fechas han sido liberadas.
+                </p>
+
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 20px; border: 1px solid #e2e8f0; margin-bottom: 30px;">
+                    <tr>
+                        <td style="padding: 25px;">
+                            <div style="display: inline-block; padding: 4px 12px; background-color: #fee2e2; color: #ef4444; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 15px;">Estado: Cancelado</div>
+                            <h3 style="margin: 0 0 5px; color: #1e293b; font-size: 18px; font-weight: 700;">@Model.PropertyTitle</h3>
+                            
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                                <tr>
+                                    <td width="50%">
+                                        <p style="margin: 0; color: #94a3b8; font-size: 11px; text-transform: uppercase; font-weight: 700;">Era para el:</p>
+                                        <p style="margin: 2px 0 0; color: #64748b; font-size: 14px;">
+                                            @Model.CheckInDate.ToString("dd MMM") - @Model.CheckOutDate.ToString("dd MMM, yyyy")
+                                        </p>
+                                    </td>
+                                    <td width="50%">
+                                        <p style="margin: 0; color: #94a3b8; font-size: 11px; text-transform: uppercase; font-weight: 700;">ID de Reserva:</p>
+                                        <p style="margin: 2px 0 0; color: #64748b; font-size: 14px; font-family: monospace;">@Model.ReservationId</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <div style="padding: 20px; background-color: #f1f5f9; border-radius: 12px; margin-bottom: 30px;">
+                    <p style="margin: 0; color: #475569; font-size: 14px; line-height: 1.6;">
+                        Si esta cancelación conlleva un reembolso según las políticas del alojamiento, verás el movimiento reflejado en tu cuenta en los próximos días.
+                    </p>
+                </div>
+
+                <table align="center" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td align="center" style="border-radius: 14px; border: 2px solid #7c3aed;">
+                            <a href="https://guestly.com/explore" target="_blank" style="padding: 16px 35px; display: inline-block; font-size: 15px; font-weight: 700; color: #7c3aed; text-decoration: none; border-radius: 14px;">
+                                Buscar otro alojamiento
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 40px; background-color: #f8fafc; text-align: center;">
+                <p style="margin: 0 0 8px; color: #94a3b8; font-size: 12px;">&copy; @DateTime.Now.Year Guestly Inc. • Tu seguridad es nuestra prioridad.</p>
+                <p style="margin: 0; color: #cbd5e1; font-size: 11px;">
+                    ¿No solicitaste esta cancelación? <a href="#" style="color: #4f46e5; text-decoration: none; font-weight: 600;">Contacta con soporte</a>.
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

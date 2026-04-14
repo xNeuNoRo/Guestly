@@ -16,16 +16,19 @@ public class ConfirmEmailCommandHandler : IRequestHandler<ConfirmEmailCommand, b
     private readonly IUserRepository _userRepository;
     private readonly IUserTokenRepository _userTokenRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IUnitOfWork _unitOfWork;
 
     public ConfirmEmailCommandHandler(
         IUserRepository userRepository,
         IUserTokenRepository userTokenRepository,
-        IDateTimeProvider dateTimeProvider
+        IDateTimeProvider dateTimeProvider,
+        IUnitOfWork unitOfWork  
     )
     {
         _userRepository = userRepository;
         _userTokenRepository = userTokenRepository;
         _dateTimeProvider = dateTimeProvider;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -69,6 +72,10 @@ public class ConfirmEmailCommandHandler : IRequestHandler<ConfirmEmailCommand, b
         user.ConfirmEmail();
         userToken.Revoke(currentTime);
         _userRepository.Update(user);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // siempre, de esa siempre se persisten los cambios.
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         // Aqui solo revocamos el token en memoria ya que EF Core lo persistira luego
         // Con el metodo SaveChangesAync que se llamara al final de la transaccion.

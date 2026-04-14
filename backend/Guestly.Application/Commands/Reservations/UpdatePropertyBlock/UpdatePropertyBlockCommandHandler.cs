@@ -20,16 +20,19 @@ public class UpdatePropertyBlockCommandHandler
     private readonly IPropertyBlockRepository _propertyBlockRepository;
     private readonly IPropertyRepository _propertyRepository;
     private readonly IReservationRepository _reservationRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UpdatePropertyBlockCommandHandler(
         IPropertyBlockRepository propertyBlockRepository,
         IPropertyRepository propertyRepository,
-        IReservationRepository reservationRepository
+        IReservationRepository reservationRepository,
+        IUnitOfWork unitOfWork
     )
     {
         _propertyBlockRepository = propertyBlockRepository;
         _propertyRepository = propertyRepository;
         _reservationRepository = reservationRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -91,6 +94,10 @@ public class UpdatePropertyBlockCommandHandler
         block.Update(request.StartDate, request.EndDate, request.Reason);
 
         _propertyBlockRepository.Update(block);
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // siempre, de esa siempre se persisten los cambios.
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return block.Adapt<PropertyBlockResponse>();
     }

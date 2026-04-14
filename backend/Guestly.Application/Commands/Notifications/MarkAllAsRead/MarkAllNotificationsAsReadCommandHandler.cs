@@ -12,14 +12,17 @@ public class MarkAllNotificationsAsReadCommandHandler
 {
     private readonly INotificationRepository _notificationRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IUnitOfWork _unitOfWork;
 
     public MarkAllNotificationsAsReadCommandHandler(
         INotificationRepository notificationRepository,
-        IDateTimeProvider dateTimeProvider
+        IDateTimeProvider dateTimeProvider,
+        IUnitOfWork unitOfWork
     )
     {
         _notificationRepository = notificationRepository;
         _dateTimeProvider = dateTimeProvider;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -48,6 +51,10 @@ public class MarkAllNotificationsAsReadCommandHandler
             notification.MarkAsRead(now);
             _notificationRepository.Update(notification);
         }
+
+        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+        // siempre, de esa siempre se persisten los cambios.
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         return true;
     }

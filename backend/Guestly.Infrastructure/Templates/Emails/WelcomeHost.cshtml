@@ -1,0 +1,74 @@
+@using Guestly.Application.Models.Emails
+@model WelcomeHostModel
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido como Anfitrión - Guestly</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f0f4f8; color: #1a202c;">
+    
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+        
+        <tr>
+            <td align="center" style="padding: 60px 40px; background: #1e293b; background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);">
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="background-color: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 12px;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 800; letter-spacing: -1px; font-style: italic;">GUESTLY</h1>
+                        </td>
+                    </tr>
+                </table>
+                <p style="margin: 20px 0 0; color: #e2e8f0; font-size: 20px; font-weight: 600;">¡Es oficial, eres Anfitrión!</p>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 50px 40px;">
+                <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 28px; font-weight: 700; line-height: 1.2;">¡Felicidades, @Model.FirstName! 🎊</h2>
+                <p style="margin: 0 0 30px; line-height: 1.7; color: #475569; font-size: 17px;">
+                    Estamos encantados de que hayas decidido dar el siguiente paso. Ahora formas parte de nuestra comunidad exclusiva de anfitriones, donde podrás compartir tus espacios y generar ingresos extraordinarios.
+                </p>
+
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border-radius: 16px; margin-bottom: 35px; border: 1px solid #e2e8f0;">
+                    <tr>
+                        <td style="padding: 25px;">
+                            <h3 style="margin: 0 0 15px; color: #1e293b; font-size: 16px; font-weight: 700;">¿Qué sigue ahora?</h3>
+                            <ul style="margin: 0; padding: 0 0 0 20px; color: #64748b; font-size: 14px; line-height: 1.8;">
+                                <li>Publica tu primera propiedad en minutos.</li>
+                                <li>Gestiona tus reservas desde un panel profesional.</li>
+                                <li>Recibe pagos seguros directamente en tu cuenta.</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                
+                <p style="margin: 0 0 30px; line-height: 1.7; color: #475569; font-size: 16px;">
+                    Tu panel de control ya está activo. Accede ahora para completar tu perfil de anfitrión y empezar a recibir huéspedes de todo el mundo.
+                </p>
+
+                <table align="center" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td align="center" style="border-radius: 14px;" bgcolor="#7c3aed">
+                            <a href="@Model.DashboardLink" target="_blank" style="padding: 18px 45px; display: inline-block; font-size: 16px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 14px; letter-spacing: 0.5px;">
+                                Ir a mi Panel de Anfitrión
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 40px; background-color: #f8fafc; text-align: center;">
+                <p style="margin: 0 0 8px; color: #94a3b8; font-size: 12px;">&copy; @DateTime.Now.Year Guestly Inc. • Haz que cada estancia cuente.</p>
+                <p style="margin: 0; color: #cbd5e1; font-size: 11px;">
+                    ¿Necesitas consejos para empezar? <a href="#" style="color: #4f46e5; text-decoration: none; font-weight: 600;">Lee nuestra guía para anfitriones</a>.
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
