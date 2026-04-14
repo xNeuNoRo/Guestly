@@ -58,7 +58,7 @@ public class CreateNotificationCommandHandler
         await _notificationRepository.AddAsync(notification, cancellationToken);
 
         // UnitOfWork es inteligente y llamara a SaveChangesAsync()
-        // solamente si es que no detecta una transaccion activa
+        // siempre, de esa siempre se persisten los cambios.
         await _unitOfWork.CommitAsync(cancellationToken);
 
         var response = notification.Adapt<NotificationResponse>();

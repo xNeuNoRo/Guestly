@@ -64,7 +64,7 @@ public class UpdateReviewCommandHandler : IRequestHandler<UpdateReviewCommand, R
         _reviewRepository.Update(review);
 
         // UnitOfWork es inteligente y llamara a SaveChangesAsync()
-        // solamente si es que no detecta una transaccion activa
+        // siempre, de esa siempre se persisten los cambios.
         await _unitOfWork.CommitAsync(cancellationToken);
 
         var property = await _propertyRepository.GetByIdAsync(review.PropertyId, cancellationToken);

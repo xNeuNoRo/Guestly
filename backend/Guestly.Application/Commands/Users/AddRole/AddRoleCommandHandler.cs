@@ -67,7 +67,7 @@ public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, AuthRespons
         _userRepository.Update(user);
 
         // UnitOfWork es inteligente y llamara a SaveChangesAsync()
-        // solamente si es que no detecta una transaccion activa
+        // siempre, de esa siempre se persisten los cambios.
         await _unitOfWork.CommitAsync(cancellationToken);
 
         var newToken = _jwtTokenGenerator.GenerateToken(user);

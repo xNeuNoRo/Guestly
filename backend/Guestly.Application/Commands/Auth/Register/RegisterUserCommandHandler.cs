@@ -73,7 +73,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, A
         await _userRepository.AddAsync(user, cancellationToken);
 
         // UnitOfWork es inteligente y llamara a SaveChangesAsync() 
-        // solamente si es que no detecta una transaccion activa
+        // siempre, de esa siempre se persisten los cambios.
         await _unitOfWork.CommitAsync(cancellationToken);
 
         // Generamos el token JWT para el nuevo usuario

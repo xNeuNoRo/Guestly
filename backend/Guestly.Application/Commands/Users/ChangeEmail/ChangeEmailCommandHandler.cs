@@ -101,7 +101,7 @@ public class ChangeEmailCommandHandler : IRequestHandler<ChangeEmailCommand, boo
         _userRepository.Update(user);
 
         // UnitOfWork es inteligente y llamara a SaveChangesAsync()
-        // solamente si es que no detecta una transaccion activa
+        // siempre, de esa siempre se persisten los cambios.
         await _unitOfWork.CommitAsync(cancellationToken);
 
         // TODO: Enviar correo de confirmación al nuevo correo electrónico con el token generado

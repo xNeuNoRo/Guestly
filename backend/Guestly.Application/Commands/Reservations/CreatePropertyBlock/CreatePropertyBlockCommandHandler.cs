@@ -100,7 +100,7 @@ public class CreatePropertyBlockCommandHandler
         await _propertyBlockRepository.AddAsync(block, cancellationToken);
 
         // UnitOfWork es inteligente y llamara a SaveChangesAsync()
-        // solamente si es que no detecta una transaccion activa
+        // siempre, de esa siempre se persisten los cambios.
         await _unitOfWork.CommitAsync(cancellationToken);
 
         return block.Adapt<PropertyBlockResponse>();
