@@ -9,4 +9,4 @@ public record ReservationCancelledModel(
     DateTime CheckInDate,
     DateTime CheckOutDate,
     string ReservationId
-);
+) : IEmailModel;

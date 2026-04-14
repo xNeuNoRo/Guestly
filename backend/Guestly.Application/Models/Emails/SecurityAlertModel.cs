@@ -7,4 +7,4 @@ public record SecurityAlertModel(
     string FirstName,
     string ActionPerformed, // Ej: "cambio de contraseña" o "cambio de correo"
     string Date // Fecha y hora del evento
-);
+) : IEmailModel;

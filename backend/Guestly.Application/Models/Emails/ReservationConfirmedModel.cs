@@ -13,4 +13,4 @@ public record ReservationConfirmedModel(
     decimal TotalPrice,
     string HostName,
     string PropertyImageUrl // Para darle un toque visual al correo
-);
+) : IEmailModel;

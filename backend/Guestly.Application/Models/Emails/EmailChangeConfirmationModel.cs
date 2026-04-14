@@ -7,4 +7,4 @@ public record EmailChangeConfirmationModel(
     string FirstName,
     string NewEmail,
     string ConfirmationLink
-);
+) : IEmailModel;
