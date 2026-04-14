@@ -39,11 +39,13 @@ public class PropertyConfiguration : IEntityTypeConfiguration<Property>
             .Metadata.SetValueComparer(
                 // El ValueComparer le dice a EF Core cómo comparar dos colecciones de imágenes para detectar cambios.
                 new ValueComparer<IReadOnlyCollection<string>>(
-                    // Comparar dos colecciones de imágenes verificando que tengan el mismo contenido (ignorando el orden)
-                    (c1, c2) => c1!.SequenceEqual(c2!),
-                    // Generar un hash code para la colección de imágenes combinando los hash codes de cada URL
-                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                    // Clonar la colección de imágenes para evitar problemas de referencia al comparar
+                    // Comparar dos colecciones de imágenes ordenándolas y verificando si son iguales (ignora el orden original)
+                    (c1, c2) => c1!.OrderBy(x => x).SequenceEqual(c2!.OrderBy(x => x)),
+                    // Generar un hash code para la colección de imágenes ordenándola y combinando los hash codes de las URLs
+                    c =>
+                        c.OrderBy(x => x)
+                            .Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    // Clonar la colección de imágenes creando una nueva lista con las mismas URLs
                     c => c.ToList()
                 )
             );
