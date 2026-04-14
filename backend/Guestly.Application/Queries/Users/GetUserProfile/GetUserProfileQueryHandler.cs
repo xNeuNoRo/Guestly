@@ -27,7 +27,7 @@ public class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery, U
         CancellationToken cancellationToken
     )
     {
-        var user = await _userRepository.GetByIdAsync(request.UserId);
+        var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
         if (user is null)
         {
             throw AppException.NotFound(

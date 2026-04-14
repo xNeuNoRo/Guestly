@@ -33,8 +33,7 @@ public class Property : BaseEntity
     public decimal PricePerNight { get; private set; }
 
     /// <summary>
-    /// Tarifa de limpieza para la propiedad, que es un campo opcional
-    /// y puede ser un monto fijo o un porcentaje del subtotal, dependiendo de la política de la propiedad.
+    /// Tarifa de limpieza para la propiedad, que es un campo obligatorio
     /// </summary>
     public decimal CleaningFee { get; private set; }
 
