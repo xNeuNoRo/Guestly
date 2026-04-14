@@ -72,6 +72,7 @@ public class CreatePropertyBlockCommandHandler
             request.PropertyId,
             request.StartDate,
             request.EndDate,
+            null,
             cancellationToken
         );
 

@@ -1,4 +1,3 @@
-using Guestly.Application.Commands.Properties.Search;
 using Guestly.Application.DTOs.Properties;
 using Guestly.Application.Interfaces.Repositories;
 using Mapster;

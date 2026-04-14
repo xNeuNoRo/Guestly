@@ -108,7 +108,7 @@ public class CreateReservationCommandHandler
             var totalNights = (request.EndDate.Date - request.StartDate.Date).Days;
             var subtotal = totalNights * property.PricePerNight;
             var cleaningFee = property.CleaningFee;
-            var serviceFee = Math.Round(subtotal * 0.10m, 2); // 10% de tarifa de servicio
+            var serviceFee = Math.Round(subtotal * 0.05m, 2); // 5% de tarifa de servicio
             var taxes = Math.Round((subtotal + cleaningFee + serviceFee) * 0.18m, 2); // 18% de impuestos (ITBIS)
 
             var reservation = new Reservation(

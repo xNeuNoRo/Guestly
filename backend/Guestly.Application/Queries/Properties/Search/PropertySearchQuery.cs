@@ -1,7 +1,7 @@
 using Guestly.Application.DTOs.Properties;
 using MediatR;
 
-namespace Guestly.Application.Commands.Properties.Search;
+namespace Guestly.Application.Queries.Properties.Search;
 
 /// <summary>
 /// Registro que representa una consulta para buscar propiedades en la aplicación, con parámetros opcionales
