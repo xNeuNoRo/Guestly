@@ -102,7 +102,7 @@ public class Reservation : BaseEntity
         DateTime currentTime
     )
     {
-        ValidateReservation(propertyPricePerNight, checkInDate, checkOutDate, currentTime);
+        ValidateReservation(propertyPricePerNight, cleaningFee, serviceFee, taxes, checkInDate, checkOutDate, currentTime);
 
         PropertyId = propertyId;
         GuestId = guestId;
@@ -128,12 +128,19 @@ public class Reservation : BaseEntity
     /// Método privado para validar las fechas de la reserva, asegurándose de que la
     /// fecha de salida sea posterior a la fecha de entrada y que la fecha de entrada no sea anterior a la fecha actual.
     /// </summary>
+    /// <param name="propertyPricePerNight">El precio por noche de la propiedad.</param>
+    /// <param name="cleaningFee">La tarifa de limpieza de la propiedad.</param>
+    /// <param name="serviceFee">La tarifa de servicio de la propiedad.</param>
+    /// <param name="taxes">Los impuestos de la propiedad.</param>
     /// <param name="checkInDate">La fecha de entrada a la propiedad.</param>
     /// <param name="checkOutDate">La fecha de salida de la propiedad.</param>
     /// <param name="currentTime">La fecha y hora actuales.</param>
     /// <exception cref="DomainException">Se lanza cuando las fechas de la reserva no son válidas.</exception>
     private static void ValidateReservation(
         decimal propertyPricePerNight,
+        decimal cleaningFee,
+        decimal serviceFee,
+        decimal taxes,
         DateTime checkInDate,
         DateTime checkOutDate,
         DateTime currentTime
@@ -144,6 +151,21 @@ public class Reservation : BaseEntity
             throw new DomainException(
                 "El precio por noche de la propiedad debe ser mayor que cero."
             );
+        }
+
+        if (cleaningFee < 0)
+        {
+            throw new DomainException("La tarifa de limpieza no puede ser negativa.");
+        }
+
+        if (serviceFee < 0)
+        {
+            throw new DomainException("La tarifa de servicio no puede ser negativa.");
+        }
+
+        if (taxes < 0)
+        {
+            throw new DomainException("Los impuestos no pueden ser negativos.");
         }
 
         if (checkInDate.Date >= checkOutDate.Date)

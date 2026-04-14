@@ -17,7 +17,7 @@ public interface IReviewRepository
         CancellationToken cancellationToken = default
     );
 
-    // Valida si ya existe una reseña para una reserva específica antes de craar una nueva
+    // Valida si ya existe una reseña para una reserva específica antes de crear una nueva
     Task<bool> ExistsByReservationIdAsync(
         Guid reservationId,
         CancellationToken cancellationToken = default

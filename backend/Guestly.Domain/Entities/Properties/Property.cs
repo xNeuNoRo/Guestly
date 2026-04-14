@@ -33,7 +33,7 @@ public class Property : BaseEntity
     public decimal PricePerNight { get; private set; }
 
     /// <summary>
-    /// Tarifa de limpieza para la propiedad, que es un campo opcional 
+    /// Tarifa de limpieza para la propiedad, que es un campo opcional
     /// y puede ser un monto fijo o un porcentaje del subtotal, dependiendo de la política de la propiedad.
     /// </summary>
     public decimal CleaningFee { get; private set; }
@@ -125,7 +125,7 @@ public class Property : BaseEntity
         Guid hostId
     )
     {
-        ValidateProperty(pricePerNight, capacity);
+        ValidateProperty(pricePerNight, cleaningFee, capacity);
 
         Title = title;
         Description = description;
@@ -155,7 +155,7 @@ public class Property : BaseEntity
         int capacity
     )
     {
-        ValidateProperty(pricePerNight, capacity);
+        ValidateProperty(pricePerNight, cleaningFee, capacity);
 
         Title = title;
         Description = description;
@@ -171,12 +171,20 @@ public class Property : BaseEntity
     /// DomainException si alguna de las validaciones falla.
     /// </summary>
     /// <param name="pricePerNight">El precio por noche de la propiedad</param>
+    /// <param name="cleaningFee">La tarifa de limpieza de la propiedad</param>
     /// <param name="capacity">La capacidad de la propiedad</param>
     /// <exception cref="DomainException">Se lanza cuando el precio por noche o la capacidad no son válidos.</exception>
-    private static void ValidateProperty(decimal pricePerNight, int capacity)
+    private static void ValidateProperty(
+        decimal pricePerNight,
+        decimal cleaningFee,
+        decimal capacity
+    )
     {
         if (pricePerNight <= 0)
             throw new DomainException("El precio por noche debe ser mayor que cero.");
+
+        if (cleaningFee < 0)
+            throw new DomainException("La tarifa de limpieza no puede ser negativa.");
 
         if (capacity <= 0)
             throw new DomainException("La capacidad debe ser mayor que cero.");

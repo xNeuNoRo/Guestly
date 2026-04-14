@@ -3,7 +3,7 @@ using Guestly.Domain.Enums;
 namespace Guestly.Application.DTOs.Notifications;
 
 /// <summary>
-/// Respresenta la respuesta de una notificación, con propiedades como el identificador de la notificación,
+/// Representa la respuesta de una notificación, con propiedades como el identificador de la notificación,
 /// el identificador del usuario al que va dirigida la notificación, el título y mensaje de
 /// la notificación, el tipo de notificación, si la notificación ha sido leída o no, 
 /// la fecha de creación y la fecha de lectura (si aplica).
