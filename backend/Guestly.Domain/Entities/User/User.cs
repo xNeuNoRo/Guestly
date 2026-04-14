@@ -113,7 +113,7 @@ public class User : BaseEntity
     /// <param name="newEmail">El nuevo correo electrónico del usuario.</param>
     public void UpdateEmail(string newEmail)
     {
-        Email = newEmail;
+        Email = newEmail.Trim().ToLowerInvariant();
         IsEmailConfirmed = false;
     }
 
@@ -134,8 +134,8 @@ public class User : BaseEntity
     /// <param name="lastName">El nuevo apellido del usuario.</param>
     public void UpdateProfile(string firstName, string lastName)
     {
-        FirstName = firstName;
-        LastName = lastName;
+        FirstName = firstName.Trim();
+        LastName = lastName.Trim();
     }
 
     /// <summary>
