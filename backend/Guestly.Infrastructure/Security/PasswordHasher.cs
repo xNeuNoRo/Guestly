@@ -49,22 +49,31 @@ public class PasswordHasher : IPasswordHasher
     /// <returns>True si la contraseña es correcta, false en caso contrario.</returns>
     public bool VerifyPassword(string password, string hashedPassword)
     {
-        // Separamos el salt y el hash del string almacenado
-        var parts = hashedPassword.Split(':');
+        try
+        {
+            // Separamos el salt y el hash del string almacenado
+            var parts = hashedPassword.Split(':');
 
-        // Si el formato no es correcto, devolvemos false
-        if (parts.Length != 2)
+            // Si el formato no es correcto, devolvemos false
+            if (parts.Length != 2)
+                return false;
+
+            // Convertimos el salt y el hash de base64 a byte arrays
+            // Si las cadenas no son Base64 válido, Convert lanzará FormatException
+            var salt = Convert.FromBase64String(parts[0]);
+            var expectedHash = Convert.FromBase64String(parts[1]);
+
+            // Generamos el hash de la contraseña proporcionada utilizando el mismo salt
+            var actualHash = GenerateHash(password, salt);
+
+            // Comparamos los hashes utilizando una comparación segura para evitar ataques de timing
+            return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
+        }
+        catch (FormatException)
+        {
+            // Si el formato Base64 está corrupto o es inválido, retornamos false
             return false;
-
-        // Convertimos el salt y el hash de base64 a byte arrays
-        var salt = Convert.FromBase64String(parts[0]);
-        var expectedHash = Convert.FromBase64String(parts[1]);
-
-        // Generamos el hash de la contraseña proporcionada utilizando el mismo salt
-        var actualHash = GenerateHash(password, salt);
-
-        // Comparamos los hashes utilizando una comparación segura para evitar ataques de timing
-        return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
+        }
     }
 
     /// <summary>
