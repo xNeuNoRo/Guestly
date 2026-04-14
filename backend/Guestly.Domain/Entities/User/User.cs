@@ -76,9 +76,9 @@ public class User : BaseEntity
     /// <param name="role">El rol del usuario.</param>
     public User(string firstName, string lastName, string email, string password, UserRoles role)
     {
-        FirstName = firstName;
-        LastName = lastName;
-        Email = email;
+        FirstName = firstName.Trim();
+        LastName = lastName.Trim();
+        Email = email.Trim().ToLowerInvariant();
         Password = password;
         Role = role;
         IsEmailConfirmed = false;
