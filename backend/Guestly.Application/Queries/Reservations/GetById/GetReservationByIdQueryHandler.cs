@@ -51,6 +51,13 @@ public class GetReservationByIdQueryHandler
             reservation.PropertyId,
             cancellationToken
         );
+        if (property is null)
+        {
+            throw AppException.NotFound(
+                "La propiedad asociada a esta reserva no existe.",
+                ErrorCodes.PropertyNotFound
+            );
+        }
 
         bool isHost = property != null && property.HostId == request.UserId;
         bool isGuest = reservation.GuestId == request.UserId;
