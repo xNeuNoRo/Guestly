@@ -80,31 +80,12 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     }
 
     /// <summary>
-    /// Libera los recursos utilizados por la transacción actual y el contexto de la base de datos.
+    /// Libera los recursos utilizados por la transacción actual.
     /// </summary>
     public void Dispose()
     {
-        Dispose(true);
+        DisposeTransaction();
         GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Implementa el patrón de disposición estándar de .NET.
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            DisposeTransaction();
-        }
-    }
-
-    /// <summary>
-    /// Finalizador para asegurar que los recursos de la transacción se liberen incluso si Dispose no es llamado explícitamente.
-    /// </summary>
-    ~UnitOfWork()
-    {
-        Dispose(false);
     }
 
     /// <summary>
