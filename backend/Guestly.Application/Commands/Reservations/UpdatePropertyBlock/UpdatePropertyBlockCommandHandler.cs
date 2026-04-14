@@ -14,14 +14,14 @@ namespace Guestly.Application.Commands.Reservations.UpdatePropertyBlock;
 /// en un objeto de respuesta adaptado a PropertyBlockResponse, utilizando el repositorio de bloques de fechas,
 /// el repositorio de propiedades y el repositorio de reservas para realizar las operaciones necesarias en la base de datos.
 /// </summary>
-public class UpdatePropertyCommandHandler
+public class UpdatePropertyBlockCommandHandler
     : IRequestHandler<UpdatePropertyBlockCommand, PropertyBlockResponse>
 {
     private readonly IPropertyBlockRepository _propertyBlockRepository;
     private readonly IPropertyRepository _propertyRepository;
     private readonly IReservationRepository _reservationRepository;
 
-    public UpdatePropertyCommandHandler(
+    public UpdatePropertyBlockCommandHandler(
         IPropertyBlockRepository propertyBlockRepository,
         IPropertyRepository propertyRepository,
         IReservationRepository reservationRepository
