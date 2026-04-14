@@ -112,6 +112,13 @@ public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, R
             cancellationToken
         );
         var guest = await _userRepository.GetByIdAsync(request.GuestId, cancellationToken);
+        if (property is null || guest is null)
+        {
+            throw AppException.NotFound(
+                "No se pudo encontrar la propiedad o el huésped asociado a esta reseña.",
+                ErrorCodes.NotFound
+            );
+        }
 
         var response = review.Adapt<ReviewResponse>();
 
