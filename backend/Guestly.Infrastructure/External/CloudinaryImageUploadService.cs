@@ -111,23 +111,41 @@ public class CloudinaryImageUploadService : IImageUploadService
         if (uploadIndex == -1)
             return string.Empty;
 
-        // Obtenemos lo que está después de "upload/"
+        // Obtenemos los segmentos después de "upload/" para filtrar transformaciones y versiones
         string afterUpload = imageUrl.Substring(uploadIndex + 7);
+        string[] segments = afterUpload.Split('/');
 
-        // Eliminamos la versión si existe (ej. "v1612345678/")
-        int slashIndex = afterUpload.IndexOf('/');
-        if (afterUpload.StartsWith('v') && slashIndex >= 0)
+        // El PublicId comienza después del segmento de versión (v12345...) o transformaciones
+        int startIndex = 0;
+        for (int i = 0; i < segments.Length; i++)
         {
-            afterUpload = afterUpload.Substring(slashIndex + 1);
+            // Si detectamos el segmento de versión (v + números), el PublicId empieza justo después
+            if (
+                segments[i].StartsWith('v')
+                && segments[i].Length > 1
+                && long.TryParse(segments[i].Substring(1), out _)
+            )
+            {
+                startIndex = i + 1;
+                break;
+            }
         }
+
+        // Unimos los segmentos restantes (por si hay carpetas como 'guestly-properties/...')
+        string publicIdWithExtension = string.Join(
+            "/",
+            segments,
+            startIndex,
+            segments.Length - startIndex
+        );
 
         // Eliminamos la extensión del archivo (".jpg", ".png")
-        int lastDotIndex = afterUpload.LastIndexOf('.');
+        int lastDotIndex = publicIdWithExtension.LastIndexOf('.');
         if (lastDotIndex != -1)
         {
-            afterUpload = afterUpload.Substring(0, lastDotIndex);
+            publicIdWithExtension = publicIdWithExtension.Substring(0, lastDotIndex);
         }
 
-        return afterUpload;
+        return publicIdWithExtension;
     }
 }
