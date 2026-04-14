@@ -126,7 +126,21 @@ public class CreateReservationCommandHandler
             await _reservationRepository.AddAsync(reservation, cancellationToken);
 
             var guest = await _userRepository.GetByIdAsync(request.GuestId, cancellationToken);
+            if (guest is null)
+            {
+                throw AppException.NotFound(
+                    "No se pudo encontrar tu perfil.",
+                    ErrorCodes.UserNotFound
+                );
+            }
             var host = await _userRepository.GetByIdAsync(property.HostId, cancellationToken);
+            if (host is null)
+            {
+                throw AppException.NotFound(
+                    "No se pudo encontrar el perfil del anfitrión asociado a esta propiedad.",
+                    ErrorCodes.UserNotFound
+                );
+            }
 
             await _unitOfWork.CommitAsync(cancellationToken);
 

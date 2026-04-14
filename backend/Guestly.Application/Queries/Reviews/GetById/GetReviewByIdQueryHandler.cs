@@ -31,7 +31,7 @@ public class GetReviewByIdQueryHandler : IRequestHandler<GetReviewByIdQuery, Rev
         CancellationToken cancellationToken
     )
     {
-        var review = await _reviewRepository.GetByIdAsync(request.ReviewId);
+        var review = await _reviewRepository.GetByIdAsync(request.ReviewId, cancellationToken);
         if (review is null)
         {
             throw AppException.NotFound("La reseña no existe.", ErrorCodes.ReviewNotFound);
