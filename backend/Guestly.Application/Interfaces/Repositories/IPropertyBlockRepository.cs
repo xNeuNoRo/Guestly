@@ -5,6 +5,12 @@ namespace Guestly.Application.Interfaces.Repositories;
 public interface IPropertyBlockRepository
 {
     Task<PropertyBlock?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<IEnumerable<PropertyBlock>> GetOverlappingBlocksAsync(
+        Guid propertyId,
+        DateTime startDate,
+        DateTime endDate,
+        CancellationToken cancellationToken = default
+    );
     Task<IEnumerable<PropertyBlock>> GetUpcomingBlocksByPropertyIdAsync(
         Guid propertyId,
         CancellationToken cancellationToken = default

@@ -6,6 +6,12 @@ namespace Guestly.Application.Interfaces.Repositories;
 public interface IReservationRepository
 {
     Task<Reservation?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Reservation>> GetOverlappingReservationsAsync(
+        Guid propertyId,
+        DateTime startDate,
+        DateTime endDate,
+        CancellationToken cancellationToken = default
+    );
     Task<IEnumerable<Reservation>> SearchAsync(
         Guid? propertyId,
         Guid? guestId,
