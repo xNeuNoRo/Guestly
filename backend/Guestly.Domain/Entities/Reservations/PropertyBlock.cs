@@ -79,8 +79,8 @@ public class PropertyBlock : BaseEntity
     {
         ValidateBlock(startDate, endDate);
 
-        StartDate = startDate;
-        EndDate = endDate;
+        StartDate = startDate.Date;
+        EndDate = endDate.Date;
         Reason = reason;
     }
 
