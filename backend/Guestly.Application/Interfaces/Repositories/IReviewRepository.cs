@@ -6,6 +6,11 @@ public interface IReviewRepository
 {
     Task<Review?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
+    Task<IEnumerable<Review>> GetByUserIdAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default
+    );
+
     // Obtiene todas las reseñas asociadas a una propiedad específica
     Task<IEnumerable<Review>> GetByPropertyIdAsync(
         Guid propertyId,
