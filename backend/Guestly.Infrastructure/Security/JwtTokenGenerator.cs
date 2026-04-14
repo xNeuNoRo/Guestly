@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -53,7 +54,14 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
         // Fallback de Expiración 7 días en minutos (60 * 24 * 7)
         var expiryMinutesString = _configuration["JwtSettings:ExpiryMinutes"] ?? "10080";
-        if (!double.TryParse(expiryMinutesString, out var expiryMinutes))
+        if (
+            !int.TryParse(
+                expiryMinutesString,
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out int expiryMinutes
+            )
+        )
         {
             expiryMinutes = 10080; // Default a 7 días si el string es inválido
         }
