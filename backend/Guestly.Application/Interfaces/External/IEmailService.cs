@@ -1,3 +1,4 @@
+using Guestly.Application.Models.Emails;
 using Guestly.Domain.Enums;
 
 namespace Guestly.Application.Interfaces.External;
@@ -23,5 +24,6 @@ public interface IEmailService
         EmailTemplate template,
         T model,
         CancellationToken cancellationToken = default
-    );
+    )
+        where T : IEmailModel;
 }
