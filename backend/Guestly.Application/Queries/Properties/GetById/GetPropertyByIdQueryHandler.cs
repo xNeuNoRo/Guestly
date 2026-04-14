@@ -41,6 +41,14 @@ public class GetPropertyByIdQueryHandler : IRequestHandler<GetPropertyByIdQuery,
         }
 
         var host = await _userRepository.GetByIdAsync(property.HostId, cancellationToken);
+        if (host is null)
+        {
+            throw AppException.NotFound(
+                "No se encontró el anfitrión asociado a esta propiedad.",
+                ErrorCodes.UserNotFound
+            );
+        }
+
         double averageRating = 0.0;
         int totalReviews = property.Reviews.Count;
 
