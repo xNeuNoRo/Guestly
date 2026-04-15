@@ -66,6 +66,8 @@ public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordComman
             return true;
         }
 
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
         try
         {
             await _userTokenRepository.RemoveExistingTokensAsync(
