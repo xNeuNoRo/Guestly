@@ -2,6 +2,7 @@ using Guestly.Application.DTOs.Reservations;
 using Guestly.Application.Interfaces.External;
 using Guestly.Application.Interfaces.Repositories;
 using Guestly.Application.Models.Emails;
+using Guestly.Domain.Entities.Notifications;
 using Guestly.Domain.Enums;
 using Guestly.Domain.Exceptions;
 using Mapster;
@@ -20,6 +21,7 @@ public class UpdateReservationStatusCommandHandler
     private readonly IReservationRepository _reservationRepository;
     private readonly IPropertyRepository _propertyRepository;
     private readonly IUserRepository _userRepository;
+    private readonly INotificationRepository _notificationRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailService _emailService;
 
@@ -27,6 +29,7 @@ public class UpdateReservationStatusCommandHandler
         IReservationRepository reservationRepository,
         IPropertyRepository propertyRepository,
         IUserRepository userRepository,
+        INotificationRepository notificationRepository,
         IUnitOfWork unitOfWork,
         IEmailService emailService
     )
@@ -34,6 +37,7 @@ public class UpdateReservationStatusCommandHandler
         _reservationRepository = reservationRepository;
         _propertyRepository = propertyRepository;
         _userRepository = userRepository;
+        _notificationRepository = notificationRepository;
         _unitOfWork = unitOfWork;
         _emailService = emailService;
     }
@@ -121,6 +125,39 @@ public class UpdateReservationStatusCommandHandler
 
             _reservationRepository.Update(reservation);
 
+            // Creamos una notificación para el usuario afectado por el cambio de estado
+            Notification? appNotification = null;
+
+            // Si la reserva es confirmada, notificamos al huésped.
+            if (request.NewStatus == ReservationStatus.Confirmed)
+            {
+                appNotification = new Notification(
+                    userId: guest.Id,
+                    title: "Reserva Confirmada",
+                    message: $"¡Buenas noticias! Tu reserva en '{property.Title}' ha sido confirmada por el anfitrión.",
+                    type: NotificationTypes.ReservationConfirmed
+                );
+            }
+            // Si el host cancela, notificamos al guest. Si el guest cancela, notificamos al host.
+            else if (request.NewStatus == ReservationStatus.Cancelled)
+            {
+                var targetUserId = isHost ? guest.Id : host.Id;
+                var cancellerName = isHost ? "El anfitrión" : "El huésped";
+
+                appNotification = new Notification(
+                    userId: targetUserId,
+                    title: "Reserva Cancelada",
+                    message: $"{cancellerName} ha cancelado la reserva para '{property.Title}'.",
+                    type: NotificationTypes.ReservationCancelled
+                );
+            }
+
+            // Solo agregamos la notificación si se ha creado una (es decir, si el estado es confirmado o cancelado)
+            if (appNotification != null)
+            {
+                await _notificationRepository.AddAsync(appNotification, cancellationToken);
+            }
+
             // UnitOfWork es inteligente y llamara a SaveChangesAsync()
             // siempre, de esa siempre se persisten los cambios.
             await _unitOfWork.CommitAsync(cancellationToken);
@@ -136,8 +173,7 @@ public class UpdateReservationStatusCommandHandler
                     ReservationId: reservation.Id.ToString(),
                     TotalPrice: reservation.TotalPrice,
                     HostName: host.FirstName,
-                    PropertyImageUrl: property.Images.FirstOrDefault()
-                        ?? "placeholder-img" // TODO: Cambiar por una imagen por defecto adecuada para propiedades sin imágenes
+                    PropertyImageUrl: property.Images.FirstOrDefault() ?? "placeholder-img" // TODO: Cambiar por una imagen por defecto adecuada para propiedades sin imágenes
                 );
 
                 await _emailService.SendTemplateEmailAsync(
