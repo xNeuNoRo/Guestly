@@ -1,10 +1,13 @@
+using Guestly.Application.Interfaces.External;
 using Guestly.Application.Interfaces.Repositories;
 using Guestly.Application.Interfaces.Security;
+using Guestly.Application.Models.Emails;
 using Guestly.Domain.Entities.User;
 using Guestly.Domain.Enums;
 using Guestly.Domain.Exceptions;
 using Guestly.Domain.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 
 namespace Guestly.Application.Commands.Users.ChangeEmail;
 
@@ -23,6 +26,8 @@ public class ChangeEmailCommandHandler : IRequestHandler<ChangeEmailCommand, boo
     private readonly IRandomTokenGenerator _tokenGenerator;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
 
     public ChangeEmailCommandHandler(
         IUserRepository userRepository,
@@ -30,7 +35,9 @@ public class ChangeEmailCommandHandler : IRequestHandler<ChangeEmailCommand, boo
         IPasswordHasher passwordHasher,
         IRandomTokenGenerator tokenGenerator,
         IDateTimeProvider dateTimeProvider,
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        IEmailService emailService,
+        IConfiguration configuration
     )
     {
         _userRepository = userRepository;
@@ -39,6 +46,8 @@ public class ChangeEmailCommandHandler : IRequestHandler<ChangeEmailCommand, boo
         _tokenGenerator = tokenGenerator;
         _dateTimeProvider = dateTimeProvider;
         _unitOfWork = unitOfWork;
+        _emailService = emailService;
+        _configuration = configuration;
     }
 
     /// <summary>
@@ -79,33 +88,59 @@ public class ChangeEmailCommandHandler : IRequestHandler<ChangeEmailCommand, boo
             );
         }
 
-        user.UpdateEmail(request.NewEmail);
-        await _userTokenRepository.RemoveExistingTokensAsync(
-            user.Id,
-            TokenTypes.EmailConfirmation,
-            cancellationToken
-        );
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        // Generar un nuevo token de confirmación de correo electrónico para el nuevo correo
-        var tokenString = _tokenGenerator.Generate();
-        var expiresAt = _dateTimeProvider.UtcNow.AddHours(24);
+        try
+        {
+            user.UpdateEmail(request.NewEmail);
+            await _userTokenRepository.RemoveExistingTokensAsync(
+                user.Id,
+                TokenTypes.EmailConfirmation,
+                cancellationToken
+            );
 
-        var userToken = new UserToken(
-            user.Id,
-            tokenString,
-            TokenTypes.EmailConfirmation,
-            expiresAt
-        );
-        await _userTokenRepository.AddAsync(userToken, cancellationToken);
+            // Generar un nuevo token de confirmación de correo electrónico para el nuevo correo
+            var tokenString = _tokenGenerator.Generate();
+            var expiresAt = _dateTimeProvider.UtcNow.AddHours(24);
 
-        _userRepository.Update(user);
+            var userToken = new UserToken(
+                user.Id,
+                tokenString,
+                TokenTypes.EmailConfirmation,
+                expiresAt
+            );
+            await _userTokenRepository.AddAsync(userToken, cancellationToken);
 
-        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
-        // siempre, de esa siempre se persisten los cambios.
-        await _unitOfWork.CommitAsync(cancellationToken);
+            _userRepository.Update(user);
 
-        // TODO: Enviar correo de confirmación al nuevo correo electrónico con el token generado
+            // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+            // siempre, de esa siempre se persisten los cambios.
+            await _unitOfWork.CommitAsync(cancellationToken);
 
-        return true;
+            var baseUrl = _configuration["FrontendSettings:BaseUrl"] ?? "http://localhost:3000";
+            var confirmationLink =
+                $"{baseUrl}/auth/confirm-email?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(tokenString)}";
+
+            var emailModel = new EmailChangeConfirmationModel(
+                user.FirstName,
+                request.NewEmail,
+                confirmationLink
+            );
+
+            await _emailService.SendTemplateEmailAsync(
+                user.Email, // user.Email ya tiene el nuevo valor por user.UpdateEmail()
+                "Confirma tu nuevo correo electrónico - Guestly",
+                EmailTemplate.EmailChangeConfirmation,
+                emailModel,
+                cancellationToken
+            );
+
+            return true;
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 }

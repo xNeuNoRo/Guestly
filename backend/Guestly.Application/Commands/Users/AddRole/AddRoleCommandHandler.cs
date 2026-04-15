@@ -1,10 +1,13 @@
 using Guestly.Application.DTOs.Auth;
+using Guestly.Application.Interfaces.External;
 using Guestly.Application.Interfaces.Repositories;
 using Guestly.Application.Interfaces.Security;
+using Guestly.Application.Models.Emails;
 using Guestly.Domain.Enums;
 using Guestly.Domain.Exceptions;
 using Mapster;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 
 namespace Guestly.Application.Commands.Users.AddRole;
 
@@ -17,16 +20,22 @@ public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, AuthRespons
     private readonly IUserRepository _userRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
 
     public AddRoleCommandHandler(
         IUserRepository userRepository,
         IJwtTokenGenerator jwtTokenGenerator,
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        IEmailService emailService,
+        IConfiguration configuration
     )
     {
         _userRepository = userRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
         _unitOfWork = unitOfWork;
+        _emailService = emailService;
+        _configuration = configuration;
     }
 
     /// <summary>
@@ -45,6 +54,8 @@ public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, AuthRespons
             throw AppException.NotFound("Usuario no encontrado.", ErrorCodes.UserNotFound);
         }
 
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
         try
         {
             switch (request.RoleToAdd)
@@ -58,24 +69,45 @@ public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, AuthRespons
                 default:
                     throw AppException.BadRequest("Rol no válido para esta operación.");
             }
+
+            _userRepository.Update(user);
+
+            // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+            // siempre, de esa siempre se persisten los cambios.
+            await _unitOfWork.CommitAsync(cancellationToken);
+
+            if (request.RoleToAdd == UserRoles.Host)
+            {
+                var baseUrl = _configuration["FrontendSettings:BaseUrl"] ?? "http://localhost:3000";
+                var dashboardLink = $"{baseUrl}/host/dashboard";
+                var emailModel = new WelcomeHostModel(user.FirstName, dashboardLink);
+
+                await _emailService.SendTemplateEmailAsync(
+                    user.Email,
+                    "¡Bienvenido a la comunidad de Anfitriones de Guestly!",
+                    EmailTemplate.WelcomeHost,
+                    emailModel,
+                    cancellationToken
+                );
+            }
+
+            var newToken = _jwtTokenGenerator.GenerateToken(user);
+            var response = user.Adapt<AuthResponse>();
+
+            return response with
+            {
+                Token = newToken,
+            };
         }
         catch (DomainException ex)
         {
+            await _unitOfWork.RollbackAsync(cancellationToken);
             throw AppException.BadRequest(ex.Message, "ROLE_ALREADY_ASSIGNED");
         }
-
-        _userRepository.Update(user);
-
-        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
-        // siempre, de esa siempre se persisten los cambios.
-        await _unitOfWork.CommitAsync(cancellationToken);
-
-        var newToken = _jwtTokenGenerator.GenerateToken(user);
-        var response = user.Adapt<AuthResponse>();
-
-        return response with
+        catch (Exception)
         {
-            Token = newToken,
-        };
+            await _unitOfWork.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 }
