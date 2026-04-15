@@ -1,8 +1,11 @@
+using Guestly.Application.Interfaces.External;
 using Guestly.Application.Interfaces.Repositories;
+using Guestly.Application.Models.Emails;
 using Guestly.Domain.Enums;
 using Guestly.Domain.Exceptions;
 using Guestly.Domain.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 
 namespace Guestly.Application.Commands.Auth.ConfirmEmail;
 
@@ -17,18 +20,24 @@ public class ConfirmEmailCommandHandler : IRequestHandler<ConfirmEmailCommand, b
     private readonly IUserTokenRepository _userTokenRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
 
     public ConfirmEmailCommandHandler(
         IUserRepository userRepository,
         IUserTokenRepository userTokenRepository,
         IDateTimeProvider dateTimeProvider,
-        IUnitOfWork unitOfWork  
+        IUnitOfWork unitOfWork,
+        IEmailService emailService,
+        IConfiguration configuration
     )
     {
         _userRepository = userRepository;
         _userTokenRepository = userTokenRepository;
         _dateTimeProvider = dateTimeProvider;
         _unitOfWork = unitOfWork;
+        _emailService = emailService;
+        _configuration = configuration;
     }
 
     /// <summary>
@@ -69,17 +78,38 @@ public class ConfirmEmailCommandHandler : IRequestHandler<ConfirmEmailCommand, b
             );
         }
 
-        user.ConfirmEmail();
-        userToken.Revoke(currentTime);
-        _userRepository.Update(user);
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
-        // siempre, de esa siempre se persisten los cambios.
-        await _unitOfWork.CommitAsync(cancellationToken);
+        try
+        {
+            user.ConfirmEmail();
+            userToken.Revoke(currentTime);
+            _userRepository.Update(user);
 
-        // Aqui solo revocamos el token en memoria ya que EF Core lo persistira luego
-        // Con el metodo SaveChangesAync que se llamara al final de la transaccion.
+            // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+            // siempre, de esa siempre se persisten los cambios.
+            await _unitOfWork.CommitAsync(cancellationToken);
 
-        return true;
+            if (user.Role.HasFlag(UserRoles.Host))
+            {
+                var baseUrl = _configuration["FrontendSettings:BaseUrl"] ?? "http://localhost:3000";
+                var dashboardLink = $"{baseUrl}/host/dashboard";
+                var welcomeHostModel = new WelcomeHostModel(user.FirstName, dashboardLink);
+
+                await _emailService.SendTemplateEmailAsync(
+                    user.Email,
+                    "¡Bienvenido a la comunidad de Anfitriones!",
+                    EmailTemplate.WelcomeHost,
+                    welcomeHostModel,
+                    cancellationToken
+                );
+            }
+            return true;
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 }
