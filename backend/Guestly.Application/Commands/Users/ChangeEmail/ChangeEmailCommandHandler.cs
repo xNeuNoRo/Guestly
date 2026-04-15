@@ -92,6 +92,9 @@ public class ChangeEmailCommandHandler : IRequestHandler<ChangeEmailCommand, boo
 
         try
         {
+            var oldEmail = user.Email;
+            var actionDate = _dateTimeProvider.UtcNow.ToString("dd MMM yyyy, HH:mm") + " UTC";
+
             user.UpdateEmail(request.NewEmail);
             await _userTokenRepository.RemoveExistingTokensAsync(
                 user.Id,
@@ -116,6 +119,20 @@ public class ChangeEmailCommandHandler : IRequestHandler<ChangeEmailCommand, boo
             // UnitOfWork es inteligente y llamara a SaveChangesAsync()
             // siempre, de esa siempre se persisten los cambios.
             await _unitOfWork.CommitAsync(cancellationToken);
+
+            var alertModel = new SecurityAlertModel(
+                user.FirstName,
+                $"Se ha modificado el correo de tu cuenta. El nuevo correo asociado es: {request.NewEmail}.",
+                actionDate
+            );
+
+            await _emailService.SendTemplateEmailAsync(
+                oldEmail, 
+                "Alerta de Seguridad: Cambio de correo electrónico",
+                EmailTemplate.SecurityAlert,
+                alertModel,
+                cancellationToken
+            );
 
             var baseUrl = _configuration["FrontendSettings:BaseUrl"] ?? "http://localhost:3000";
             var confirmationLink =
