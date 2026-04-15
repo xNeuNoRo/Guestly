@@ -1,6 +1,8 @@
 using Guestly.Application.DTOs.Reservations;
 using Guestly.Application.Interfaces.Repositories;
+using Guestly.Domain.Entities.Notifications;
 using Guestly.Domain.Entities.Reservations;
+using Guestly.Domain.Enums;
 using Guestly.Domain.Exceptions;
 using Guestly.Domain.Interfaces;
 using Guestly.Domain.ValueObjects;
@@ -21,6 +23,7 @@ public class CreateReservationCommandHandler
     private readonly IReservationRepository _reservationRepository;
     private readonly IPropertyBlockRepository _propertyBlockRepository;
     private readonly IUserRepository _userRepository;
+    private readonly INotificationRepository _notificationRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IDateTimeProvider _dateTimeProvider;
 
@@ -29,6 +32,7 @@ public class CreateReservationCommandHandler
         IReservationRepository reservationRepository,
         IPropertyBlockRepository propertyBlockRepository,
         IUserRepository userRepository,
+        INotificationRepository notificationRepository,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider
     )
@@ -37,6 +41,7 @@ public class CreateReservationCommandHandler
         _reservationRepository = reservationRepository;
         _propertyBlockRepository = propertyBlockRepository;
         _userRepository = userRepository;
+        _notificationRepository = notificationRepository;
         _unitOfWork = unitOfWork;
         _dateTimeProvider = dateTimeProvider;
     }
@@ -141,6 +146,14 @@ public class CreateReservationCommandHandler
                     ErrorCodes.UserNotFound
                 );
             }
+
+            var notification = new Notification(
+                userId: host.Id,
+                title: "¡Nueva solicitud de reserva!",
+                message: $"{guest.FirstName} {guest.LastName} ha reservado tu propiedad '{property.Title}' del {request.StartDate:dd MMM} al {request.EndDate:dd MMM yyyy}.",
+                type: NotificationTypes.ReservationRequested
+            );
+            await _notificationRepository.AddAsync(notification, cancellationToken);
 
             await _unitOfWork.CommitAsync(cancellationToken);
 
