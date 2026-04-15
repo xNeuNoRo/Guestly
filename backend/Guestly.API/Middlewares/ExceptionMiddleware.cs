@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Guestly.Domain.Common;
 using Guestly.Domain.Exceptions;
 
@@ -89,6 +90,9 @@ public class ExceptionMiddleware
         var message = "Ha ocurrido un error inesperado en el servidor.";
         string errorCode = ErrorCodes.InternalServerError;
 
+        // Diccionario para almacenar los errores de validación por campo, si la excepción es de tipo ValidationException
+        IReadOnlyDictionary<string, string[]>? validationErrors = null;
+
         // Pero, si la excepción es una AppException, podemos extraer el código de error y el mensaje específico
         if (exception is AppException appEx)
         {
@@ -106,6 +110,16 @@ public class ExceptionMiddleware
                 statusCode
             );
         }
+        else if (exception is ValidationException valEx)
+        {
+            // Si es una excepción de validación lanzada por FluentValidation en el Behavior
+            statusCode = (int)HttpStatusCode.BadRequest;
+            message = "Uno o más campos tienen errores de validación.";
+            errorCode = ErrorCodes.ValidationError;
+            validationErrors = valEx
+                .Errors.GroupBy(e => e.PropertyName, e => e.ErrorMessage)
+                .ToDictionary(g => g.Key, g => g.ToArray());
+        }
         else
         {
             // Si es cualquier otra excepción no controlada, la loggeamos como un error crítico,
@@ -119,8 +133,13 @@ public class ExceptionMiddleware
         // Establecemos el código de estado HTTP en la respuesta
         context.Response.StatusCode = statusCode;
 
+        // Construimos un objeto ApiError con el código de error, mensaje y detalles de validación (si los hay)
+        var error = validationErrors is not null
+            ? new ApiError(errorCode, message, validationErrors)
+            : new ApiError(errorCode, message);
+
         // Creamos un objeto de respuesta con el formato definido en ApiResponse, indicando que la respuesta no fue exitosa y proporcionando el mensaje de error
-        var response = new ApiResponse<object>(errorCode, message);
+        var response = new ApiResponse<object>(error);
 
         // Configuramos la serializacion del JSON para usar camelCase en los nombres de las propiedades
         var options = new JsonSerializerOptions
