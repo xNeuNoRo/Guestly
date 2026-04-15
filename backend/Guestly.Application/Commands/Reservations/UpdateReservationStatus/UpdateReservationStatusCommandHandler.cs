@@ -186,8 +186,10 @@ public class UpdateReservationStatusCommandHandler
             }
             else if (request.NewStatus == ReservationStatus.Cancelled)
             {
+                var targetUser = isHost ? guest : host;
+
                 var cancelledModel = new ReservationCancelledModel(
-                    UserName: guest.FirstName,
+                    UserName: targetUser.FirstName,
                     PropertyTitle: property.Title,
                     CheckInDate: reservation.CheckInDate,
                     CheckOutDate: reservation.CheckOutDate,
@@ -195,7 +197,7 @@ public class UpdateReservationStatusCommandHandler
                 );
 
                 await _emailService.SendTemplateEmailAsync(
-                    guest.Email,
+                    targetUser.Email,
                     "Actualización: Tu reserva ha sido cancelada",
                     EmailTemplate.ReservationCancelled,
                     cancelledModel,
