@@ -1,5 +1,6 @@
 using Guestly.Application.DTOs.Reviews;
 using Guestly.Application.Interfaces.Repositories;
+using Guestly.Domain.Entities.Notifications;
 using Guestly.Domain.Entities.Reviews;
 using Guestly.Domain.Enums;
 using Guestly.Domain.Exceptions;
@@ -23,6 +24,7 @@ public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, R
     private readonly IReservationRepository _reservationRepository;
     private readonly IPropertyRepository _propertyRepository;
     private readonly IUserRepository _userRepository;
+    private readonly INotificationRepository _notificationRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateReviewCommandHandler(
@@ -30,6 +32,7 @@ public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, R
         IReservationRepository reservationRepository,
         IPropertyRepository propertyRepository,
         IUserRepository userRepository,
+        INotificationRepository notificationRepository,
         IUnitOfWork unitOfWork
     )
     {
@@ -37,6 +40,7 @@ public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, R
         _reservationRepository = reservationRepository;
         _propertyRepository = propertyRepository;
         _userRepository = userRepository;
+        _notificationRepository = notificationRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -100,20 +104,6 @@ public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, R
             );
         }
 
-        var review = new Review(
-            propertyId: request.PropertyId,
-            reservationId: request.ReservationId,
-            guestId: request.GuestId,
-            rating: request.Rating,
-            comment: request.Comment
-        );
-
-        await _reviewRepository.AddAsync(review, cancellationToken);
-
-        // UnitOfWork es inteligente y llamara a SaveChangesAsync()
-        // siempre, de esa siempre se persisten los cambios.
-        await _unitOfWork.CommitAsync(cancellationToken);
-
         var property = await _propertyRepository.GetByIdAsync(
             request.PropertyId,
             cancellationToken
@@ -127,12 +117,45 @@ public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, R
             );
         }
 
-        var response = review.Adapt<ReviewResponse>();
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        return response with
+        try
         {
-            PropertyTitle = property!.Title,
-            GuestFullName = $"{guest!.FirstName} {guest.LastName}",
-        };
+            // Crear la reseña y guardarla en el repositorio
+            var review = new Review(
+                propertyId: request.PropertyId,
+                reservationId: request.ReservationId,
+                guestId: request.GuestId,
+                rating: request.Rating,
+                comment: request.Comment
+            );
+            await _reviewRepository.AddAsync(review, cancellationToken);
+
+            // Crear una notificación para el anfitrión informándole que ha recibido una nueva reseña
+            var notification = new Notification(
+                userId: property.HostId,
+                title: "¡Nueva reseña recibida!",
+                message: $"{guest.FirstName} ha dejado una calificación de {request.Rating} estrellas para tu propiedad '{property.Title}'.",
+                type: NotificationTypes.System
+            );
+            await _notificationRepository.AddAsync(notification, cancellationToken);
+
+            // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+            // siempre, de esa siempre se persisten los cambios.
+            await _unitOfWork.CommitAsync(cancellationToken);
+
+            var response = review.Adapt<ReviewResponse>();
+
+            return response with
+            {
+                PropertyTitle = property!.Title,
+                GuestFullName = $"{guest!.FirstName} {guest.LastName}",
+            };
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 }

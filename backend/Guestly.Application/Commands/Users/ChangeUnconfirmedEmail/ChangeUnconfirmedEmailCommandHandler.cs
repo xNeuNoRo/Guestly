@@ -1,10 +1,13 @@
+using Guestly.Application.Interfaces.External;
 using Guestly.Application.Interfaces.Repositories;
 using Guestly.Application.Interfaces.Security;
+using Guestly.Application.Models.Emails;
 using Guestly.Domain.Entities.User;
 using Guestly.Domain.Enums;
 using Guestly.Domain.Exceptions;
 using Guestly.Domain.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 
 namespace Guestly.Application.Commands.Users.ChangeUnconfirmedEmail;
 
@@ -20,13 +23,17 @@ public class ChangeUnconfirmedEmailCommandHandler
     private readonly IRandomTokenGenerator _tokenGenerator;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
 
     public ChangeUnconfirmedEmailCommandHandler(
         IUserRepository userRepository,
         IUserTokenRepository userTokenRepository,
         IRandomTokenGenerator tokenGenerator,
         IDateTimeProvider dateTimeProvider,
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        IEmailService emailService,
+        IConfiguration configuration
     )
     {
         _userRepository = userRepository;
@@ -34,6 +41,8 @@ public class ChangeUnconfirmedEmailCommandHandler
         _tokenGenerator = tokenGenerator;
         _dateTimeProvider = dateTimeProvider;
         _unitOfWork = unitOfWork;
+        _emailService = emailService;
+        _configuration = configuration;
     }
 
     /// <summary>
@@ -95,7 +104,19 @@ public class ChangeUnconfirmedEmailCommandHandler
         // siempre, de esa siempre se persisten los cambios.
         await _unitOfWork.CommitAsync(cancellationToken);
 
-        // TODO: Enviar correo de confirmación al nuevo correo electrónico con el token generado
+        var baseUrl = _configuration["FrontendSettings:BaseUrl"] ?? "http://localhost:3000";
+        var confirmationLink =
+            $"{baseUrl}/auth/confirm-email?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(tokenString)}";
+
+        var emailModel = new ConfirmEmailModel(user.FirstName, confirmationLink);
+
+        await _emailService.SendTemplateEmailAsync(
+            user.Email,
+            "Confirma tu nuevo correo en Guestly",
+            EmailTemplate.EmailConfirmation,
+            emailModel,
+            cancellationToken
+        );
 
         return true;
     }
