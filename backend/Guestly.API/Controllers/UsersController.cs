@@ -139,7 +139,7 @@ public class UsersController : BaseApiController
     /// Obtiene el perfil público de cualquier usuario (generalmente usado para ver detalles de un Anfitrión).
     /// </summary>
     [AllowAnonymous]
-    [HttpGet("{guid:id}/public")]
+    [HttpGet("{id:guid}/public")]
     public async Task<IActionResult> GetPublicProfile(Guid id)
     {
         var query = new GetPublicProfileQuery(id);
