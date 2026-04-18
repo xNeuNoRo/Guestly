@@ -1,3 +1,4 @@
+@using System
 @using Guestly.Application.Models.Emails
 @model WelcomeHostModel
 
@@ -63,7 +64,7 @@
 
         <tr>
             <td style="padding: 40px; background-color: #f8fafc; text-align: center;">
-                <p style="margin: 0 0 8px; color: #94a3b8; font-size: 12px;">&copy; @DateTime.Now.Year Guestly Inc. • Haz que cada estancia cuente.</p>
+                <p style="margin: 0 0 8px; color: #94a3b8; font-size: 12px;">&copy; @System.DateTime.Now.Year Guestly Inc. • Haz que cada estancia cuente.</p>
                 <p style="margin: 0; color: #cbd5e1; font-size: 11px;">
                     ¿Necesitas consejos para empezar? <a href="#" style="color: #4f46e5; text-decoration: none; font-weight: 600;">Lee nuestra guía para anfitriones</a>.
                 </p>
