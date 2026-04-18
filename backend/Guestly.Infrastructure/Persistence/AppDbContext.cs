@@ -41,6 +41,7 @@ public class AppDbContext : DbContext
                 // Si la entidad es nueva (Added), asignamos la fecha de creación (CreatedAt) con la fecha y hora actual en UTC
                 case EntityState.Added:
                     entry.Entity.CreatedAt = _dateTimeProvider.UtcNow;
+                    entry.Entity.UpdatedAt = _dateTimeProvider.UtcNow; // También asignamos UpdatedAt para nuevas entidades
                     break;
                 // Si la entidad ha sido modificada (Modified), 
                 // asignamos la fecha de actualización (UpdatedAt) con la fecha y hora actual en UTC
