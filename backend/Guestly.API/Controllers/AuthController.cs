@@ -43,8 +43,8 @@ public class AuthController : BaseApiController
 
         var result = await _mediator.Send(command);
 
-        // Usamos CreatedSuccess para indicar que el recurso se creó correctamente
-        return CreatedSuccess(nameof(Register), new { }, result);
+        // Devuelve un 201 Created con la información del nuevo usuario registrado
+        return Created("api/v1/users/me", result);
     }
 
     /// <summary>
