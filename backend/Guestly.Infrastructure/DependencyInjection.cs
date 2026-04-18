@@ -71,6 +71,7 @@ public static class DependencyInjection
         var senderEmail = configuration["EmailSettings:SenderEmail"] ?? "noreply@guestly.com";
         var senderName = configuration["EmailSettings:SenderName"] ?? "Guestly";
 
+        var enableSsl = configuration["EmailSettings:EnableSsl"] == "true";
         var smtpHost = configuration["EmailSettings:SmtpHost"] ?? "localhost";
         var smtpPort = int.TryParse(configuration["EmailSettings:SmtpPort"], out int port)
             ? port
@@ -85,7 +86,7 @@ public static class DependencyInjection
                 new SmtpClient(smtpHost, smtpPort)
                 {
                     Credentials = new NetworkCredential(smtpUser, smtpPass),
-                    EnableSsl = true,
+                    EnableSsl = enableSsl,
                 }
             );
     }

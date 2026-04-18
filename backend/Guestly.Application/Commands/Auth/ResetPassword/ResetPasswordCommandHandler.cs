@@ -6,7 +6,6 @@ using Guestly.Domain.Enums;
 using Guestly.Domain.Exceptions;
 using Guestly.Domain.Interfaces;
 using MediatR;
-using Microsoft.Extensions.Configuration;
 
 namespace Guestly.Application.Commands.Auth.ResetPassword;
 
@@ -24,7 +23,6 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailService _emailService;
-    private readonly IConfiguration _configuration;
 
     public ResetPasswordCommandHandler(
         IUserRepository userRepository,
@@ -32,8 +30,7 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
         IPasswordHasher passwordHasher,
         IDateTimeProvider dateTimeProvider,
         IUnitOfWork unitOfWork,
-        IEmailService emailService,
-        IConfiguration configuration
+        IEmailService emailService
     )
     {
         _userRepository = userRepository;
@@ -42,7 +39,6 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
         _dateTimeProvider = dateTimeProvider;
         _unitOfWork = unitOfWork;
         _emailService = emailService;
-        _configuration = configuration;
     }
 
     /// <summary>
