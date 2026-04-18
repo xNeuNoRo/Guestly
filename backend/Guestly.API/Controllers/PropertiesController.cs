@@ -102,6 +102,7 @@ public class PropertiesController : BaseApiController
     /// </summary>
     [Authorize(Roles = "Host")] // Solo los usuarios con rol de Host pueden crear propiedades, y se utiliza multipart/form-data para manejar la carga de imágenes junto con los datos de la propiedad
     [HttpPost]
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> Create([FromForm] CreatePropertyRequest request)
     {
         var command = new CreatePropertyCommand(
@@ -127,6 +128,7 @@ public class PropertiesController : BaseApiController
     /// </summary>
     [Authorize(Roles = "Host")] // Solo los usuarios con rol de Host pueden actualizar propiedades, y se utiliza multipart/form-data para manejar la carga de imágenes junto con los datos de la propiedad
     [HttpPut("{id:guid}")]
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> Update(Guid id, [FromForm] UpdatePropertyRequest request)
     {
         var command = new UpdatePropertyCommand(

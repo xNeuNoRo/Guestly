@@ -85,7 +85,7 @@ public static class DependencyInjection
                 new SmtpClient(smtpHost, smtpPort)
                 {
                     Credentials = new NetworkCredential(smtpUser, smtpPass),
-                    EnableSsl = true,
+                    EnableSsl = smtpHost != "localhost",
                 }
             );
     }
