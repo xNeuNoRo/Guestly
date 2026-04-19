@@ -46,7 +46,7 @@ export function Providers({ children }: Readonly<ProvidersProps>) {
         duration={4000}
       />
 
-      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
     </QueryClientProvider>
   );
 }
