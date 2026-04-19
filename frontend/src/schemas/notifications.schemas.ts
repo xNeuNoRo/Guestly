@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 // --- Enums ---
-// Asegúrate de ajustar estos strings a los valores exactos que devuelve tu backend
 export const NotificationTypeSchema = z.enum([
   "System",
   "ReservationRequested",
