@@ -1,0 +1,1 @@
+export const AUTH_TOKEN_KEY = "GUESTLY_AUTH_TOKEN";
