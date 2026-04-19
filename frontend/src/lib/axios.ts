@@ -1,4 +1,4 @@
-import { AUTH_TOKEN_KEY } from "@/constants";
+import { useAppStore } from "@/stores/useAppStore";
 import axios from "axios";
 
 export const api = axios.create({
@@ -12,7 +12,7 @@ api.interceptors.request.use(
     if (globalThis.window !== undefined) {
       // Ya se que es inseguro guardar el token en el localStorage, pero lo considero una demo xd
       // En un proyecto real, se debería usar HttpOnly cookies para almacenar el token de forma segura y evitar vulnerabilidades XSS.
-      const token = localStorage.getItem(AUTH_TOKEN_KEY);
+      const token = useAppStore.getState().token;
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -35,7 +35,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       if (globalThis.window !== undefined) {
         // Limpiamos el token muerto
-        localStorage.removeItem(AUTH_TOKEN_KEY);
+        useAppStore.getState().logout();
 
         // Redirigimos al usuario al login forzosamente (evitando bucles de redirección)
         // Todavia pendiente esta logica hasta que decida su ruta
