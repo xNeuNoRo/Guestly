@@ -15,6 +15,7 @@ import {
   IoSettingsOutline,
   IoLogOutOutline,
   IoHomeOutline,
+  IoPersonOutline,
 } from "react-icons/io5";
 
 import { Avatar } from "@/components/shared/Avatar";
@@ -31,7 +32,6 @@ export function UserMenu() {
 
   if (!user) return null;
 
-  // Verificamos si el usuario tiene el rol de Anfitrión
   const isHost = user.role?.includes("Host");
   const fullName = `${user.firstName} ${user.lastName}`;
 
@@ -42,7 +42,6 @@ export function UserMenu() {
 
   return (
     <Menu as="div" className="relative inline-block text-left">
-      {/* Gatillo: El Avatar del usuario */}
       <MenuButton className="flex items-center gap-2 rounded-full hover:cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 hover:opacity-90 transition-opacity">
         <Avatar
           initials={user.firstName[0] + user.lastName[0]}
@@ -51,7 +50,6 @@ export function UserMenu() {
         />
       </MenuButton>
 
-      {/* Transición del desplegable */}
       <Transition
         as={Fragment}
         enter="transition ease-out duration-200"
@@ -62,7 +60,6 @@ export function UserMenu() {
         leaveTo="opacity-0 scale-95 translate-y-1"
       >
         <MenuItems className="absolute right-0 z-50 mt-3 w-64 origin-top-right rounded-3xl bg-white shadow-2xl ring-1 ring-slate-200 border border-slate-100 focus:outline-none overflow-hidden">
-          {/* Cabecera del Menú: Info del Usuario */}
           <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50">
             <p className="text-sm font-bold text-slate-900 truncate">
               {fullName}
@@ -73,7 +70,24 @@ export function UserMenu() {
           </div>
 
           <div className="p-2 space-y-1">
-            {/* Opciones de Huésped (Siempre visibles) */}
+            {/* Mi Perfil Público */}
+            <MenuItem>
+              {({ focus }) => (
+                <Link
+                  href={ROUTES.PUBLIC.USER_PROFILE(user.id)}
+                  className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${
+                    focus ? "bg-slate-50 text-primary-600" : "text-slate-700"
+                  }`}
+                >
+                  <IoPersonOutline
+                    size={18}
+                    className={focus ? "text-primary-500" : "text-slate-400"}
+                  />
+                  Mi Perfil
+                </Link>
+              )}
+            </MenuItem>
+
             <MenuItem>
               {({ focus }) => (
                 <Link
@@ -91,7 +105,6 @@ export function UserMenu() {
               )}
             </MenuItem>
 
-            {/* Opciones de Anfitrión (Solo si tiene el rol) */}
             {isHost && (
               <MenuItem>
                 {({ focus }) => (
@@ -115,7 +128,6 @@ export function UserMenu() {
           </div>
 
           <div className="p-2 border-t border-slate-100 space-y-1 bg-slate-50/30">
-            {/* Configuración */}
             <MenuItem>
               {({ focus }) => (
                 <Link
@@ -130,12 +142,11 @@ export function UserMenu() {
               )}
             </MenuItem>
 
-            {/* Cerrar Sesión */}
             <MenuItem>
               {({ focus }) => (
                 <button
                   onClick={handleLogout}
-                  className={`hover:cursor-pointer flex items-center  gap-3 w-full px-3 py-2.5 text-sm font-bold rounded-xl transition-colors text-left ${
+                  className={`hover:cursor-pointer flex items-center gap-3 w-full px-3 py-2.5 text-sm font-bold rounded-xl transition-colors text-left ${
                     focus ? "bg-red-50 text-red-600" : "text-red-500"
                   }`}
                 >
