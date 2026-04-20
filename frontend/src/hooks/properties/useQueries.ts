@@ -7,7 +7,7 @@ import {
 import { useAuth } from "@/hooks/stores/useAuth";
 import { propertyKeys } from "@/lib/queryKeys";
 import type { PropertySearchRequest } from "@/schemas/properties.schemas";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 /**
  * @description Hook para buscar propiedades con filtros (ubicación, fechas, capacidad, etc.).
@@ -19,6 +19,7 @@ export function useSearchProperties(params: PropertySearchRequest = {}) {
     queryKey: propertyKeys.search(params),
     queryFn: () => searchProperties(params),
     staleTime: 1000 * 60 * 5, // 5 minutos para evitar recargar búsquedas recientes
+    placeholderData: keepPreviousData,
   });
 }
 
