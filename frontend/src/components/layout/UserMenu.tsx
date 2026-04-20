@@ -14,8 +14,9 @@ import {
   IoCalendarOutline,
   IoSettingsOutline,
   IoLogOutOutline,
-  IoHomeOutline,
   IoPersonOutline,
+  IoBusinessOutline,
+  IoStatsChartOutline,
 } from "react-icons/io5";
 
 import { Avatar } from "@/components/shared/Avatar";
@@ -106,24 +107,48 @@ export function UserMenu() {
             </MenuItem>
 
             {isHost && (
-              <MenuItem>
-                {({ focus }) => (
-                  <Link
-                    href={ROUTES.HOST.DASHBOARD}
-                    className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${
-                      focus
-                        ? "bg-primary-50 text-primary-700"
-                        : "text-slate-700"
-                    }`}
-                  >
-                    <IoHomeOutline
-                      size={18}
-                      className={focus ? "text-primary-600" : "text-slate-400"}
-                    />
-                    Panel de Anfitrión
-                  </Link>
-                )}
-              </MenuItem>
+              <>
+                <MenuItem>
+                  {({ focus }) => (
+                    <Link
+                      href={ROUTES.HOST.PROPERTIES}
+                      className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${
+                        focus
+                          ? "bg-primary-50 text-primary-700"
+                          : "text-slate-700"
+                      }`}
+                    >
+                      <IoBusinessOutline
+                        size={18}
+                        className={
+                          focus ? "text-primary-600" : "text-slate-400"
+                        }
+                      />
+                      Mis Propiedades
+                    </Link>
+                  )}
+                </MenuItem>
+                <MenuItem>
+                  {({ focus }) => (
+                    <Link
+                      href={ROUTES.HOST.DASHBOARD}
+                      className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${
+                        focus
+                          ? "bg-primary-50 text-primary-700"
+                          : "text-slate-700"
+                      }`}
+                    >
+                      <IoStatsChartOutline
+                        size={18}
+                        className={
+                          focus ? "text-primary-600" : "text-slate-400"
+                        }
+                      />
+                      Panel de Anfitrión
+                    </Link>
+                  )}
+                </MenuItem>
+              </>
             )}
           </div>
 

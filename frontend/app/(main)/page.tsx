@@ -84,7 +84,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 2. GRID DE PROPIEDADES (Exploración / Resultados) */}
+        {/* GRID DE PROPIEDADES (Exploración / Resultados) */}
         <main className="py-16 container mx-auto px-4 md:px-6 flex-1">
           <div className="mb-10">
             <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
