@@ -84,20 +84,47 @@ public class ResendConfirmationEmailCommandHandler
             await _userTokenRepository.AddAsync(userToken, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
 
+            bool isChange = request.Flow == EmailVerificationFlow.ChangeEmail;
+
+            string route = isChange ? "/auth/confirm-email-change" : "/auth/confirm-email";
+            var template = isChange
+                ? EmailTemplate.EmailChangeConfirmation
+                : EmailTemplate.EmailConfirmation;
+            string subject = isChange
+                ? "Confirma tu nuevo correo electrónico - Guestly"
+                : "Confirma tu cuenta en Guestly";
+
             var baseUrl = _configuration["FrontendSettings:BaseUrl"] ?? "http://localhost:3000";
             // Construimos el enlace de confirmación con el email y token como parámetros de consulta
             var confirmationLink =
-                $"{baseUrl}/auth/confirm-email?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(tokenString)}";
+                $"{baseUrl}{route}?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(tokenString)}";
 
-            // Enviamos el email de confirmación utilizando una plantilla de email
-            var emailModel = new ConfirmEmailModel(user.FirstName, confirmationLink);
-            await _emailService.SendTemplateEmailAsync(
-                user.Email,
-                "Confirma tu cuenta en Guestly",
-                EmailTemplate.EmailConfirmation,
-                emailModel,
-                cancellationToken
-            );
+            if (isChange)
+            {
+                var model = new EmailChangeConfirmationModel(
+                    user.FirstName,
+                    user.Email,
+                    confirmationLink
+                );
+                await _emailService.SendTemplateEmailAsync(
+                    user.Email,
+                    subject,
+                    template,
+                    model,
+                    cancellationToken
+                );
+            }
+            else
+            {
+                var model = new ConfirmEmailModel(user.FirstName, confirmationLink);
+                await _emailService.SendTemplateEmailAsync(
+                    user.Email,
+                    subject,
+                    template,
+                    model,
+                    cancellationToken
+                );
+            }
 
             return true;
         }

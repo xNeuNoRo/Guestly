@@ -93,7 +93,7 @@ export function RegisterWizard() {
   const handleResend = () => {
     if (!registeredEmail) return;
 
-    resendEmail({ email: registeredEmail });
+    resendEmail({ email: registeredEmail, flow: "registration" });
   };
 
   const isFixEmailModalOpen = searchParams.get("modal") === "fix-email";

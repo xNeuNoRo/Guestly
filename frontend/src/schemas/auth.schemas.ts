@@ -1,7 +1,12 @@
 import { z } from "zod";
 
 export const UserRoleSchema = z.enum(["None", "Guest", "Host"]);
+export const EmailVerificationFlowSchema = z.enum([
+  "registration",
+  "changeEmail",
+]);
 export type UserRole = z.infer<typeof UserRoleSchema>;
+export type EmailVerificationFlow = z.infer<typeof EmailVerificationFlowSchema>;
 
 // --- Schemas de Petición (Requests) ---
 
@@ -36,6 +41,7 @@ export const resendConfirmationSchema = z.object({
   email: z.email({
     message: "Formato de correo inválido",
   }),
+  flow: EmailVerificationFlowSchema.optional().default("registration"),
 });
 export type ResendConfirmationEmailRequest = z.infer<
   typeof resendConfirmationSchema
@@ -59,7 +65,8 @@ export const resetPasswordSchema = z.object({
     message: "La contraseña debe tener al menos 8 caracteres",
   }),
   confirmNewPassword: z.string().min(8, {
-    message: "La confirmación de la contraseña debe tener al menos 8 caracteres",
+    message:
+      "La confirmación de la contraseña debe tener al menos 8 caracteres",
   }),
 });
 export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>;

@@ -80,7 +80,7 @@ export function LoginWizard() {
   const handleResend = () => {
     if (!unconfirmedEmail) return;
 
-    resendEmail({ email: unconfirmedEmail });
+    resendEmail({ email: unconfirmedEmail, flow: "registration" });
   };
 
   const handleBack = () => {

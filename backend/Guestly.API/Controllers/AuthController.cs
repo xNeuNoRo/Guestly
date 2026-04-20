@@ -76,9 +76,11 @@ public class AuthController : BaseApiController
     /// Reenvía el correo de confirmación en caso de que el original haya expirado o no llegara.
     /// </summary>
     [HttpPost("resend-confirmation")]
-    public async Task<IActionResult> ResendConfirmation([FromBody] ResendConfirmationEmailRequest request)
+    public async Task<IActionResult> ResendConfirmation(
+        [FromBody] ResendConfirmationEmailRequest request
+    )
     {
-        var command = new ResendConfirmationEmailCommand(request.Email);
+        var command = new ResendConfirmationEmailCommand(request.Email, request.Flow);
         await _mediator.Send(command);
         return Success();
     }

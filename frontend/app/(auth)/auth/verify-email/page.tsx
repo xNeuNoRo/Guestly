@@ -37,7 +37,7 @@ export function VerifyEmailPage() {
 
   const handleResend = () => {
     if (!user?.email) return;
-    resend({ email: user.email });
+    resend({ email: user.email, flow: "registration" });
   };
 
   const isModalOpen = searchParams.get("modal") === "fix-email";

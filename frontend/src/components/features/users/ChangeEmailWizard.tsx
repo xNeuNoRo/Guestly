@@ -5,7 +5,7 @@ import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { z } from "zod"; // ARSENAL: Importamos Zod
+import { z } from "zod";
 import {
   IoShieldCheckmarkOutline,
   IoMailOpenOutline,
@@ -13,7 +13,6 @@ import {
   IoArrowBackOutline,
   IoCreateOutline,
 } from "react-icons/io5";
-import { toast } from "sonner";
 
 import { Form } from "@/components/shared/form/Form";
 import { InputField } from "@/components/shared/form/InputField";
@@ -29,6 +28,7 @@ import {
   changeUnconfirmedEmailSchema,
   type ChangeEmailRequest,
 } from "@/schemas/users.schemas";
+import { useResendConfirmation } from "@/hooks/auth";
 
 interface ChangeEmailWizardProps {
   isConfirmedMode?: boolean;
@@ -40,7 +40,6 @@ type ChangeEmailWizardFormData = {
   password?: string;
 };
 
-// ARSENAL: Creamos un esquema exclusivo para el paso 1 que ignora el correo
 const step1Schema = z.object({
   password: z.string().min(1, "La contraseña es obligatoria"),
   newEmail: z.string().optional(),
@@ -63,6 +62,10 @@ export function ChangeEmailWizard({
   const { mutate: changeEmail, isPending: isChanging } = useChangeEmail();
   const { mutate: resendUnconfirmed, isPending: isChangingUnconfirmed } =
     useChangeUnconfirmedEmail();
+  const {
+    mutate: resendVerificationEmail,
+    isPending: isResendingVerification,
+  } = useResendConfirmation();
 
   let validationSchema:
     | typeof changeUnconfirmedEmailSchema
@@ -94,6 +97,13 @@ export function ChangeEmailWizard({
   const prevStep = () => {
     setDirection(-1);
     router.push(createUrl({ wizardStep: currentStep - 1 }), { scroll: false });
+  };
+
+  const handleResend = () => {
+    resendVerificationEmail({
+      email: newEmailValue,
+      flow: isConfirmedMode ? "changeEmail" : "registration",
+    });
   };
 
   const onSubmit = (data: ChangeEmailWizardFormData) => {
@@ -260,11 +270,22 @@ export function ChangeEmailWizard({
                 </span>
               </p>
             </div>
-            {!isConfirmedMode && (
-              <p className="text-xs text-slate-400">
-                Ahora puedes cerrar esta ventana y revisar tu bandeja.
-              </p>
-            )}
+            <div className="flex flex-col items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs font-bold"
+                onClick={handleResend}
+                isLoading={isResendingVerification}
+              >
+                ¿No recibiste nada? Reenviar enlace
+              </Button>
+              {!isConfirmedMode && (
+                <p className="text-xs text-slate-400">
+                  Ahora puedes cerrar esta ventana y revisar tu bandeja.
+                </p>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

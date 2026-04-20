@@ -1,3 +1,5 @@
+using Guestly.Domain.Enums;
+
 namespace Guestly.Application.DTOs.Auth;
 
 /// <summary>
@@ -10,4 +12,11 @@ public record ResendConfirmationEmailRequest
     /// La dirección de correo electrónico del usuario para el cual se desea reenviar el correo de confirmación.
     /// </summary>
     public required string Email { get; init; }
+
+    /// <summary>
+    /// Indica el flujo de verificación de correo electrónico, utilizado para
+    /// diferenciar entre la verificación durante el registro y la verificación
+    /// al cambiar el correo electrónico. Por defecto es Registration.
+    /// </summary>
+    public required EmailVerificationFlow Flow { get; init; } = EmailVerificationFlow.Registration;
 }
