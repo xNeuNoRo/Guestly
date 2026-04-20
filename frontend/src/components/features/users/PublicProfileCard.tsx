@@ -119,7 +119,7 @@ export function PublicProfileCard({
         </div>
 
         {/* Panel lateral de estadísticas (Preparado estructuralmente) */}
-        <div className="hidden lg:flex flex-col justify-center border-l border-slate-100 pl-8 min-w-[160px] space-y-4">
+        <div className="hidden lg:flex flex-col justify-center border-l border-slate-100 pl-8 min-w-40 space-y-4">
           <div className="space-y-1">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
               Estatus de Cuenta
