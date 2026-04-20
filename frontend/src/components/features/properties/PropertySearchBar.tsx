@@ -139,11 +139,11 @@ export function PropertySearchBar({
         className,
       )}
     >
-      <div className="flex-1 w-full px-6 py-2 md:py-0 hover:bg-slate-50 transition-colors cursor-text focus-within:bg-slate-50 rounded-l-full flex items-center h-full">
+      <div className="flex-[1.5] w-full px-8 py-2 md:py-0 hover:bg-slate-50 transition-colors cursor-text focus-within:bg-slate-50 rounded-l-full flex items-center h-full">
         <InputField
           name="location"
           placeholder="¿A dónde vas?"
-          className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium placeholder:text-slate-500"
+          className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium placeholder:text-slate-500 text-lg"
         />
       </div>
 
@@ -189,25 +189,25 @@ export function PropertySearchBar({
         </div>
       </div>
 
-      <div className="flex-1 flex w-full items-center justify-between pl-6 pr-2 py-2 md:py-0 hover:bg-slate-50 transition-colors focus-within:bg-slate-50 rounded-r-full h-full">
-        <div className="w-24">
+      <div className="flex-1 flex w-full items-center justify-between px-6 py-2 md:py-0 hover:bg-slate-50 transition-colors focus-within:bg-slate-50 rounded-r-full h-full gap-4">
+        <div className="flex-1 w-16">
           <InputField
             name="capacity"
             type="number"
             min={1}
             placeholder="Huéspedes"
             rules={{ valueAsNumber: true }}
-            className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium text-slate-900 placeholder:text-slate-500"
+            className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium text-slate-900 placeholder:text-slate-500 text-lg"
           />
         </div>
 
-        <Button
+        <button
           type="submit"
-          className="rounded-full h-12 w-12 md:h-12 md:w-12 shrink-0 flex items-center justify-center p-0"
+          className="bg-primary-600 text-white rounded-full h-10 w-10 shrink-0 flex items-center justify-center hover:bg-primary-700 transition-all shadow-md active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 p-0 border-none cursor-pointer"
           aria-label="Buscar propiedades"
         >
-          <IoSearchOutline size={20} className="stroke-[2px]" />
-        </Button>
+          <IoSearchOutline size={20} className="stroke-[2.5px]" />
+        </button>
       </div>
     </Form>
   );

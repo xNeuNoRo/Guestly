@@ -46,7 +46,7 @@ export function Navbar() {
           </Link>
 
           <div className="flex-1 max-w-2xl hidden md:block">
-            <PropertySearchBar isCompact={true} />
+            <PropertySearchBar />
           </div>
 
           <div className="flex items-center gap-2 md:gap-4 shrink-0">
