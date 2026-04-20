@@ -79,14 +79,16 @@ export default function PropertyDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 mt-10 items-start">
           {/* COLUMNA IZQUIERDA: Información detallada */}
           <div className="space-y-10">
-            <PropertyHostInfo property={property} />
-            <hr className="border-slate-100" />
+            <div className="space-y-2">
+              <PropertyHostInfo property={property} />
+              <hr className="border-slate-100" />
 
-            <PropertyStats property={property} />
-            <hr className="border-slate-100" />
+              <PropertyStats property={property} />
+              <hr className="border-slate-100" />
 
-            <PropertyDescription description={property.description} />
-            <hr className="border-slate-100" />
+              <PropertyDescription description={property.description} />
+              <hr className="border-slate-100" />
+            </div>
 
             <PropertyReviewsSection propertyId={id} />
           </div>
