@@ -99,21 +99,21 @@ export function PropertySearchBar({
           <InputField
             name="location"
             placeholder="¿A dónde vas?"
-            className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full text-sm font-medium w-full truncate text-slate-900"
+            className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full text-sm font-medium w-full truncate text-slate-900 placeholder:text-slate-500"
           />
         </div>
 
         <div className="w-px bg-slate-200 h-6 mx-2 shrink-0" />
 
         {/* Input de Huéspedes */}
-        <div className="w-16 h-full flex items-center shrink-0">
+        <div className="w-25 h-full flex items-center shrink-0">
           <InputField
             name="capacity"
             type="number"
             min={1}
             placeholder="Hués."
             rules={{ valueAsNumber: true }}
-            className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full text-sm font-medium w-full text-center text-slate-900"
+            className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full text-sm font-medium w-full text-center text-slate-900 placeholder:text-slate-500"
           />
         </div>
 
@@ -143,7 +143,7 @@ export function PropertySearchBar({
         <InputField
           name="location"
           placeholder="¿A dónde vas?"
-          className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium"
+          className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium placeholder:text-slate-500"
         />
       </div>
 
@@ -197,7 +197,7 @@ export function PropertySearchBar({
             min={1}
             placeholder="Huéspedes"
             rules={{ valueAsNumber: true }}
-            className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium text-slate-900"
+            className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium text-slate-900 placeholder:text-slate-500"
           />
         </div>
 
