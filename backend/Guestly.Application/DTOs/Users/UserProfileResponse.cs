@@ -31,7 +31,7 @@ public record UserProfileResponse
     /// <summary>
     /// El rol del usuario cuyo perfil se está obteniendo, que puede ser "Guest" o "Host".
     /// </summary>
-    public required UserRoles Role { get; init; }
+    public required List<UserRoles> Role { get; init; }
 
     /// <summary>
     /// La fecha y hora en que se creó el usuario autenticado

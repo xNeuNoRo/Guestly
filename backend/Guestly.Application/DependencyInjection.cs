@@ -1,5 +1,10 @@
 using System.Reflection;
 using FluentValidation;
+using Guestly.Application.DTOs.Auth;
+using Guestly.Application.DTOs.Users;
+using Guestly.Domain.Entities.User;
+using Guestly.Domain.Enums;
+using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Guestly.Application;
@@ -23,6 +28,28 @@ public static class DependencyInjection
             // Registramos el pipeline de validación para que se ejecute antes de los handlers
             cfg.AddOpenBehavior(typeof(Behaviors.ValidationBehavior<,>));
         });
+
+        // Configuramos Mapster para mapear la propiedad Role de User a una lista de roles en UserProfileResponse
+        TypeAdapterConfig<User, UserProfileResponse>
+            .NewConfig()
+            .Map(
+                dest => dest.Role,
+                src =>
+                    Enum.GetValues<UserRoles>()
+                        .Where(r => src.Role.HasFlag(r) && r != UserRoles.None)
+                        .ToList()
+            );
+
+        // Configuramos Mapster para mapear la propiedad Role de User a una lista de roles en AuthResponse
+        TypeAdapterConfig<User, AuthResponse>
+            .NewConfig()
+            .Map(
+                dest => dest.Role,
+                src =>
+                    Enum.GetValues<UserRoles>()
+                        .Where(r => src.Role.HasFlag(r) && r != UserRoles.None)
+                        .ToList()
+            );
 
         // Registramos todos los validadores de FluentValidation del ensamblado actual
         services.AddValidatorsFromAssembly(assembly);

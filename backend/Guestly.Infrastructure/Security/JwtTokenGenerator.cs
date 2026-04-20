@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using Guestly.Application.Interfaces.Security;
 using Guestly.Domain.Entities.User;
+using Guestly.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -85,10 +86,17 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new Claim(JwtRegisteredClaimNames.Name, $"{user.FirstName} {user.LastName}"),
             // El "jti" (JWT ID) es un identificador único para cada token, lo que ayuda a prevenir ataques de repetición.
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            // El rol del usuario se incluye como un claim de tipo "role",
-            // lo que permite al frontend implementar lógica de autorización basada en roles sin necesidad de consultar al backend.
-            new Claim(ClaimTypes.Role, user.Role.ToString()),
         };
+
+        var roles = Enum.GetValues<UserRoles>()
+            .Where(r => user.Role.HasFlag(r) && r != UserRoles.None);
+
+        foreach (var role in roles)
+        {
+            // Agregamos cada rol del usuario como un claim de tipo "role",
+            // lo que permite al frontend y a la API realizar autorizaciones basadas en roles.
+            claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+        }
 
         // Creamos el descriptor del token con toda la información necesaria para generar el token JWT.
         var tokenDescriptor = new SecurityTokenDescriptor
