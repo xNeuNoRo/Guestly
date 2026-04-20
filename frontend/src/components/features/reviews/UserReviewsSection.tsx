@@ -12,16 +12,30 @@ import { useAuth } from "@/hooks/stores/useAuth";
 import { useQueryString } from "@/hooks/shared/useQueryString";
 import type { ReviewResponse } from "@/schemas/reviews.schemas";
 
+interface UserReviewsSectionProps {
+  userId?: string;
+}
+
 /**
  * @description Listado centralizado de reseñas escritas por el usuario autenticado.
  * Orquesta la edición y eliminación mediante SearchParams.
  */
-export function UserReviewsSection() {
+export function UserReviewsSection({
+  userId,
+}: Readonly<UserReviewsSectionProps>) {
   const router = useRouter();
   const { user } = useAuth();
   const { createUrl } = useQueryString();
 
-  const { data: reviews, isLoading, isError, error } = useUserReviews(user?.id);
+  const targetUserId = userId ?? user?.id;
+  const isOwnProfile = !userId || userId === user?.id;
+
+  const {
+    data: reviews,
+    isLoading,
+    isError,
+    error,
+  } = useUserReviews(targetUserId);
 
   const handleEditClick = (review: ReviewResponse) => {
     router.push(createUrl({ action: "edit-review", reviewId: review.id }), {
@@ -57,19 +71,21 @@ export function UserReviewsSection() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-primary-50 text-primary-600 rounded-2xl">
-          <IoChatboxOutline size={24} />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-            Mis Reseñas
-          </h2>
-          <p className="text-sm text-slate-500">
-            Gestiona las opiniones que has compartido con la comunidad.
-          </p>
-        </div>
-      </header>
+      {isOwnProfile && (
+        <header className="flex items-center gap-3 mb-8">
+          <div className="p-3 bg-primary-50 text-primary-600 rounded-2xl">
+            <IoChatboxOutline size={24} />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+              Mis Reseñas
+            </h2>
+            <p className="text-sm text-slate-500">
+              Gestiona las opiniones que has compartido con la comunidad.
+            </p>
+          </div>
+        </header>
+      )}
 
       {/* ESTADO VACÍO */}
       {!reviews || reviews.length === 0 ? (
@@ -80,11 +96,12 @@ export function UserReviewsSection() {
         >
           <IoChatboxOutline size={48} className="mx-auto text-slate-200 mb-4" />
           <h3 className="text-lg font-bold text-slate-900 mb-1">
-            Aún no has escrito reseñas
+            Aún no hay reseñas
           </h3>
           <p className="text-slate-500 max-w-xs mx-auto">
-            Tus opiniones aparecerán aquí después de que completes tus estancias
-            y califiques las propiedades.
+            {isOwnProfile
+              ? "Tus opiniones aparecerán aquí después de que completes tus estancias y califiques las propiedades."
+              : "Este usuario aún no ha compartido opiniones con la comunidad."}
           </p>
         </motion.div>
       ) : (
@@ -121,8 +138,8 @@ export function UserReviewsSection() {
                 </div>
                 <ReviewCard
                   review={review}
-                  onEdit={handleEditClick}
-                  onDelete={handleDeleteClick}
+                  onEdit={isOwnProfile ? handleEditClick : undefined}
+                  onDelete={isOwnProfile ? handleDeleteClick : undefined}
                 />
               </div>
             </motion.div>
