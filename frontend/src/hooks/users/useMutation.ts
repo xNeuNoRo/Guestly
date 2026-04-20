@@ -75,7 +75,9 @@ export function useChangeEmail() {
       );
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Error al solicitar el cambio de correo.");
+      toast.error("Error", {
+        description: error.message || "Error al solicitar el cambio de correo.",
+      });
     },
   });
 }
@@ -87,10 +89,14 @@ export function useChangeUnconfirmedEmail() {
   return useMutation({
     mutationFn: changeUnconfirmedEmail,
     onSuccess: () => {
-      toast.success("Correo actualizado. Revisa tu bandeja para confirmarlo.");
+      toast.success("Correo actualizado", {
+        description: "Revisa tu bandeja para confirmarlo.",
+      });
     },
     onError: (error: Error) => {
-      toast.error(error.message || "No se pudo actualizar el correo.");
+      toast.error("Error", {
+        description: error.message || "No se pudo cambiar el correo.",
+      });
     },
   });
 }

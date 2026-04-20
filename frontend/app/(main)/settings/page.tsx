@@ -99,7 +99,7 @@ export default function SettingsPage() {
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 {/* Sección Email */}
-                <section className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm h-full flex flex-col">
+                <section className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm h-fit">
                   <div className="mb-6">
                     <h3 className="text-lg font-bold text-slate-900">
                       Correo Electrónico
@@ -117,7 +117,7 @@ export default function SettingsPage() {
                 </section>
 
                 {/* Sección Password */}
-                <section className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm h-full flex flex-col">
+                <section className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm h-fit">
                   <div className="mb-6">
                     <h3 className="text-lg font-bold text-slate-900">
                       Contraseña

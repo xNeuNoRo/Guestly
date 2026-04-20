@@ -33,7 +33,13 @@ api.interceptors.response.use(
   (error) => {
     // Si la API rechaza el token (expirado o inválido)
     if (error.response?.status === 401) {
-      if (globalThis.window !== undefined) {
+      const url = error.config?.url || "";
+      // Nos aseguramos de comprobar que no sea una ruta del backend donde arrojara 401
+      // por razones válidas (ej. cambio de contraseña o email)
+      const isPasswordVerification =
+        url.includes("/users/me/email") || url.includes("/users/me/password");
+
+      if (!isPasswordVerification && globalThis.window !== undefined) {
         // Limpiamos el token muerto
         useAppStore.getState().logout();
 

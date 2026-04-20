@@ -61,7 +61,7 @@ export function ChangeEmailWizard({
     resolver: zodResolver(
       isConfirmedMode ? changeEmailSchema : changeUnconfirmedEmailSchema,
     ) as Resolver<ChangeEmailWizardFormData>,
-    defaultValues: { newEmail: "", password: "" },
+    defaultValues: { newEmail: "temp@temp.com", password: "" },
   });
 
   const nextStep = () => {
@@ -71,7 +71,10 @@ export function ChangeEmailWizard({
 
   const handleSecurityNext = async () => {
     const isValid = await form.trigger("password");
-    if (isValid) nextStep();
+    if (isValid) {
+      form.setValue("newEmail", "");
+      nextStep();
+    }
   };
 
   const prevStep = () => {
@@ -97,21 +100,12 @@ export function ChangeEmailWizard({
 
       changeEmail(payload, {
         onSuccess: commonOnSuccess,
-        onError: () =>
-          toast.error("Error", {
-            description: "Contraseña incorrecta o email ya en uso.",
-          }),
       });
     } else {
       resendUnconfirmed(
         { newEmail: data.newEmail },
         {
           onSuccess: commonOnSuccess,
-          onError: () =>
-            toast.error("Error", {
-              description:
-                "No se pudo cambiar el correo. Verifica que no esté en uso.",
-            }),
         },
       );
     }
@@ -124,7 +118,7 @@ export function ChangeEmailWizard({
   };
 
   return (
-    <div className="w-full overflow-hidden relative min-h-87.5 flex flex-col justify-center">
+    <div className="w-full overflow-hidden relative">
       <AnimatePresence mode="wait" custom={direction} initial={false}>
         {/* PASO 1: SEGURIDAD (Solo modo confirmado) */}
         {isConfirmedMode && currentStep === 1 && (
@@ -148,15 +142,15 @@ export function ChangeEmailWizard({
                 Necesitamos tu contraseña para autorizar el cambio.
               </p>
             </div>
-            {/* Cambiamos onSubmit para validar antes de saltar */}
-            <Form form={form} onSubmit={handleSecurityNext}>
+            <Form form={form} onSubmit={onSubmit} className="space-y-4">
               <InputField
                 name="password"
                 label="Contraseña actual"
                 type="password"
               />
               <Button
-                type="submit"
+                type="button"
+                onClick={handleSecurityNext}
                 className="w-full mt-4"
                 rightIcon={<IoArrowForwardOutline />}
               >
