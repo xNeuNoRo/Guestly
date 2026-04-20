@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers/Providers";
-import { Navbar } from "@/components/layout/NavBar";
 import "./globals.css";
-import { Footer } from "@/components/layout/Footer";
 import { AuthLoader } from "@/components/auth/AuthLoader";
 
 const geistSans = Geist({
@@ -42,9 +40,7 @@ export default function RootLayout({
       >
         <Providers>
           <AuthLoader />
-          <Navbar />
-          <main className="flex-1 pt-24 pb-12">{children}</main>
-          <Footer />
+          {children}
         </Providers>
       </body>
     </html>
