@@ -41,8 +41,9 @@ export function useLogin() {
   return useMutation({
     mutationFn: login,
     onSuccess: (data) => {
+      const { token, ...userProfile } = data;
       // Guardamos el token y el perfil en el estado global
-      setAuth(data.token, data);
+      setAuth(token, userProfile);
       toast.success("Inicio de sesión exitoso.");
     },
     onError: (error: Error) => {

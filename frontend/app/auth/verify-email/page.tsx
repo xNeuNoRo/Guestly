@@ -37,16 +37,7 @@ export function VerifyEmailPage() {
 
   const handleResend = () => {
     if (!user?.email) return;
-    resend(
-      { email: user.email },
-      {
-        onSuccess: () => {
-          toast.success("Enlace enviado", {
-            description: "Revisa tu bandeja de entrada y spam.",
-          });
-        },
-      },
-    );
+    resend({ email: user.email });
   };
 
   const isModalOpen = searchParams.get("modal") === "fix-email";
@@ -94,7 +85,7 @@ export function VerifyEmailPage() {
                 logout();
                 router.push(ROUTES.AUTH.LOGIN);
               }}
-              className="flex items-center justify-center gap-2 mx-auto text-sm font-bold text-slate-400 hover:text-red-500 transition-colors"
+              className="flex p-4 rounded-full items-center justify-center gap-2 mx-auto text-sm font-bold text-slate-400 hover:cursor-pointer hover:bg-red-500 hover:text-white transition-colors duration-300"
             >
               <IoLogOutOutline size={18} />
               Cerrar sesión e intentar con otra cuenta

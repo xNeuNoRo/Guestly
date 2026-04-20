@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, ReactNode } from "react";
 import { useAuth } from "@/hooks/stores/useAuth";
 import { useIsMounted } from "@/hooks/shared/useIsMounted";
@@ -9,51 +9,46 @@ import { ROUTES } from "@/constants/routes";
 
 interface AuthGuardProps extends GuardConfig {
   children: ReactNode;
+  allowGuests?: boolean; // Permitir visualización a no logueados (como en la Landing)
 }
 
-/**
- * @description Componente de protección de rutas.
- * Maneja autenticación, roles y enrutamiento inteligente basado en el tipo de usuario.
- */
 export function AuthGuard({
   children,
   allowedRoles,
   requireEmailConfirmed = false,
   publicOnly = false,
+  allowGuests = false,
 }: Readonly<AuthGuardProps>) {
   const router = useRouter();
+  const pathname = usePathname();
   const isMounted = useIsMounted();
-  // Arsenal: Usamos useAuth para consistencia con el resto de la app
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     if (!isMounted) return;
 
     // Rutas "Solo Públicas" (Login/Register)
-    if (publicOnly && isAuthenticated && user?.isEmailConfirmed) {
-      // Enrutamiento inteligente: Host -> Dashboard | Guest -> Home/Reservas
-      const isHost = user?.role?.includes("Host");
-      router.replace(isHost ? ROUTES.HOST.DASHBOARD : ROUTES.PUBLIC.HOME);
-      return;
-    } else if (isAuthenticated && user && !user.isEmailConfirmed) {
-      router.replace(ROUTES.USER.VERIFY_EMAIL);
+    if (publicOnly && isAuthenticated) {
+      // Si no lo ha confirmado, permitimos que se quede para que el Wizard muestre el Paso 2.
+      if (user?.isEmailConfirmed) {
+        const isHost = user?.role?.includes("Host");
+        router.replace(isHost ? ROUTES.HOST.DASHBOARD : ROUTES.PUBLIC.HOME);
+      }
       return;
     }
 
-    // Rutas Privadas
-    if (!publicOnly && !isAuthenticated) {
+    // PRIORIDAD PARA EL RESTO DE LA APP: Bloqueo de usuarios no confirmados
+    // Si la ruta no es pública y el usuario no está confirmado, lo mandamos a verificar.
+    if (isAuthenticated && user && !user.isEmailConfirmed) {
+      if (pathname !== ROUTES.USER.VERIFY_EMAIL) {
+        router.replace(ROUTES.USER.VERIFY_EMAIL);
+      }
+      return;
+    }
+
+    // Rutas Privadas (Requieren login)
+    if (!publicOnly && !isAuthenticated && !allowGuests) {
       router.replace(ROUTES.AUTH.LOGIN);
-      return;
-    }
-
-    // Verificación de Correo (Si es requerida)
-    if (
-      isAuthenticated &&
-      requireEmailConfirmed &&
-      user &&
-      !user.isEmailConfirmed
-    ) {
-      router.replace(ROUTES.USER.SETTINGS);
       return;
     }
 
@@ -63,7 +58,6 @@ export function AuthGuard({
         allowedRoles.includes(role),
       );
       if (!hasAllowedRole) {
-        // Redirigimos al home si no tiene permiso, en lugar de una pantalla muerta
         router.replace(ROUTES.PUBLIC.HOME);
       }
     }
@@ -74,16 +68,24 @@ export function AuthGuard({
     allowedRoles,
     requireEmailConfirmed,
     publicOnly,
+    allowGuests,
     router,
+    pathname,
   ]);
 
   if (!isMounted) return null;
 
-  // Renderizado preventivo estricto
+  const isUnconfirmed = isAuthenticated && user && !user.isEmailConfirmed;
+
+  // Renderizado preventivo sincronizado
   const shouldBlock =
-    (!publicOnly && !isAuthenticated) ||
+    // Bloqueamos en la app general si no está confirmado
+    (!publicOnly && isUnconfirmed && pathname !== ROUTES.USER.VERIFY_EMAIL) ||
+    // Bloqueamos rutas privadas si no hay sesión
+    (!publicOnly && !isAuthenticated && !allowGuests) ||
+    // Bloqueamos rutas públicas SOLO si ya está confirmado
     (publicOnly && isAuthenticated && user?.isEmailConfirmed) ||
-    (requireEmailConfirmed && user && !user.isEmailConfirmed) ||
+    // Bloqueamos por roles
     (allowedRoles && user && !user.role.some((r) => allowedRoles.includes(r)));
 
   return shouldBlock ? null : <>{children}</>;

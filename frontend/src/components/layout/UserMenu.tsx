@@ -135,7 +135,7 @@ export function UserMenu() {
               {({ focus }) => (
                 <button
                   onClick={handleLogout}
-                  className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm font-bold rounded-xl transition-colors text-left ${
+                  className={`hover:cursor-pointer flex items-center  gap-3 w-full px-3 py-2.5 text-sm font-bold rounded-xl transition-colors text-left ${
                     focus ? "bg-red-50 text-red-600" : "text-red-500"
                   }`}
                 >

@@ -24,7 +24,7 @@ export const ROUTES = {
     SETTINGS: "/settings", // Engloba UpdateProfile, ChangePassword, ChangeEmail
     RESERVATIONS: "/reservations", // Tus propias reservas
     NOTIFICATIONS: "/notifications",
-    VERIFY_EMAIL: "/verify-email",
+    VERIFY_EMAIL: "/auth/verify-email",
   },
 
   // Lógica de Anfitrión (HOST)

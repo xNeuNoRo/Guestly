@@ -17,16 +17,6 @@ export function AuthLoader() {
   const hasHydrated = useRef(false);
 
   useEffect(() => {
-    console.log("AuthLoader - Token:", token);
-    console.log("AuthLoader - isSuccess:", isSuccess);
-    console.log("AuthLoader - isAuthenticated:", isAuthenticated);
-    console.log("AuthLoader - Response:", response);
-    console.log("AuthLoader - Has Hydrated:", hasHydrated.current);
-    // Solo sincronizamos si:
-    // 1. Tenemos un token.
-    // 2. La petición fue exitosa.
-    // 3. No estamos marcados como autenticados en memoria.
-    // 4. El usuario existe en la respuesta.
     if (
       token &&
       isSuccess &&

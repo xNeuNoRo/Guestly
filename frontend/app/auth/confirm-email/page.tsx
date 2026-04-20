@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/shared/Button";
 import { useConfirmEmail } from "@/hooks/auth/useMutation";
 import { ROUTES } from "@/constants/routes";
+import { useAuth } from "@/hooks/stores/useAuth";
 
 /**
  * @description Página de aterrizaje para la confirmación de cuenta.
@@ -20,6 +21,7 @@ import { ROUTES } from "@/constants/routes";
 export default function ConfirmEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { logout } = useAuth();
 
   const token = searchParams.get("token");
   const email = searchParams.get("email");
@@ -31,6 +33,12 @@ export default function ConfirmEmailPage() {
       mutate({ token, email });
     }
   }, [token, email, mutate]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      logout();
+    }
+  }, [isSuccess, logout]);
 
   // --- ESCENARIO 1: CARGANDO / PROCESANDO ---
   if (isPending || !token || !email) {
