@@ -2,7 +2,11 @@
 
 import { useRef } from "react";
 import clsx from "clsx";
-import { IoChevronDownOutline, IoAlertCircleOutline, IoCheckmark } from "react-icons/io5";
+import {
+  IoChevronDownOutline,
+  IoAlertCircleOutline,
+  IoCheckmark,
+} from "react-icons/io5";
 import { useToggle } from "@/hooks/shared/useToggle";
 import { useClickOutside } from "@/hooks/shared/useClickOutside";
 
@@ -17,7 +21,8 @@ export interface SelectProps {
   value?: string | number;
   onChange?: (value: string | number) => void;
   placeholder?: string;
-  error?: string;
+  // Modificado: Ampliamos el tipo para aceptar el objeto de error
+  error?: string | boolean | Error;
   hint?: string;
   disabled?: boolean;
   className?: string;
@@ -40,7 +45,21 @@ export function Select({
   // Si el usuario hace clic fuera de este contenedor, se cierra el menú
   useClickOutside(containerRef, close);
 
-  const hasError = !!error;
+  // Modificado: Extracción segura del mensaje de error
+  const hasError = error !== undefined && error !== null && error !== false;
+
+  let errorMessage = "Selección inválida";
+  if (typeof error === "string" && error.trim() !== "") {
+    errorMessage = error;
+  } else if (
+    error &&
+    typeof error === "object" &&
+    typeof error.message === "string" &&
+    error.message.trim() !== ""
+  ) {
+    errorMessage = error.message;
+  }
+
   const selectedOption = options.find((opt) => opt.value === value);
 
   // Función para manejar la selección y cerrar el menú
@@ -53,9 +72,7 @@ export function Select({
     <div className="w-full flex flex-col gap-1.5" ref={containerRef}>
       {/* Label */}
       {label && (
-        <label className="text-sm font-medium text-slate-700">
-          {label}
-        </label>
+        <label className="text-sm font-medium text-slate-700">{label}</label>
       )}
 
       {/* Botón Disparador (Actúa visualmente como el Input) */}
@@ -74,18 +91,23 @@ export function Select({
               : "border-slate-300 focus:border-primary-500 focus:ring-primary-500/20",
             !selectedOption && "text-slate-400", // Color del placeholder
             selectedOption && "text-slate-900", // Color del valor seleccionado
-            className
+            className,
           )}
         >
           <span className="truncate">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          
+
           <div className="flex items-center gap-2 text-slate-400 shrink-0">
-            {hasError && <IoAlertCircleOutline size={18} className="text-red-500" />}
-            <IoChevronDownOutline 
-              size={18} 
-              className={clsx("transition-transform duration-200", isOpen && "rotate-180")} 
+            {hasError && (
+              <IoAlertCircleOutline size={18} className="text-red-500" />
+            )}
+            <IoChevronDownOutline
+              size={18}
+              className={clsx(
+                "transition-transform duration-200",
+                isOpen && "rotate-180",
+              )}
             />
           </div>
         </button>
@@ -113,7 +135,7 @@ export function Select({
                       "relative flex cursor-pointer select-none items-center justify-between py-2 pl-3 pr-9 text-sm transition-colors",
                       isSelected
                         ? "bg-primary-50 text-primary-900 font-medium"
-                        : "text-slate-700 hover:bg-slate-100"
+                        : "text-slate-700 hover:bg-slate-100",
                     )}
                   >
                     <span className="truncate">{option.label}</span>
@@ -133,7 +155,7 @@ export function Select({
       {/* Mensaje de Error o Ayuda */}
       {hasError ? (
         <p className="text-sm text-red-600 font-medium animate-in fade-in slide-in-from-top-1">
-          {error}
+          {errorMessage}
         </p>
       ) : hint ? (
         <p className="text-sm text-slate-500">{hint}</p>

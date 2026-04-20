@@ -30,6 +30,7 @@ export function ChangePasswordForm() {
       newPassword: "",
       confirmNewPassword: "",
     },
+    mode: "onChange", // Validación en tiempo real para mejor UX
   });
 
   const onSubmit = (data: ChangePasswordRequest) => {
