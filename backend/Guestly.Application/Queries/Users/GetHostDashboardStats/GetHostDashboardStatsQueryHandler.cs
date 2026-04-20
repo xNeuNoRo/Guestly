@@ -31,39 +31,31 @@ public class GetHostDashboardStatsQueryHandler
         CancellationToken cancellationToken
     )
     {
-        var totalPropertiesTask = _propertyRepository.CountByHostIdAsync(
+        var totalPropertiesTask = await _propertyRepository.CountByHostIdAsync(
             request.HostId,
             cancellationToken
         );
-        var totalReservationsTask = _reservationRepository.CountByHostIdAsync(
+        var totalReservationsTask = await _reservationRepository.CountByHostIdAsync(
             request.HostId,
             null,
             cancellationToken
         );
-        var pendingReservationsTask = _reservationRepository.CountByHostIdAsync(
+        var pendingReservationsTask = await _reservationRepository.CountByHostIdAsync(
             request.HostId,
             ReservationStatus.Pending,
             cancellationToken
         );
-        var totalRevenueTask = _reservationRepository.GetTotalRevenueByHostIdAsync(
+        var totalRevenueTask = await _reservationRepository.GetTotalRevenueByHostIdAsync(
             request.HostId,
             cancellationToken
         );
 
-        // Esperamos a que todas las tareas se completen simultáneamente antes de continuar
-        await Task.WhenAll(
-            totalPropertiesTask,
-            totalReservationsTask,
-            pendingReservationsTask,
-            totalRevenueTask
-        );
-
         return new HostDashboardStatsResponse
         {
-            TotalProperties = await totalPropertiesTask,
-            TotalReservations = await totalReservationsTask,
-            PendingReservations = await pendingReservationsTask,
-            TotalRevenue = await totalRevenueTask,
+            TotalProperties = totalPropertiesTask,
+            TotalReservations = totalReservationsTask,
+            PendingReservations = pendingReservationsTask,
+            TotalRevenue = totalRevenueTask,
         };
     }
 }
