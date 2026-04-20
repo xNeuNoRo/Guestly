@@ -4,7 +4,10 @@ import {
   updateProperty,
 } from "@/api/PropertiesAPI";
 import { propertyKeys } from "@/lib/queryKeys";
-import type { PropertyResponse, UpdatePropertyRequest } from "@/schemas/properties.schemas";
+import type {
+  PropertyResponse,
+  UpdatePropertyRequest,
+} from "@/schemas/properties.schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -46,7 +49,9 @@ export function useUpdateProperty() {
       request: UpdatePropertyRequest;
     }) => updateProperty(id, request),
     onSuccess: (data) => {
-      toast.success("Propiedad actualizada correctamente.");
+      toast.success("Propiedad actualizada", {
+        description: "Los cambios se han guardado correctamente.",
+      });
 
       // Actualizamos directamente la caché de los detalles de esta propiedad específica
       queryClient.setQueryData(propertyKeys.detail(data.id), data);
@@ -56,7 +61,9 @@ export function useUpdateProperty() {
       queryClient.invalidateQueries({ queryKey: propertyKeys.search() });
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Error al actualizar la propiedad.");
+      toast.error("Error al actualizar", {
+        description: error.message || "No se pudieron guardar los cambios.",
+      });
     },
   });
 }
@@ -70,8 +77,6 @@ export function useDeleteProperty() {
   return useMutation({
     mutationFn: deleteProperty,
     onSuccess: (_, deletedId) => {
-      toast.success("Propiedad eliminada.");
-
       // Removemos la propiedad de la lista del Host sin tener que hacer otro fetch
       queryClient.setQueryData(
         propertyKeys.byHost(),
@@ -86,7 +91,11 @@ export function useDeleteProperty() {
       queryClient.invalidateQueries({ queryKey: propertyKeys.search() });
     },
     onError: (error: Error) => {
-      toast.error(error.message || "No se pudo eliminar la propiedad.");
+      toast.error("Error al eliminar", {
+        description:
+          error.message ||
+          "No se pudo eliminar la propiedad. Inténtalo de nuevo.",
+      });
     },
   });
 }

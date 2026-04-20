@@ -78,15 +78,7 @@ export function EditPropertyForm({
       { id: property.id, request: data },
       {
         onSuccess: () => {
-          toast.success("Propiedad actualizada", {
-            description: "Los cambios se han guardado correctamente.",
-          });
-          router.push(ROUTES.HOST.DASHBOARD);
-        },
-        onError: () => {
-          toast.error("Error al actualizar", {
-            description: "No se pudieron guardar los cambios.",
-          });
+          router.push(ROUTES.HOST.PROPERTIES);
         },
       },
     );
@@ -105,7 +97,7 @@ export function EditPropertyForm({
             key={tab.id}
             type="button"
             onClick={() => handleTabChange(tab.id)}
-            className={`relative flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold transition-all rounded-xl ${
+            className={`relative flex-1 flex hover:cursor-pointer items-center justify-center gap-2 py-3 text-sm font-bold transition-all rounded-xl ${
               activeTab === tab.id
                 ? "text-white"
                 : "text-slate-500 hover:bg-slate-50"

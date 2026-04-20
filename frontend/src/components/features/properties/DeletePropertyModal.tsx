@@ -41,11 +41,6 @@ export function DeletePropertyModal() {
         });
         close();
       },
-      onError: () => {
-        toast.error("Error al eliminar", {
-          description: "No se pudo eliminar la propiedad. Inténtalo de nuevo.",
-        });
-      },
     });
   };
 
