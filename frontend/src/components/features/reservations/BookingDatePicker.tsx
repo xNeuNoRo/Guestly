@@ -2,7 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { type DateRange, type Matcher } from "react-day-picker";
-import { addMonths, format, startOfDay, isWithinInterval, parseISO } from "date-fns";
+import {
+  addMonths,
+  format,
+  startOfDay,
+  isWithinInterval,
+  parseISO,
+} from "date-fns";
 import { useRouter } from "next/navigation";
 import { IoAlertCircleOutline } from "react-icons/io5";
 
@@ -17,10 +23,6 @@ export interface BookingDatePickerProps {
   error?: string;
 }
 
-/**
- * @description Organismo de Calendario para el flujo de reservas.
- * Fuente de verdad: URL (startDate, endDate, bookingError).
- */
 export function BookingDatePicker({
   propertyId,
   onChange,
@@ -29,7 +31,6 @@ export function BookingDatePicker({
   const router = useRouter();
   const { createUrl, searchParams } = useQueryString();
 
-  // --- Fuente de Verdad: URL ---
   const startDateParam = searchParams.get("startDate");
   const endDateParam = searchParams.get("endDate");
   const bookingError = searchParams.get("bookingError");
@@ -42,7 +43,6 @@ export function BookingDatePicker({
     };
   }, [startDateParam, endDateParam]);
 
-  // Calculamos la ventana de disponibilidad (Fija, no necesita URL)
   const [dateWindow] = useState(() => {
     const today = startOfDay(new Date());
     const sixMonthsLater = addMonths(today, 6);
@@ -79,14 +79,11 @@ export function BookingDatePicker({
 
   const isRangeValid = (range: DateRange) => {
     if (!range.from || !range.to) return true;
-
     const blockedRanges =
       blockedDates?.filter((b) => b.startDate && b.endDate) || [];
-
     for (const block of blockedRanges) {
       const blockStart = startOfDay(new Date(block.startDate));
       const blockEnd = startOfDay(new Date(block.endDate));
-
       if (
         isWithinInterval(blockStart, { start: range.from, end: range.to }) ||
         isWithinInterval(blockEnd, { start: range.from, end: range.to })
@@ -98,10 +95,7 @@ export function BookingDatePicker({
   };
 
   const handleSelect = (range: DateRange | undefined) => {
-    let newParams: Record<string, string | null> = {
-      bookingError: null,
-    };
-
+    let newParams: Record<string, string | null> = { bookingError: null };
     if (range?.from && range?.to) {
       if (!isRangeValid(range)) {
         newParams = {
@@ -114,25 +108,20 @@ export function BookingDatePicker({
         return;
       }
     }
-
     newParams = {
       startDate: range?.from ? format(range.from, "yyyy-MM-dd") : null,
       endDate: range?.to ? format(range.to, "yyyy-MM-dd") : null,
       bookingError: null,
     };
-
     router.push(createUrl(newParams), { scroll: false });
     if (onChange) onChange(range);
   };
 
   if (isLoading) {
     return (
-      <div className="flex gap-4 p-4 rounded-xl border border-slate-200 bg-white w-fit shadow-sm">
-        <Skeleton variant="rectangular" className="h-75 w-70" />
-        <Skeleton
-          variant="rectangular"
-          className="h-75 w-70 hidden sm:block"
-        />
+      <div className="p-4 rounded-xl border border-slate-100 bg-white w-full shadow-sm">
+        {/* Skeleton ajustado a 1 mes para evitar el salto visual */}
+        <Skeleton variant="rectangular" className="h-64 w-full rounded-xl" />
       </div>
     );
   }
@@ -140,13 +129,14 @@ export function BookingDatePicker({
   const displayError = bookingError || error;
 
   return (
-    <div className="flex flex-col gap-2 w-fit">
+    <div className="flex flex-col gap-2 w-full">
       <Calendar
         mode="range"
         selected={selectedRange}
         onSelect={handleSelect}
         disabled={disabledDays}
-        numberOfMonths={2}
+        numberOfMonths={1}
+        className="w-full border rounded-2xl border-slate-100"
         pagedNavigation
       />
 

@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { IoImagesOutline } from "react-icons/io5";
+import {
+  IoImagesOutline,
+  IoChevronBack,
+  IoChevronForward,
+} from "react-icons/io5";
 
 import { Button } from "@/components/shared/Button";
 import { Modal } from "@/components/shared/Modal";
@@ -33,18 +37,7 @@ export function PropertyGallery({
     ? Number(searchParams.get("photo"))
     : null;
 
-  // Si el usuario abre una foto específica o navega por el historial,
-  // hacemos scroll automático hacia esa imagen dentro del modal.
-  useEffect(() => {
-    if (isGalleryOpen && activePhotoIndex !== null && galleryRef.current) {
-      const targetPhoto = galleryRef.current.querySelector(
-        `#photo-${activePhotoIndex}`,
-      );
-      if (targetPhoto) {
-        targetPhoto.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }
-  }, [isGalleryOpen, activePhotoIndex]);
+  const currentIndex = activePhotoIndex ?? 0;
 
   // Helpers de navegación
   const openGallery = (index?: number) => {
@@ -55,6 +48,22 @@ export function PropertyGallery({
 
   const closeGallery = () => {
     router.push(createUrl({ gallery: null, photo: null }), { scroll: false });
+  };
+
+  const nextPhoto = () => {
+    if (currentIndex < images.length - 1) {
+      router.push(createUrl({ gallery: "open", photo: currentIndex + 1 }), {
+        scroll: false,
+      });
+    }
+  };
+
+  const prevPhoto = () => {
+    if (currentIndex > 0) {
+      router.push(createUrl({ gallery: "open", photo: currentIndex - 1 }), {
+        scroll: false,
+      });
+    }
   };
 
   if (!images || images.length === 0) {
@@ -129,7 +138,7 @@ export function PropertyGallery({
             variant="secondary"
             size="md"
             onClick={() => openGallery()}
-            className="absolute bottom-4 right-4 shadow-md border border-slate-200 backdrop-blur-md bg-white/90"
+            className="absolute bottom-12 -right-2 z-10 whitespace-nowrap shadow-md border border-slate-200 backdrop-blur-md bg-white/90"
             leftIcon={<IoImagesOutline />}
           >
             Mostrar todas las fotos ({images.length})
@@ -140,28 +149,37 @@ export function PropertyGallery({
       <Modal
         open={isGalleryOpen}
         close={closeGallery}
-        title="Galería de fotos"
+        title={`Foto ${currentIndex + 1} de ${images.length}`}
         size="large"
       >
-        <div
-          ref={galleryRef}
-          className="flex flex-col gap-4 max-h-[75vh] overflow-y-auto pr-2 pb-4 scroll-smooth"
-        >
-          {images.map((src, index) => (
-            <div
-              key={`${src}-modal`}
-              id={`photo-${index}`}
-              className="relative w-full aspect-video md:aspect-video rounded-lg overflow-hidden border border-slate-100 shadow-sm"
+        <div className="relative w-full h-[70vh] flex items-center justify-center bg-slate-50 rounded-xl overflow-hidden">
+          {currentIndex > 0 && (
+            <button
+              onClick={prevPhoto}
+              className="absolute left-4 z-20 p-3 bg-white/50 hover:bg-slate-100/50 text-slate-900 rounded-full shadow-lg backdrop-blur-md transition-all hover:cursor-pointer active:scale-95"
             >
-              <Image
-                src={src}
-                alt={`${title} - Galería completa ${index + 1}`}
-                fill
-                sizes="(max-width: 1024px) 100vw, 1024px"
-                className="object-cover"
-              />
-            </div>
-          ))}
+              <IoChevronBack size={24} />
+            </button>
+          )}
+
+          <div className="relative w-full h-full">
+            <Image
+              src={images[currentIndex]}
+              alt={`${title} - Galería ${currentIndex + 1}`}
+              fill
+              sizes="(max-width: 1024px) 100vw, 1024px"
+              className="object-contain"
+            />
+          </div>
+
+          {currentIndex < images.length - 1 && (
+            <button
+              onClick={nextPhoto}
+              className="absolute right-4 z-20 p-3 bg-white/50 hover:bg-slate-100/50 text-slate-900 rounded-full shadow-lg backdrop-blur-md transition-all hover:cursor-pointer active:scale-95"
+            >
+              <IoChevronForward size={24} />
+            </button>
+          )}
         </div>
       </Modal>
     </>

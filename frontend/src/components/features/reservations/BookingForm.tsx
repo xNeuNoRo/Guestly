@@ -22,16 +22,11 @@ interface BookingFormProps {
   propertyId: string;
 }
 
-/**
- * @description Organismo que gestiona el flujo completo de reserva.
- * Sincroniza el estado del formulario con la URL para asegurar persistencia total.
- */
 export function BookingForm({ propertyId }: Readonly<BookingFormProps>) {
   const router = useRouter();
   const { searchParams } = useQueryString();
   const { mutate: createReservation, isPending } = useCreateReservation();
 
-  // --- Fuente de Verdad: URL ---
   const urlStart = searchParams.get("startDate");
   const urlEnd = searchParams.get("endDate");
 
@@ -44,8 +39,6 @@ export function BookingForm({ propertyId }: Readonly<BookingFormProps>) {
     },
   });
 
-  // REDENCIÓN: Sincronización bidireccional. Si la URL cambia (ej. el DatePicker actualiza los params), 
-  // el formulario se resetea para mantenerse en sintonía con la fuente de verdad.
   useEffect(() => {
     form.reset({
       propertyId,
@@ -60,32 +53,24 @@ export function BookingForm({ propertyId }: Readonly<BookingFormProps>) {
   const onSubmit = (data: CreateReservationRequest) => {
     createReservation(data, {
       onSuccess: () => {
-        toast.success("¡Reserva confirmada con éxito!");
+        toast.success("¡Reserva confirmada!");
         router.push(ROUTES.USER.RESERVATIONS);
-      },
-      onError: () => {
-        toast.error(
-          "No se pudo crear la reserva. Las fechas podrían no estar disponibles.",
-        );
       },
     });
   };
 
   return (
-    <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-xl p-6 sticky top-24">
+    <div className="w-full bg-white rounded-4xl border border-slate-200 shadow-2xl shadow-slate-200/50 p-6 lg:p-8 sticky top-32 z-10">
       <Form form={form} onSubmit={onSubmit} className="flex flex-col gap-6">
-        <div>
-          <h3 className="text-xl font-bold text-slate-900">
-            Reserva tu estancia
+        <header>
+          <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+            Reserva ahora
           </h3>
-          <p className="text-sm text-slate-500">
-            Selecciona tus fechas para continuar
+          <p className="text-sm font-medium text-slate-500 mt-1">
+            Selecciona fechas para ver el precio
           </p>
-        </div>
+        </header>
 
-        {/* El BookingDatePicker ahora es inteligente y gestiona la URL. 
-          Al interactuar con él, la URL cambiará, disparando nuestro useEffect y sincronizando el Form.
-        */}
         <Controller
           name="startDate"
           control={form.control}
@@ -97,7 +82,6 @@ export function BookingForm({ propertyId }: Readonly<BookingFormProps>) {
           )}
         />
 
-        {/* El Widget de Precios lee directamente de lo que ya está en la URL para evitar estados locales redundantes */}
         <PricePreviewWidget
           propertyId={propertyId}
           startDate={urlStart ?? undefined}
@@ -107,15 +91,15 @@ export function BookingForm({ propertyId }: Readonly<BookingFormProps>) {
         <Button
           type="submit"
           size="lg"
-          className="w-full py-4 text-lg"
+          className="w-full py-4 text-lg font-bold rounded-2xl shadow-lg shadow-primary-500/25 transition-all hover:shadow-primary-500/40 hover:-translate-y-0.5"
           isLoading={isPending}
           disabled={!startDate || !endDate}
         >
-          {startDate && endDate ? "Reservar ahora" : "Selecciona fechas"}
+          {startDate && endDate ? "Reservar estancia" : "Ver disponibilidad"}
         </Button>
 
-        <p className="text-center text-xs text-slate-400">
-          Se te enviará una confirmación por correo una vez aceptada.
+        <p className="text-center text-[10px] uppercase tracking-widest font-bold text-slate-400">
+          No se te cobrará nada todavía
         </p>
       </Form>
     </div>
