@@ -1,7 +1,9 @@
+// frontend/src/components/layout/NavBar.tsx
 "use client";
 
 import Link from "next/link";
-import { IoHome } from "react-icons/io5";
+import { usePathname } from "next/navigation";
+import { IoHome, IoSearchOutline } from "react-icons/io5";
 
 import { PropertySearchBar } from "@/components/features/properties/PropertySearchBar";
 import { NotificationBell } from "@/components/features/notifications/NotificationBell";
@@ -11,17 +13,55 @@ import { Button } from "@/components/shared/Button";
 import { useAuth } from "@/hooks/stores/useAuth";
 import { useScroll } from "@/hooks/shared/useScroll";
 import { ROUTES } from "@/constants/routes";
+import { JSX } from "react";
 
 /**
  * @description Componente de navegación principal.
- * Integra la búsqueda, notificaciones y menú de usuario con un diseño pegajoso (sticky).
+ * Adapta su barra de búsqueda central dependiendo de la ruta actual.
  */
 export function Navbar() {
   const { isAuthenticated } = useAuth();
   const { y } = useScroll();
+  const pathname = usePathname();
+
+  // ARSENAL: Control de renderizado por rutas
+  const isHomePage = pathname === ROUTES.PUBLIC.HOME;
+  const isExplorePage = pathname === "/explore";
 
   // Cambiamos el estilo si el usuario ha hecho scroll
   const isScrolled = y > 20;
+
+  let desktopSearchContent: JSX.Element | null = null;
+  if (isExplorePage) {
+    // En Explore: Mostramos el buscador completo (tu PropertySearchBar es compacta por diseño, así que encaja perfecto)
+    desktopSearchContent = <PropertySearchBar isCompact />;
+  } else if (!isHomePage) {
+    // En otras páginas (Perfil, Reservas): Mostramos un botón píldora que redirige a Explore
+    desktopSearchContent = (
+      <Link href="/explore">
+        <button className="flex items-center gap-3 px-5 py-2.5 bg-slate-50 hover:cursor-pointer hover:bg-slate-100 border border-slate-200 rounded-full transition-colors text-slate-500 font-medium text-sm shadow-sm group">
+          <span className="bg-primary-600 p-1.5 rounded-full text-white group-hover:scale-105 transition-transform">
+            <IoSearchOutline size={14} className="stroke-[3px]" />
+          </span>
+          <span>¿A dónde vas?</span>
+        </button>
+      </Link>
+    );
+  }
+
+  let mobileSearchContent: JSX.Element | null = null;
+  if (isExplorePage) {
+    mobileSearchContent = <PropertySearchBar isCompact />;
+  } else if (!isHomePage) {
+    mobileSearchContent = (
+      <Link href="/explore" className="w-full block">
+        <button className="flex w-full items-center justify-center gap-3 px-5 py-3 hover:cursor-pointer bg-slate-50 border border-slate-200 rounded-full text-slate-500 font-medium text-sm shadow-sm">
+          <IoSearchOutline size={18} className="text-primary-600" />
+          Buscar destinos o propiedades...
+        </button>
+      </Link>
+    );
+  }
 
   return (
     <nav
@@ -45,10 +85,12 @@ export function Navbar() {
             </span>
           </Link>
 
-          <div className="flex-1 max-w-2xl hidden md:block">
-            <PropertySearchBar />
+          {/* ARSENAL: ZONA CENTRAL DINÁMICA */}
+          <div className="flex-1 max-w-2xl hidden md:flex justify-center">
+            {desktopSearchContent}
           </div>
 
+          {/* ACCIONES DE USUARIO */}
           <div className="flex items-center gap-2 md:gap-4 shrink-0">
             {isAuthenticated ? (
               <>
@@ -79,9 +121,8 @@ export function Navbar() {
           </div>
         </div>
 
-        <div className="mt-4 md:hidden">
-          <PropertySearchBar />
-        </div>
+        {/* ZONA MÓVIL DINÁMICA */}
+        <div className="mt-4 md:hidden">{mobileSearchContent}</div>
       </div>
     </nav>
   );
