@@ -93,13 +93,13 @@ export default function MyPropertiesPage() {
         {/* Acciones del Host */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
           <Link href={`${ROUTES.HOST.PROPERTIES}/${property.id}/edit`}>
-            <button className="p-2.5 bg-white text-slate-700 rounded-xl shadow-xl hover:text-primary-600 transition-colors border border-slate-100">
+            <button className="p-2.5 bg-white text-slate-700 rounded-xl shadow-xl hover:cursor-pointer hover:text-primary-600 transition-colors border border-slate-100">
               <IoCreateOutline size={20} />
             </button>
           </Link>
           <button
             onClick={() => openDeleteModal(property.id, property.title)}
-            className="p-2.5 bg-white text-red-500 rounded-xl shadow-xl hover:bg-red-50 transition-colors border border-slate-100"
+            className="p-2.5 bg-white text-red-500 rounded-xl shadow-xl hover:cursor-pointer hover:bg-red-50 transition-colors border border-slate-100"
           >
             <IoTrashOutline size={20} />
           </button>

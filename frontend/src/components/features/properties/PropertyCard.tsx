@@ -108,14 +108,14 @@ export function PropertyCard({ property }: Readonly<PropertyCardProps>) {
           <>
             <button
               onClick={scrollPrev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-1.5 text-slate-800 opacity-0 shadow-sm backdrop-blur-sm transition-opacity hover:bg-white hover:scale-105 group-hover:opacity-100 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary-500 z-10"
+              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-1.5 text-slate-800 opacity-0 shadow-sm backdrop-blur-sm transition-opacity hover:bg-white hover:scale-105 group-hover:opacity-100 hover:cursor-pointer focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary-500 z-10"
               aria-label="Imagen anterior"
             >
               <IoChevronBack size={18} />
             </button>
             <button
               onClick={scrollNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-1.5 text-slate-800 opacity-0 shadow-sm backdrop-blur-sm transition-opacity hover:bg-white hover:scale-105 group-hover:opacity-100 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary-500 z-10"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-1.5 text-slate-800 opacity-0 shadow-sm backdrop-blur-sm transition-opacity hover:bg-white hover:scale-105 group-hover:opacity-100 hover:cursor-pointer focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary-500 z-10"
               aria-label="Siguiente imagen"
             >
               <IoChevronForward size={18} />
