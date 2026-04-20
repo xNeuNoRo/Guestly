@@ -80,8 +80,18 @@ export function useConfirmEmail() {
 export function useResendConfirmation() {
   return useMutation({
     mutationFn: resendConfirmation,
+    onSuccess: () => {
+      toast.success("Correo reenviado", {
+        description:
+          "Hemos enviado un nuevo enlace de confirmación a tu bandeja.",
+      });
+    },
     onError: (error: Error) => {
-      toast.error(error.message || "Error al reenviar el correo.");
+      toast.error("Error al reenviar", {
+        description:
+          error.message ||
+          "Por favor, espera unos minutos antes de intentar de nuevo.",
+      });
     },
   });
 }
@@ -112,12 +122,16 @@ export function useResetPassword() {
   return useMutation({
     mutationFn: resetPassword,
     onSuccess: () => {
-      toast.success(
-        "Contraseña actualizada correctamente. Ya puedes iniciar sesión con tu nueva clave.",
-      );
+      toast.success("Contraseña actualizada", {
+        description: "Ya puedes iniciar sesión con tu nueva contraseña.",
+      });
     },
     onError: (error: Error) => {
-      toast.error(error.message || "El token es inválido o ha expirado.");
+      toast.error("Error al restablecer", {
+        description:
+          error.message ||
+          "El enlace puede haber caducado. Intenta solicitar uno nuevo.",
+      });
     },
   });
 }

@@ -26,7 +26,7 @@ export function NotificationBell() {
       {({ close }) => (
         <>
           <PopoverButton
-            className="relative p-2.5 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+            className="relative p-2.5 text-slate-500 hover:cursor-pointer hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
             aria-label={`${unreadCount} notificaciones no leídas`}
           >
             <IoNotificationsOutline size={24} />

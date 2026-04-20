@@ -80,23 +80,7 @@ export function LoginWizard() {
   const handleResend = () => {
     if (!unconfirmedEmail) return;
 
-    resendEmail(
-      { email: unconfirmedEmail },
-      {
-        onSuccess: () => {
-          toast.success("Correo reenviado", {
-            description:
-              "Hemos enviado un nuevo enlace de confirmación a tu bandeja.",
-          });
-        },
-        onError: () => {
-          toast.error("Error al reenviar", {
-            description:
-              "Por favor, espera unos minutos antes de intentar de nuevo.",
-          });
-        },
-      },
-    );
+    resendEmail({ email: unconfirmedEmail });
   };
 
   const handleBack = () => {

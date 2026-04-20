@@ -58,6 +58,9 @@ export const resetPasswordSchema = z.object({
   newPassword: z.string().min(8, {
     error: "La contraseña debe tener al menos 8 caracteres",
   }),
+  confirmNewPassword: z.string().min(8, {
+    error: "La confirmación de la contraseña debe tener al menos 8 caracteres",
+  }),
 });
 export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>;
 
@@ -72,9 +75,12 @@ export const authResponseSchema = z.object({
   }),
   role: z.array(UserRoleSchema),
   token: z.string(),
-  createdAt: z.string().refine((date) => !Number.isNaN(Date.parse(date)), {
-    error: "Fecha de creación inválida",
-  }).transform((date) => new Date(date)),
+  createdAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de creación inválida",
+    })
+    .transform((date) => new Date(date)),
   isEmailConfirmed: z.boolean(),
 });
 export type AuthResponse = z.infer<typeof authResponseSchema>;

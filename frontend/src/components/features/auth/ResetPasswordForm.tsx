@@ -54,17 +54,8 @@ export function ResetPasswordForm() {
   const onSubmit = (data: ResetPasswordRequest) => {
     resetPassword(data, {
       onSuccess: () => {
-        toast.success("Contraseña actualizada", {
-          description: "Ya puedes iniciar sesión con tu nueva contraseña.",
-        });
         // Persistimos el éxito en la URL
         router.push(createUrl({ status: "success" }), { scroll: false });
-      },
-      onError: () => {
-        toast.error("Error al restablecer", {
-          description:
-            "El enlace puede haber caducado. Intenta solicitar uno nuevo.",
-        });
       },
     });
   };
@@ -116,6 +107,12 @@ export function ResetPasswordForm() {
           label="Nueva contraseña"
           type="password"
           placeholder="Mínimo 8 caracteres"
+        />
+
+        <InputField
+          name="confirmNewPassword"
+          label="Confirmar nueva contraseña"
+          type="password"
         />
 
         <Button

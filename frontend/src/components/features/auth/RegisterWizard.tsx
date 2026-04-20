@@ -93,23 +93,7 @@ export function RegisterWizard() {
   const handleResend = () => {
     if (!registeredEmail) return;
 
-    resendEmail(
-      { email: registeredEmail },
-      {
-        onSuccess: () => {
-          toast.success("Correo reenviado", {
-            description:
-              "Hemos enviado un nuevo enlace de confirmación a tu bandeja.",
-          });
-        },
-        onError: () => {
-          toast.error("Error al reenviar", {
-            description:
-              "Por favor, espera unos minutos antes de intentar de nuevo.",
-          });
-        },
-      },
-    );
+    resendEmail({ email: registeredEmail });
   };
 
   const isFixEmailModalOpen = searchParams.get("modal") === "fix-email";

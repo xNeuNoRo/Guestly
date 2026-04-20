@@ -43,7 +43,7 @@ export function UserMenu() {
   return (
     <Menu as="div" className="relative inline-block text-left">
       {/* Gatillo: El Avatar del usuario */}
-      <MenuButton className="flex items-center gap-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 hover:opacity-90 transition-opacity">
+      <MenuButton className="flex items-center gap-2 rounded-full hover:cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 hover:opacity-90 transition-opacity">
         <Avatar
           initials={user.firstName[0] + user.lastName[0]}
           size="md"

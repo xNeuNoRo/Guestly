@@ -65,7 +65,7 @@ export function Modal({
               <button
                 type="button"
                 onClick={close}
-                className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors hover:cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
                 <span className="sr-only">Cerrar modal</span>
                 <IoClose className="h-6 w-6" aria-hidden="true" />
