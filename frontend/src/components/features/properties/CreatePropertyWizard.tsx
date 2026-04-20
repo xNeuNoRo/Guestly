@@ -132,14 +132,29 @@ export function CreatePropertyWizard() {
   const onSubmit = (data: CreatePropertyRequest) => {
     createProperty(data, {
       onSuccess: () => {
-        toast.success("¡Propiedad publicada con éxito!");
         router.push(ROUTES.HOST.DASHBOARD);
       },
-      onError: (error) => {
-        toast.error("Hubo un error al publicar la propiedad.");
-        console.error(error);
-      },
     });
+  };
+
+  // Lógica corregida para acumular imágenes sin reemplazar las anteriores
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newFiles = e.target.files;
+    if (!newFiles) return;
+
+    const currentFiles = form.getValues("images") as unknown as FileList;
+    const dataTransfer = new DataTransfer();
+
+    if (currentFiles) {
+      Array.from(currentFiles).forEach((file) => dataTransfer.items.add(file));
+    }
+
+    Array.from(newFiles).forEach((file) => dataTransfer.items.add(file));
+
+    form.setValue("images", dataTransfer.files, { shouldValidate: true });
+
+    // Reset para permitir volver a subir el mismo archivo si fue eliminado
+    e.target.value = "";
   };
 
   const removeImage = (indexToRemove: number) => {
@@ -180,7 +195,8 @@ export function CreatePropertyWizard() {
         onSubmit={onSubmit}
         className="flex flex-col flex-1 relative"
       >
-        <div className="p-6 relative min-h-75 overflow-hidden">
+        {/* Se quita el overflow-hidden y se ajusta el min-h para que el contenido fluya */}
+        <div className="p-6 relative min-h-75">
           <AnimatePresence mode="wait" custom={direction} initial={false}>
             {currentStep === 1 && (
               <motion.div
@@ -191,7 +207,7 @@ export function CreatePropertyWizard() {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="space-y-4 w-full absolute top-6 left-0 px-6"
+                className="space-y-4 w-full"
               >
                 <InputField
                   name="title"
@@ -222,7 +238,7 @@ export function CreatePropertyWizard() {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="space-y-4 w-full absolute top-6 left-0 px-6"
+                className="space-y-4 w-full"
               >
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-slate-700">
@@ -247,7 +263,7 @@ export function CreatePropertyWizard() {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="space-y-6 w-full absolute top-6 left-0 px-6"
+                className="space-y-6 w-full"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <InputField
@@ -277,7 +293,7 @@ export function CreatePropertyWizard() {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="space-y-4 w-full absolute top-6 left-0 px-6"
+                className="space-y-4 w-full"
               >
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-slate-700">
@@ -297,12 +313,12 @@ export function CreatePropertyWizard() {
                       multiple
                       accept="image/png, image/jpeg, image/webp"
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      {...form.register("images")}
+                      onChange={handleImageChange}
                     />
                   </div>
 
                   {form.formState.errors.images && (
-                    <p className="text-sm text-red-600 font-medium">
+                    <p className="text-sm text-red-600 font-medium text-center">
                       {form.formState.errors.images.message as string}
                     </p>
                   )}
