@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, ReactNode } from "react";
-import { useAppStore } from "@/stores/useAppStore";
+import { useAuth } from "@/hooks/stores/useAuth";
 import { useIsMounted } from "@/hooks/shared/useIsMounted";
 import { GuardConfig } from "@/types/auth";
 import { ROUTES } from "@/constants/routes";
@@ -13,7 +13,7 @@ interface AuthGuardProps extends GuardConfig {
 
 /**
  * @description Componente de protección de rutas.
- * Maneja autenticación, roles y validación de estado de cuenta.
+ * Maneja autenticación, roles y enrutamiento inteligente basado en el tipo de usuario.
  */
 export function AuthGuard({
   children,
@@ -23,34 +23,45 @@ export function AuthGuard({
 }: Readonly<AuthGuardProps>) {
   const router = useRouter();
   const isMounted = useIsMounted();
-  const { isAuthenticated, user } = useAppStore();
+  // Arsenal: Usamos useAuth para consistencia con el resto de la app
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     if (!isMounted) return;
 
+    // Rutas "Solo Públicas" (Login/Register)
     if (publicOnly && isAuthenticated) {
-      router.replace(ROUTES.HOST.DASHBOARD);
+      // Enrutamiento inteligente: Host -> Dashboard | Guest -> Home/Reservas
+      const isHost = user?.role?.includes("Host");
+      router.replace(isHost ? ROUTES.HOST.DASHBOARD : ROUTES.PUBLIC.HOME);
       return;
     }
 
+    // Rutas Privadas
     if (!publicOnly && !isAuthenticated) {
       router.replace(ROUTES.AUTH.LOGIN);
       return;
     }
 
+    // Verificación de Correo (Si es requerida)
     if (
       isAuthenticated &&
       requireEmailConfirmed &&
       user &&
       !user.isEmailConfirmed
     ) {
-      router.replace(ROUTES.USER.VERIFY_EMAIL);
+      router.replace(ROUTES.USER.SETTINGS);
       return;
     }
 
+    // Verificación de Roles (RBAC)
     if (isAuthenticated && allowedRoles && user) {
-      if (!allowedRoles.includes(user.role)) {
-        router.replace(ROUTES.UNAUTHORIZED);
+      const hasAllowedRole = user.role.some((role) =>
+        allowedRoles.includes(role),
+      );
+      if (!hasAllowedRole) {
+        // Redirigimos al home si no tiene permiso, en lugar de una pantalla muerta
+        router.replace(ROUTES.PUBLIC.HOME);
       }
     }
   }, [
@@ -65,11 +76,12 @@ export function AuthGuard({
 
   if (!isMounted) return null;
 
-  // Renderizado preventivo
+  // Renderizado preventivo estricto
   const shouldBlock =
     (!publicOnly && !isAuthenticated) ||
     (publicOnly && isAuthenticated) ||
-    (requireEmailConfirmed && user && !user.isEmailConfirmed);
+    (requireEmailConfirmed && user && !user.isEmailConfirmed) ||
+    (allowedRoles && user && !user.role.some((r) => allowedRoles.includes(r)));
 
   return shouldBlock ? null : <>{children}</>;
 }
