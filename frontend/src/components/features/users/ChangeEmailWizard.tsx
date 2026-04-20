@@ -5,6 +5,7 @@ import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { z } from "zod"; // ARSENAL: Importamos Zod
 import {
   IoShieldCheckmarkOutline,
   IoMailOpenOutline,
@@ -39,6 +40,12 @@ type ChangeEmailWizardFormData = {
   password?: string;
 };
 
+// ARSENAL: Creamos un esquema exclusivo para el paso 1 que ignora el correo
+const step1Schema = z.object({
+  password: z.string().min(1, "La contraseña es obligatoria"),
+  newEmail: z.string().optional(),
+});
+
 export function ChangeEmailWizard({
   isConfirmedMode = true,
   onSuccess,
@@ -57,24 +64,31 @@ export function ChangeEmailWizard({
   const { mutate: resendUnconfirmed, isPending: isChangingUnconfirmed } =
     useChangeUnconfirmedEmail();
 
+  let validationSchema:
+    | typeof changeUnconfirmedEmailSchema
+    | typeof step1Schema
+    | typeof changeEmailSchema;
+
+  if (!isConfirmedMode) {
+    validationSchema = changeUnconfirmedEmailSchema;
+  } else if (currentStep === 1) {
+    validationSchema = step1Schema;
+  } else {
+    validationSchema = changeEmailSchema;
+  }
+
   const form = useForm<ChangeEmailWizardFormData>({
+    // Esquema Dinámico. Cambia las reglas según el paso actual.
     resolver: zodResolver(
-      isConfirmedMode ? changeEmailSchema : changeUnconfirmedEmailSchema,
+      validationSchema,
     ) as Resolver<ChangeEmailWizardFormData>,
-    defaultValues: { newEmail: "temp@temp.com", password: "" },
+    defaultValues: { newEmail: "", password: "" },
+    shouldUnregister: false, // Importante para mantener los valores al cambiar de paso
   });
 
   const nextStep = () => {
     setDirection(1);
     router.push(createUrl({ wizardStep: currentStep + 1 }), { scroll: false });
-  };
-
-  const handleSecurityNext = async () => {
-    const isValid = await form.trigger("password");
-    if (isValid) {
-      form.setValue("newEmail", "");
-      nextStep();
-    }
   };
 
   const prevStep = () => {
@@ -83,6 +97,12 @@ export function ChangeEmailWizard({
   };
 
   const onSubmit = (data: ChangeEmailWizardFormData) => {
+    // Si el formulario se envía en el paso 1, solo avanzamos (así funciona el Enter)
+    if (isConfirmedMode && currentStep === 1) {
+      nextStep();
+      return;
+    }
+
     const commonOnSuccess = () => {
       setDirection(1);
       router.push(
@@ -149,8 +169,7 @@ export function ChangeEmailWizard({
                 type="password"
               />
               <Button
-                type="button"
-                onClick={handleSecurityNext}
+                type="submit"
                 className="w-full mt-4"
                 rightIcon={<IoArrowForwardOutline />}
               >

@@ -34,7 +34,11 @@ export default function SettingsPage() {
   // Función para cambiar de pestaña actualizando la URL
   const handleTabChange = (tab: TabType) => {
     // Si vamos al perfil (default), limpiamos el parámetro. Si no, lo establecemos.
-    const newUrl = createUrl({ tab: tab === "profile" ? null : tab });
+    const newUrl = createUrl({
+      tab: tab === "profile" ? null : tab,
+      wizardStep: null,
+      newEmail: null,
+    });
     router.push(newUrl, { scroll: false }); // scroll: false evita saltos bruscos
   };
 

@@ -3,7 +3,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IoKeyOutline, IoShieldCheckmarkOutline } from "react-icons/io5";
-import { toast } from "sonner";
 import { motion } from "framer-motion";
 
 import { Form } from "@/components/shared/form/Form";
