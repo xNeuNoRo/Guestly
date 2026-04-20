@@ -5,40 +5,40 @@ import { UserRoleSchema } from "./auth.schemas";
 
 export const updateUserProfileSchema = z.object({
   firstName: z.string().min(2, {
-    error: "El nombre debe tener al menos 2 caracteres",
+    message: "El nombre debe tener al menos 2 caracteres",
   }),
   lastName: z.string().min(2, {
-    error: "El apellido debe tener al menos 2 caracteres",
+    message: "El apellido debe tener al menos 2 caracteres",
   }),
 });
 export type UpdateUserProfileRequest = z.infer<typeof updateUserProfileSchema>;
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, {
-    error: "La contraseña actual es obligatoria",
+    message: "La contraseña actual es obligatoria",
   }),
   newPassword: z.string().min(8, {
-    error: "La contraseña debe tener al menos 8 caracteres",
+    message: "La contraseña debe tener al menos 8 caracteres",
   }),
   confirmNewPassword: z.string().min(8, {
-    error: "La confirmación debe tener al menos 8 caracteres",
+    message: "La confirmación debe tener al menos 8 caracteres",
   }),
 });
 export type ChangePasswordRequest = z.infer<typeof changePasswordSchema>;
 
 export const changeEmailSchema = z.object({
   newEmail: z.email({
-    error: "Formato de correo inválido",
+    message: "Formato de correo inválido",
   }),
   password: z.string().min(1, {
-    error: "La contraseña es obligatoria",
+    message: "La contraseña es obligatoria",
   }),
 });
 export type ChangeEmailRequest = z.infer<typeof changeEmailSchema>;
 
 export const changeUnconfirmedEmailSchema = z.object({
   newEmail: z.email({
-    error: "Formato de correo inválido",
+    message: "Formato de correo inválido",
   }),
 });
 export type ChangeUnconfirmedEmailRequest = z.infer<
@@ -57,13 +57,13 @@ export const userProfileResponseSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   email: z.email({
-    error: "Formato de correo inválido",
+    message: "Formato de correo inválido",
   }),
   role: z.array(UserRoleSchema),
   createdAt: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de creación inválida",
+      message: "Fecha de creación inválida",
     })
     .transform((date) => new Date(date)),
   isEmailConfirmed: z.boolean(),
@@ -77,7 +77,7 @@ export const publicProfileResponseSchema = z.object({
   createdAt: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de creación inválida",
+      message: "Fecha de creación inválida",
     })
     .transform((date) => new Date(date)),
 });

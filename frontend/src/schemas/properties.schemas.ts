@@ -11,13 +11,13 @@ export const dateRangeResponseSchema = z.object({
   startDate: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de inicio inválida",
+      message: "Fecha de inicio inválida",
     })
     .transform((date) => new Date(date)),
   endDate: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de fin inválida",
+      message: "Fecha de fin inválida",
     })
     .transform((date) => new Date(date)),
 });
@@ -37,13 +37,13 @@ export const propertyResponseSchema = z.object({
   createdAt: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de creación inválida",
+      message: "Fecha de creación inválida",
     })
     .transform((date) => new Date(date)),
   updatedAt: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de actualización inválida",
+      message: "Fecha de actualización inválida",
     })
     .transform((date) => new Date(date))
     .nullable()
@@ -69,16 +69,16 @@ export const propertySearchSchema = z.object({
 export type PropertySearchRequest = z.infer<typeof propertySearchSchema>;
 
 export const createPropertySchema = z.object({
-  title: z.string().min(1, { error: "El título es obligatorio" }),
-  description: z.string().min(1, { error: "La descripción es obligatoria" }),
-  location: z.string().min(1, { error: "La ubicación es obligatoria" }),
+  title: z.string().min(1, { message: "El título es obligatorio" }),
+  description: z.string().min(1, { message: "La descripción es obligatoria" }),
+  location: z.string().min(1, { message: "La ubicación es obligatoria" }),
   pricePerNight: z
     .number()
-    .min(0, { error: "El precio debe ser mayor o igual a 0" }),
+    .min(0, { message: "El precio debe ser mayor o igual a 0" }),
   cleaningFee: z
     .number()
-    .min(0, { error: "La tarifa de limpieza debe ser mayor o igual a 0" }),
-  capacity: z.number().min(1, { error: "La capacidad debe ser al menos 1" }),
+    .min(0, { message: "La tarifa de limpieza debe ser mayor o igual a 0" }),
+  capacity: z.number().min(1, { message: "La capacidad debe ser al menos 1" }),
   images: z.any(),
 });
 

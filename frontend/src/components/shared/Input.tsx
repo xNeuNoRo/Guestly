@@ -1,15 +1,25 @@
 "use client";
 
-import { forwardRef, useState, type InputHTMLAttributes, type ReactNode } from "react";
+import {
+  forwardRef,
+  useState,
+  type InputHTMLAttributes,
+  type ReactNode,
+} from "react";
 import clsx from "clsx";
-import { IoEyeOutline, IoEyeOffOutline, IoAlertCircleOutline } from "react-icons/io5";
+import {
+  IoEyeOutline,
+  IoEyeOffOutline,
+  IoAlertCircleOutline,
+} from "react-icons/io5";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  error?: string; // Mensaje de error (típicamente viene de react-hook-form)
+  // Ampliamos el tipo para atrapar objetos de error completos o booleanos
+  error?: string | boolean | Error;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
-  hint?: string; // Texto de ayuda debajo del input
+  hint?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -26,16 +36,32 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       disabled,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [showPassword, setShowPassword] = useState(false);
-    
-    // Generamos un ID seguro en caso de que no se provea uno, útil para accesibilidad
-    const inputId = id ?? (label ? label.toLowerCase().replaceAll(/\s+/g, "-") : undefined);
-    
+
+    const inputId =
+      id ?? (label ? label.toLowerCase().replaceAll(/\s+/g, "-") : undefined);
+
     const isPassword = type === "password";
     const currentType = isPassword && showPassword ? "text" : type;
-    const hasError = !!error;
+
+    // Evaluamos la existencia del error sin depender del truthiness de un string.
+    // Así un string vacío ("") de Zod sí activará el estado de error visual.
+    const hasError = error !== undefined && error !== null && error !== false;
+
+    // Extracción segura del mensaje para que nunca se quede en el aire
+    let errorMessage = "Campo inválido";
+    if (typeof error === "string" && error.trim() !== "") {
+      errorMessage = error;
+    } else if (
+      error &&
+      typeof error === "object" &&
+      typeof error.message === "string" &&
+      error.message.trim() !== ""
+    ) {
+      errorMessage = error.message;
+    }
 
     let ariaDescribedBy: string | undefined;
     if (hasError) {
@@ -52,24 +78,38 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           type="button"
           onClick={() => setShowPassword(!showPassword)}
           className="text-slate-400 hover:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-md"
-          aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+          aria-label={
+            showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+          }
         >
-          {showPassword ? <IoEyeOffOutline size={18} /> : <IoEyeOutline size={18} />}
+          {showPassword ? (
+            <IoEyeOffOutline size={18} />
+          ) : (
+            <IoEyeOutline size={18} />
+          )}
         </button>
       );
     } else if (hasError) {
       rightAdornment = (
-        <IoAlertCircleOutline size={18} className="text-red-500 pointer-events-none" />
+        <IoAlertCircleOutline
+          size={18}
+          className="text-red-500 pointer-events-none"
+        />
       );
     } else if (rightIcon) {
-      rightAdornment = <div className="text-slate-400 pointer-events-none">{rightIcon}</div>;
+      rightAdornment = (
+        <div className="text-slate-400 pointer-events-none">{rightIcon}</div>
+      );
     }
 
     let helperMessage: ReactNode = null;
     if (hasError) {
       helperMessage = (
-        <p id={`${inputId}-error`} className="text-sm text-red-600 font-medium animate-in fade-in slide-in-from-top-1">
-          {error}
+        <p
+          id={`${inputId}-error`}
+          className="text-sm text-red-600 font-medium animate-in fade-in slide-in-from-top-1"
+        >
+          {errorMessage}
         </p>
       );
     } else if (hint) {
@@ -113,8 +153,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               "focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500",
               // Dinámica de Paddings según los iconos
               leftIcon ? "pl-10" : "pl-3",
-              (rightIcon || isPassword || hasError) ? "pr-10" : "pr-3",
-              // Dinámica de Estados (Error vs Normal)
+              rightIcon || isPassword || hasError ? "pr-10" : "pr-3",
               hasError
                 ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                 : "border-slate-300 focus:border-primary-500 focus:ring-primary-500/20",

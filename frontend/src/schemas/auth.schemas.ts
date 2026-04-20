@@ -7,26 +7,26 @@ export type UserRole = z.infer<typeof UserRoleSchema>;
 
 export const loginSchema = z.object({
   email: z.email({
-    error: "Formato de correo inválido",
+    message: "Formato de correo inválido",
   }),
   password: z.string().min(1, {
-    error: "La contraseña no puede estar vacía",
+    message: "La contraseña no puede estar vacía",
   }),
 });
 export type LoginRequest = z.infer<typeof loginSchema>;
 
 export const registerSchema = z.object({
   firstName: z.string().min(2, {
-    error: "El nombre debe tener al menos 2 caracteres",
+    message: "El nombre debe tener al menos 2 caracteres",
   }),
   lastName: z.string().min(2, {
-    error: "El apellido debe tener al menos 2 caracteres",
+    message: "El apellido debe tener al menos 2 caracteres",
   }),
   email: z.email({
-    error: "Formato de correo inválido",
+    message: "Formato de correo inválido",
   }),
   password: z.string().min(8, {
-    error: "La contraseña debe tener al menos 8 caracteres",
+    message: "La contraseña debe tener al menos 8 caracteres",
   }),
   role: UserRoleSchema,
 });
@@ -34,7 +34,7 @@ export type RegisterRequest = z.infer<typeof registerSchema>;
 
 export const resendConfirmationSchema = z.object({
   email: z.email({
-    error: "Formato de correo inválido",
+    message: "Formato de correo inválido",
   }),
 });
 export type ResendConfirmationEmailRequest = z.infer<
@@ -43,23 +43,23 @@ export type ResendConfirmationEmailRequest = z.infer<
 
 export const forgotPasswordSchema = z.object({
   email: z.email({
-    error: "Formato de correo inválido",
+    message: "Formato de correo inválido",
   }),
 });
 export type ForgotPasswordRequest = z.infer<typeof forgotPasswordSchema>;
 
 export const resetPasswordSchema = z.object({
   email: z.email({
-    error: "Formato de correo inválido",
+    message: "Formato de correo inválido",
   }),
   token: z.string().min(1, {
-    error: "El token de seguridad es obligatorio",
+    message: "El token de seguridad es obligatorio",
   }),
   newPassword: z.string().min(8, {
-    error: "La contraseña debe tener al menos 8 caracteres",
+    message: "La contraseña debe tener al menos 8 caracteres",
   }),
   confirmNewPassword: z.string().min(8, {
-    error: "La confirmación de la contraseña debe tener al menos 8 caracteres",
+    message: "La confirmación de la contraseña debe tener al menos 8 caracteres",
   }),
 });
 export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>;
@@ -71,14 +71,14 @@ export const authResponseSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   email: z.email({
-    error: "Formato de correo inválido",
+    message: "Formato de correo inválido",
   }),
   role: z.array(UserRoleSchema),
   token: z.string(),
   createdAt: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de creación inválida",
+      message: "Fecha de creación inválida",
     })
     .transform((date) => new Date(date)),
   isEmailConfirmed: z.boolean(),

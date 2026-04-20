@@ -21,13 +21,13 @@ export const notificationResponseSchema = z.object({
   createdAt: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de creación inválida",
+      message: "Fecha de creación inválida",
     })
     .transform((date) => new Date(date)),
   readAt: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de lectura inválida",
+      message: "Fecha de lectura inválida",
     })
     .transform((date) => new Date(date))
     .nullable()

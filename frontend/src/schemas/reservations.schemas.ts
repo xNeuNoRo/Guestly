@@ -17,9 +17,9 @@ export type ReservationStatusMutate = z.infer<typeof ReservationStatusMutate>;
 // --- Schemas de Petición (Requests) ---
 
 export const createReservationSchema = z.object({
-  propertyId: z.uuid({ error: "El ID de la propiedad es inválido" }),
-  startDate: z.date({ error: "La fecha de inicio es obligatoria" }),
-  endDate: z.date({ error: "La fecha de fin es obligatoria" }),
+  propertyId: z.uuid({ message: "El ID de la propiedad es inválido" }),
+  startDate: z.date({ message: "La fecha de inicio es obligatoria" }),
+  endDate: z.date({ message: "La fecha de fin es obligatoria" }),
 });
 export type CreateReservationRequest = z.infer<typeof createReservationSchema>;
 
@@ -41,9 +41,9 @@ export type UpdateReservationStatusRequest = z.infer<
 >;
 
 export const createPropertyBlockSchema = z.object({
-  propertyId: z.uuid({ error: "El ID de la propiedad es inválido" }),
-  startDate: z.date({ error: "La fecha de inicio es obligatoria" }),
-  endDate: z.date({ error: "La fecha de fin es obligatoria" }),
+  propertyId: z.uuid({ message: "El ID de la propiedad es inválido" }),
+  startDate: z.date({ message: "La fecha de inicio es obligatoria" }),
+  endDate: z.date({ message: "La fecha de fin es obligatoria" }),
   reason: z.string().optional(),
 });
 export type CreatePropertyBlockRequest = z.infer<
@@ -51,8 +51,8 @@ export type CreatePropertyBlockRequest = z.infer<
 >;
 
 export const updatePropertyBlockSchema = z.object({
-  startDate: z.date({ error: "La fecha de inicio es obligatoria" }),
-  endDate: z.date({ error: "La fecha de fin es obligatoria" }),
+  startDate: z.date({ message: "La fecha de inicio es obligatoria" }),
+  endDate: z.date({ message: "La fecha de fin es obligatoria" }),
   reason: z.string().optional(),
 });
 export type UpdatePropertyBlockRequest = z.infer<
@@ -78,20 +78,20 @@ export const propertyBlockResponseSchema = z.object({
   startDate: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de creación inválida",
+      message: "Fecha de creación inválida",
     })
     .transform((date) => new Date(date)),
   endDate: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de creación inválida",
+      message: "Fecha de fin inválida",
     })
     .transform((date) => new Date(date)),
   reason: z.string().nullable().optional(),
   createdAt: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de creación inválida",
+      message: "Fecha de creación inválida",
     })
     .transform((date) => new Date(date)),
 });
@@ -110,13 +110,13 @@ export const reservationResponseSchema = z.object({
   checkInDate: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de inicio inválida",
+      message: "Fecha de inicio inválida",
     })
     .transform((date) => new Date(date)),
   checkOutDate: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de fin inválida",
+      message: "Fecha de fin inválida",
     })
     .transform((date) => new Date(date)),
   pricePerNightAtBooking: z.number(),
@@ -128,13 +128,13 @@ export const reservationResponseSchema = z.object({
   createdAt: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de creación inválida",
+      message: "Fecha de creación inválida",
     })
     .transform((date) => new Date(date)),
   updatedAt: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
-      error: "Fecha de actualización inválida",
+      message: "Fecha de actualización inválida",
     })
     .transform((date) => new Date(date))
     .nullable()
