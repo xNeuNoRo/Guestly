@@ -107,7 +107,7 @@ export function UnlockRoleBanner() {
           onClick={handleUnlock}
           isLoading={isPending}
           size="lg"
-          className="bg-white text-slate-900 hover:bg-slate-100 px-8 py-6 rounded-2xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0 border-none"
+          className="bg-primary-600 text-white hover:bg-primary-700 px-8 py-6 rounded-2xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0 border-none"
           rightIcon={<IoArrowForwardOutline size={20} />}
         >
           {config.buttonText}

@@ -36,35 +36,19 @@ export function ProfileSettingsForm() {
       firstName: "",
       lastName: "",
     },
+    values: {
+      firstName: profile?.firstName || "",
+      lastName: profile?.lastName || "",
+    },
   });
-
-  // 3. Efecto para resetear el formulario cuando los datos del perfil lleguen del servidor
-  useEffect(() => {
-    if (profile) {
-      form.reset({
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-      });
-    }
-  }, [profile, form]);
 
   const onSubmit = (data: UpdateUserProfileRequest) => {
     updateProfile(data, {
       onSuccess: (updatedUser) => {
-        toast.success("Perfil actualizado", {
-          description: "Tus cambios se han guardado correctamente.",
-        });
         form.reset({
           firstName: updatedUser.firstName,
           lastName: updatedUser.lastName,
         });
-      },
-      onError: (error) => {
-        toast.error("Error al actualizar", {
-          description:
-            "No se pudieron guardar los cambios. Inténtalo de nuevo.",
-        });
-        console.error(error);
       },
     });
   };

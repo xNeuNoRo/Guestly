@@ -22,16 +22,22 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: updateProfile,
     onSuccess: (data) => {
-      toast.success("Perfil actualizado exitosamente.");
-      
+      toast.success("Perfil actualizado", {
+        description: "Tus cambios se han guardado correctamente.",
+      });
+
       // Actualizamos el estado global (Zustand)
       setUser(data);
-      
+
       // Actualizamos la caché de React Query mediante Pessimistic Update
       queryClient.setQueryData(userKeys.me(), data);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Error al actualizar el perfil.");
+      toast.error("Error al actualizar", {
+        description:
+          error.message ||
+          "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+      });
     },
   });
 }
@@ -43,10 +49,16 @@ export function useChangePassword() {
   return useMutation({
     mutationFn: changePassword,
     onSuccess: () => {
-      toast.success("Tu contraseña ha sido cambiada de forma segura.");
+      toast.success("Seguridad actualizada", {
+        description: "Tu contraseña ha sido cambiada exitosamente.",
+      });
     },
     onError: (error: Error) => {
-      toast.error(error.message || "No se pudo cambiar la contraseña.");
+      toast.error("Error de validación", {
+        description:
+          error.message ||
+          "La contraseña actual es incorrecta o no cumple los requisitos.",
+      });
     },
   });
 }
@@ -58,7 +70,9 @@ export function useChangeEmail() {
   return useMutation({
     mutationFn: changeEmail,
     onSuccess: () => {
-      toast.success("Te hemos enviado un enlace de confirmación al nuevo correo.");
+      toast.success(
+        "Te hemos enviado un enlace de confirmación al nuevo correo.",
+      );
     },
     onError: (error: Error) => {
       toast.error(error.message || "Error al solicitar el cambio de correo.");
@@ -112,16 +126,20 @@ export function useAddRole() {
   return useMutation({
     mutationFn: addRole,
     onSuccess: (data) => {
-      toast.success("¡Felicidades! Ahora tienes acceso a las funciones de Anfitrión.");
-      
+      toast.success(
+        "¡Felicidades! Ahora tienes acceso a las funciones de Anfitrión.",
+      );
+
       // data incluye el nuevo JWT (token) y el perfil actualizado
       setAuth(data.token, data);
-      
+
       // Actualizamos la caché también para mantener congruencia
       queryClient.setQueryData(userKeys.me(), data);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Ocurrió un problema al procesar tu solicitud.");
+      toast.error(
+        error.message || "Ocurrió un problema al procesar tu solicitud.",
+      );
     },
   });
 }

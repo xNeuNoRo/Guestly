@@ -43,17 +43,7 @@ export function ChangePasswordForm() {
 
     changePassword(data, {
       onSuccess: () => {
-        toast.success("Seguridad actualizada", {
-          description: "Tu contraseña ha sido cambiada exitosamente.",
-        });
         form.reset(); // Limpiamos campos sensibles tras el éxito
-      },
-      onError: (error) => {
-        toast.error("Error de validación", {
-          description:
-            "La contraseña actual es incorrecta o no cumple los requisitos.",
-        });
-        console.error(error);
       },
     });
   };
