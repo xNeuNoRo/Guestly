@@ -1,70 +1,113 @@
-import Image from "next/image";
-import { PropertySearchBar } from "@/components/features/properties/PropertySearchBar";
-// IMPORTANTE: Aquí importaríamos un listado de propiedades destacadas si tienes el componente
-// import { FeaturedProperties } from "@/components/features/properties/FeaturedProperties";
+"use client";
 
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { IoSearchOutline } from "react-icons/io5";
+
+import { PropertyCard } from "@/components/features/properties/PropertyCard";
+import { Skeleton } from "@/components/shared/Skeleton";
+import { useSearchProperties } from "@/hooks/properties";
+
+/**
+ * @description Landing Page de Guestly.
+ * Conectada al motor de búsqueda de la Navbar mediante los parámetros de la URL.
+ * Muestra el grid general o los resultados filtrados dinámicamente.
+ */
 export default function HomePage() {
+  const searchParams = useSearchParams();
+  const locationQuery = searchParams.get("location");
+
+  // Arsenal: Hook real que reacciona automáticamente a los cambios en la URL
+  const { data: properties, isLoading, isError } = useSearchProperties();
+
+  const propertiesContent = (() => {
+    if (isLoading) {
+      // Skeletons mientras carga la API
+      return Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className="space-y-4">
+          <Skeleton className="h-64 w-full rounded-3xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-3/4 rounded-lg" />
+            <Skeleton className="h-4 w-1/2 rounded-lg" />
+          </div>
+        </div>
+      ));
+    }
+
+    if (properties && properties.length > 0) {
+      // Mapeo de propiedades reales
+      return properties.map((property) => (
+        <PropertyCard key={property.id} property={property} />
+      ));
+    }
+
+    // Empty State robusto cuando la búsqueda no arroja resultados
+    return (
+      <div className="col-span-full py-24 flex flex-col items-center justify-center text-center bg-slate-50 rounded-[3rem] border border-dashed border-slate-200">
+        <div className="h-20 w-20 bg-white rounded-full flex items-center justify-center shadow-sm mb-6">
+          <IoSearchOutline size={40} className="text-slate-300" />
+        </div>
+        <h3 className="text-xl font-bold text-slate-900 mb-2">
+          No se encontraron propiedades
+        </h3>
+        <p className="text-slate-500 max-w-md">
+          Intenta ajustar los filtros de búsqueda en la barra superior,
+          cambia el destino o reduce la cantidad de huéspedes.
+        </p>
+      </div>
+    );
+  })();
+
   return (
     <div className="flex flex-col min-h-screen">
-      {/* HERO SECTION
-        Un encabezado inmersivo con la barra de búsqueda centrada.
-      */}
-      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-4 flex items-center justify-center min-h-[600px] overflow-hidden">
-        {/* Fondo decorativo (Puedes reemplazar el bg-slate-900 con una imagen real optimizada) */}
-        <div className="absolute inset-0 z-0 bg-slate-900">
-          <Image
-            src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop"
-            alt="Casa de playa espectacular"
-            fill
-            className="object-cover opacity-40"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-900/90" />
-        </div>
+      {/* 1. HERO SECTION (Visual e Inspirador) */}
+      <section className="relative h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden">
+        <Image
+          src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1980&auto=format&fit=crop"
+          alt="Interior de lujo"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/40" />
 
-        <div className="relative z-10 w-full max-w-5xl mx-auto text-center space-y-8">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tight drop-shadow-lg">
-            Encuentra tu próximo <br className="hidden md:block" />
-            <span className="text-primary-400">destino inolvidable</span>
+        <div className="relative z-10 text-center px-4">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tight drop-shadow-2xl">
+            Tu próximo hogar, <br />
+            <span className="text-primary-400">donde quieras.</span>
           </h1>
-
-          <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto drop-shadow-md font-medium">
-            Descubre casas, cabañas y apartamentos únicos administrados por
-            anfitriones excepcionales en todo el mundo.
+          <p className="mt-6 text-lg md:text-xl text-white/90 font-medium max-w-xl mx-auto drop-shadow-md">
+            Descubre alojamientos únicos verificados por nuestra comunidad.
           </p>
-
-          {/* ARSENAL: Inyectamos el motor de búsqueda en el corazón de la página */}
-          <div className="mt-12 max-w-4xl mx-auto bg-white/10 backdrop-blur-md p-2 md:p-3 rounded-[2rem] shadow-2xl border border-white/20">
-            <PropertySearchBar />
-          </div>
         </div>
       </section>
 
-      {/* SECCIÓN DE EXPLORACIÓN
-        Aquí irían las propiedades destacadas.
-      */}
-      <section className="py-20 px-4 md:px-6 container mx-auto flex-1">
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-              Propiedades Destacadas
-            </h2>
-            <p className="text-slate-500 mt-2">
-              Alojamientos altamente calificados por la comunidad de Guestly.
-            </p>
-          </div>
+      {/* 2. GRID DE PROPIEDADES (Exploración / Resultados) */}
+      <main className="py-16 container mx-auto px-4 md:px-6 flex-1">
+        <div className="mb-10">
+          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
+            {locationQuery
+              ? `Resultados en "${locationQuery}"`
+              : "Explora lo mejor de Guestly"}
+          </h2>
+          <p className="text-slate-500 mt-2">
+            {locationQuery
+              ? "Alojamientos que coinciden con tu búsqueda actual."
+              : "Propiedades destacadas con las mejores calificaciones."}
+          </p>
         </div>
 
-        {/* Si ya construimos un listado de propiedades para el Home, se colocaría aquí.
-          Por ahora, dejamos el espacio estructural listo.
-        */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="h-72 bg-slate-100 rounded-3xl animate-pulse border border-slate-200"></div>
-          <div className="h-72 bg-slate-100 rounded-3xl animate-pulse border border-slate-200"></div>
-          <div className="h-72 bg-slate-100 rounded-3xl animate-pulse border border-slate-200"></div>
-          <div className="h-72 bg-slate-100 rounded-3xl animate-pulse border border-slate-200"></div>
-        </div>
-      </section>
+        {isError ? (
+          <div className="py-16 text-center bg-red-50 rounded-4xl border border-red-100 text-red-600 font-bold shadow-sm">
+            No pudimos cargar las propiedades. Verifica tu conexión con el
+            servidor.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
+            {propertiesContent}
+          </div>
+        )}
+      </main>
     </div>
   );
 }
