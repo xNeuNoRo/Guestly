@@ -18,6 +18,9 @@ public class FluentEmailService : IEmailService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<FluentEmailService> _logger;
 
+    // Patron semaforo para controlar el acceso concurrente al envío de correos electrónicos, evitando saturar el servidor SMTP
+    private static readonly SemaphoreSlim _smtpQueue = new SemaphoreSlim(1, 1);
+
     public FluentEmailService(IServiceScopeFactory scopeFactory, ILogger<FluentEmailService> logger)
     {
         _scopeFactory = scopeFactory;
@@ -35,14 +38,10 @@ public class FluentEmailService : IEmailService
     {
         _ = Task.Run(async () =>
         {
+            await _smtpQueue.WaitAsync();
+
             try
             {
-                // Agregamos un jitter (retraso aleatorio de 50ms a 300ms)
-                // para evitar colisiones de hilos SMTP si se mandan varios correos al mismo tiempo.
-                // Como está dentro del Task.Run, NO bloquea la respuesta HTTP al usuario.
-                var randomDelay = new Random().Next(50, 300);
-                await Task.Delay(randomDelay, CancellationToken.None);
-
                 // Creamos un nuevo ámbito de servicio para resolver IFluentEmailFactory,
                 // lo que nos permite enviar correos electrónicos de manera segura y eficiente.
                 using var scope = _scopeFactory.CreateScope();
@@ -102,6 +101,11 @@ public class FluentEmailService : IEmailService
                     toEmail
                 );
                 return false;
+            }
+            finally
+            {
+                // Liberamos el semáforo para permitir que el siguiente correo en la cola se envíe.
+                _smtpQueue.Release();
             }
         });
 
