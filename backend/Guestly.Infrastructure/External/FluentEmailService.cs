@@ -37,6 +37,12 @@ public class FluentEmailService : IEmailService
         {
             try
             {
+                // Agregamos un jitter (retraso aleatorio de 50ms a 300ms)
+                // para evitar colisiones de hilos SMTP si se mandan varios correos al mismo tiempo.
+                // Como está dentro del Task.Run, NO bloquea la respuesta HTTP al usuario.
+                var randomDelay = new Random().Next(50, 300);
+                await Task.Delay(randomDelay, CancellationToken.None);
+
                 // Creamos un nuevo ámbito de servicio para resolver IFluentEmailFactory,
                 // lo que nos permite enviar correos electrónicos de manera segura y eficiente.
                 using var scope = _scopeFactory.CreateScope();
