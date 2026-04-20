@@ -10,8 +10,11 @@ interface ScrollState {
 // sin provocar re-renders innecesarios por estados intermedios.
 let lastScrollY = 0;
 
+const serverSnapshot: ScrollState = { x: 0, y: 0, direction: null };
+let cachedSnapshot: ScrollState = serverSnapshot;
+
 /**
- * @description Hook de scroll ultra-refinado. 
+ * @description Hook de scroll ultra-refinado.
  * Proporciona las coordenadas X/Y y la dirección del desplazamiento.
  * Utiliza 'useSyncExternalStore' para una sincronización perfecta con el SSR.
  * @returns Un objeto con la posición actual (x, y) y la dirección ('up', 'down' o null).
@@ -32,28 +35,33 @@ export function useScroll(): ScrollState {
     },
     // Snapshot (Cliente): Calculamos la posición y dirección actual
     () => {
-      if (globalThis.window === undefined) return { x: 0, y: 0, direction: null };
+      if (globalThis.window === undefined) return serverSnapshot;
 
       const currentY = window.scrollY;
       const currentX = window.scrollX;
-      
-      let direction: "up" | "down" | null = null;
 
-      if (currentY > lastScrollY) {
-        direction = "down";
-      } else if (currentY < lastScrollY) {
-        direction = "up";
+      if (currentY !== cachedSnapshot.y || currentX !== cachedSnapshot.x) {
+        let direction: "up" | "down" | null = null;
+
+        if (currentY > lastScrollY) {
+          direction = "down";
+        } else if (currentY < lastScrollY) {
+          direction = "up";
+        }
+
+        lastScrollY = currentY;
+
+        cachedSnapshot = {
+          x: currentX,
+          y: currentY,
+          direction,
+        };
       }
 
-      lastScrollY = currentY;
-
-      return {
-        x: currentX,
-        y: currentY,
-        direction,
-      };
+      // Devolvemos la referencia en caché
+      return cachedSnapshot;
     },
     // Snapshot (Servidor): Valor inicial para el renderizado inicial
-    () => ({ x: 0, y: 0, direction: null })
+    () => serverSnapshot, // SOLUCIÓN: Retornar siempre la misma referencia constante
   );
 }

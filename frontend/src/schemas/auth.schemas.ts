@@ -70,7 +70,7 @@ export const authResponseSchema = z.object({
   email: z.email({
     error: "Formato de correo inválido",
   }),
-  role: UserRoleSchema,
+  role: z.array(UserRoleSchema),
   token: z.string(),
   createdAt: z.date(),
   isEmailConfirmed: z.boolean(),

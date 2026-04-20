@@ -5,8 +5,14 @@ export const ReservationStatusSchema = z.enum([
   "Pending",
   "Confirmed",
   "Cancelled",
+  "Completed",
+]);
+export const ReservationStatusMutate = ReservationStatusSchema.exclude([
+  "Pending",
+  "Completed",
 ]);
 export type ReservationStatus = z.infer<typeof ReservationStatusSchema>;
+export type ReservationStatusMutate = z.infer<typeof ReservationStatusMutate>;
 
 // --- Schemas de Petición (Requests) ---
 
@@ -28,7 +34,7 @@ export const reservationSearchSchema = z.object({
 export type ReservationSearchRequest = z.infer<typeof reservationSearchSchema>;
 
 export const updateReservationStatusSchema = z.object({
-  newStatus: ReservationStatusSchema,
+  newStatus: ReservationStatusMutate,
 });
 export type UpdateReservationStatusRequest = z.infer<
   typeof updateReservationStatusSchema
