@@ -37,8 +37,8 @@ export function ConfirmEmailChangeHandler() {
     }
   }, [email, token, mutate]);
 
-  const handleGoToProfile = () => {
-    router.push(ROUTES.USER.SETTINGS);
+  const handleGoToLogin = () => {
+    router.push(ROUTES.AUTH.LOGIN);
   };
 
   if (!email || !token) {
@@ -49,8 +49,8 @@ export function ConfirmEmailChangeHandler() {
           <p className="text-slate-500 font-medium">
             Enlace inválido o incompleto.
           </p>
-          <Button onClick={handleGoToProfile} variant="ghost">
-            Volver a configuración
+          <Button onClick={handleGoToLogin} variant="ghost">
+            Volver a iniciar sesión para solicitar un nuevo cambio
           </Button>
         </div>
       </div>
@@ -109,20 +109,20 @@ export function ConfirmEmailChangeHandler() {
               <p className="text-slate-600">
                 Tu dirección ha sido actualizada a{" "}
                 <span className="font-bold text-slate-900">{email}</span>{" "}
-                correctamente.
+                correctamente. Por seguridad, inicia sesión nuevamente.
               </p>
             </div>
             <Button
-              onClick={handleGoToProfile}
+              onClick={handleGoToLogin}
               className="w-full h-12 rounded-2xl"
               rightIcon={<IoArrowForwardOutline />}
             >
-              Ir a mi perfil
+              Iniciar sesión
             </Button>
           </motion.div>
         )}
 
-        {/* ESTADO: ERROR (Arsenal: handleApiError message) */}
+        {/* ESTADO: ERROR */}
         {isError && (
           <motion.div
             key="error"
@@ -145,10 +145,10 @@ export function ConfirmEmailChangeHandler() {
             <div className="flex flex-col gap-3">
               <Button
                 variant="ghost"
-                onClick={handleGoToProfile}
+                onClick={handleGoToLogin}
                 className="w-full"
               >
-                Volver al perfil
+                Volver a iniciar sesión para solicitar un nuevo cambio
               </Button>
               <p className="text-xs text-slate-400">
                 Si el problema persiste, solicita un nuevo cambio desde tu
