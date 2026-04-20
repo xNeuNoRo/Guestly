@@ -20,8 +20,9 @@ export function useRegister() {
   return useMutation({
     mutationFn: register,
     onSuccess: (data) => {
+      const { token, ...userProfile } = data;
       // Guardamos el token y el perfil en el estado global
-      setAuth(data.token, data);
+      setAuth(token, userProfile);
       toast.success("Cuenta creada exitosamente. ¡Bienvenido!");
     },
     onError: (error: Error) => {
@@ -45,7 +46,9 @@ export function useLogin() {
       toast.success("Inicio de sesión exitoso.");
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Credenciales incorrectas o error de conexión.");
+      toast.error(
+        error.message || "Credenciales incorrectas o error de conexión.",
+      );
     },
   });
 }
@@ -60,7 +63,9 @@ export function useConfirmEmail() {
     mutationFn: ({ email, token }: { email: string; token: string }) =>
       confirmEmail(email, token),
     onSuccess: () => {
-      toast.success("Correo confirmado exitosamente. Ya puedes iniciar sesión.");
+      toast.success(
+        "Correo confirmado exitosamente. Ya puedes iniciar sesión.",
+      );
     },
     onError: (error: Error) => {
       toast.error(error.message || "El enlace es inválido o ha expirado.");
@@ -75,9 +80,6 @@ export function useConfirmEmail() {
 export function useResendConfirmation() {
   return useMutation({
     mutationFn: resendConfirmation,
-    onSuccess: () => {
-      toast.success("Si el correo está registrado, recibirás un nuevo enlace de confirmación.");
-    },
     onError: (error: Error) => {
       toast.error(error.message || "Error al reenviar el correo.");
     },
@@ -92,7 +94,9 @@ export function useForgotPassword() {
   return useMutation({
     mutationFn: forgotPassword,
     onSuccess: () => {
-      toast.success("Se han enviado las instrucciones a tu correo electrónico.");
+      toast.success(
+        "Se han enviado las instrucciones a tu correo electrónico.",
+      );
     },
     onError: (error: Error) => {
       toast.error(error.message || "No se pudo procesar la solicitud.");
@@ -108,7 +112,9 @@ export function useResetPassword() {
   return useMutation({
     mutationFn: resetPassword,
     onSuccess: () => {
-      toast.success("Contraseña actualizada correctamente. Ya puedes iniciar sesión con tu nueva clave.");
+      toast.success(
+        "Contraseña actualizada correctamente. Ya puedes iniciar sesión con tu nueva clave.",
+      );
     },
     onError: (error: Error) => {
       toast.error(error.message || "El token es inválido o ha expirado.");

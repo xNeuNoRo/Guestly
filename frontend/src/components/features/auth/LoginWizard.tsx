@@ -37,7 +37,7 @@ const slideVariants = {
   }),
 };
 
-export function LoginForm() {
+export function LoginWizard() {
   const router = useRouter();
   const { createUrl, searchParams } = useQueryString();
 
@@ -73,11 +73,6 @@ export function LoginForm() {
 
         toast.success(`¡Bienvenido de vuelta, ${authResponse.firstName}!`);
         router.push(ROUTES.PUBLIC.HOME);
-      },
-      onError: () => {
-        toast.error("Credenciales incorrectas", {
-          description: "Verifica tu correo y contraseña e intenta de nuevo.",
-        });
       },
     });
   };

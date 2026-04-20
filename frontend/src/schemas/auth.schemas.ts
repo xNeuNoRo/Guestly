@@ -72,7 +72,9 @@ export const authResponseSchema = z.object({
   }),
   role: z.array(UserRoleSchema),
   token: z.string(),
-  createdAt: z.date(),
+  createdAt: z.string().refine((date) => !Number.isNaN(Date.parse(date)), {
+    error: "Fecha de creación inválida",
+  }).transform((date) => new Date(date)),
   isEmailConfirmed: z.boolean(),
 });
 export type AuthResponse = z.infer<typeof authResponseSchema>;

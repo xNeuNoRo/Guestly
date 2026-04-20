@@ -10,6 +10,7 @@ import {
   IoKeyOutline,
   IoHomeOutline,
   IoCheckmarkCircle,
+  IoArrowForwardOutline,
 } from "react-icons/io5";
 import { toast } from "sonner";
 import clsx from "clsx";
@@ -71,6 +72,7 @@ export function RegisterWizard() {
   });
 
   const selectedRole = form.watch("role");
+  const currentFormEmail = form.watch("email");
 
   // --- Helpers Reconstruidos (Para no extrañar el useStep) ---
   const navigateToStep = (step: number, email?: string) => {
@@ -83,13 +85,7 @@ export function RegisterWizard() {
   const onSubmit = (data: RegisterRequest) => {
     register(data, {
       onSuccess: () => {
-        // En vez de nextStep() local, disparamos la navegación por URL
         navigateToStep(2, data.email);
-      },
-      onError: () => {
-        toast.error("Error al registrar", {
-          description: "Revisa tus datos o intenta con otro correo.",
-        });
       },
     });
   };
@@ -117,6 +113,10 @@ export function RegisterWizard() {
   };
 
   const isFixEmailModalOpen = searchParams.get("modal") === "fix-email";
+
+  // ARSENAL: Detectamos si el usuario ya se registró y si no ha modificado el email en el input
+  const isAlreadyRegistered =
+    Boolean(registeredEmail) && currentFormEmail === registeredEmail;
 
   return (
     <div className="w-full max-w-md mx-auto bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden relative">
@@ -154,7 +154,7 @@ export function RegisterWizard() {
                       form.setValue("role", "Guest", { shouldValidate: true })
                     }
                     className={clsx(
-                      "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all relative",
+                      "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all relative hover:cursor-pointer",
                       selectedRole === "Guest"
                         ? "border-primary-600 bg-primary-50 text-primary-700"
                         : "border-slate-200 bg-white hover:border-slate-300 text-slate-500",
@@ -173,7 +173,7 @@ export function RegisterWizard() {
                       form.setValue("role", "Host", { shouldValidate: true })
                     }
                     className={clsx(
-                      "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all relative",
+                      "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all relative hover:cursor-pointer",
                       selectedRole === "Host"
                         ? "border-primary-600 bg-primary-50 text-primary-700"
                         : "border-slate-200 bg-white hover:border-slate-300 text-slate-500",
@@ -214,14 +214,27 @@ export function RegisterWizard() {
                 placeholder="Mínimo 8 caracteres"
               />
 
-              <Button
-                type="submit"
-                className="w-full py-4 text-base mt-2"
-                isLoading={isRegistering}
-                leftIcon={!isRegistering && <IoKeyOutline />}
-              >
-                Crear cuenta
-              </Button>
+              {/* Lógica del botón inteligente */}
+              {isAlreadyRegistered ? (
+                <Button
+                  type="button"
+                  onClick={() => navigateToStep(2)}
+                  className="w-full py-4 text-base mt-2"
+                  variant="secondary"
+                  rightIcon={<IoArrowForwardOutline />}
+                >
+                  Continuar a confirmación
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  className="w-full py-4 text-base mt-2"
+                  isLoading={isRegistering}
+                  leftIcon={!isRegistering && <IoKeyOutline />}
+                >
+                  Crear cuenta
+                </Button>
+              )}
             </Form>
           </motion.div>
         )}
@@ -258,7 +271,7 @@ export function RegisterWizard() {
                   scroll: false,
                 })
               }
-              className="text-sm font-medium text-primary-600 hover:underline"
+              className="text-sm font-medium text-primary-600 hover:underline hover:cursor-pointer transition-colors underline-offset-4"
             >
               ¿Escribiste mal tu correo? Corrígelo aquí
             </button>
@@ -296,10 +309,12 @@ export function RegisterWizard() {
         <ChangeEmailWizard
           isConfirmedMode={false}
           onSuccess={(newEmail) => {
-            // Sincronizamos el nuevo email en la URL
-            router.push(createUrl({ modal: null, email: newEmail }), {
+            // Sincronizamos el nuevo email en la URL y volvemos al paso 2
+            router.push(createUrl({ modal: null, email: newEmail, step: 2 }), {
               scroll: false,
             });
+            // Actualizamos el formulario para que el email coincida si vuelven al paso 1
+            form.setValue("email", newEmail);
           }}
         />
       </Modal>

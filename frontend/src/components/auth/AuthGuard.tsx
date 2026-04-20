@@ -30,7 +30,7 @@ export function AuthGuard({
     if (!isMounted) return;
 
     // Rutas "Solo Públicas" (Login/Register)
-    if (publicOnly && isAuthenticated) {
+    if (publicOnly && isAuthenticated && user?.isEmailConfirmed) {
       // Enrutamiento inteligente: Host -> Dashboard | Guest -> Home/Reservas
       const isHost = user?.role?.includes("Host");
       router.replace(isHost ? ROUTES.HOST.DASHBOARD : ROUTES.PUBLIC.HOME);
@@ -79,7 +79,7 @@ export function AuthGuard({
   // Renderizado preventivo estricto
   const shouldBlock =
     (!publicOnly && !isAuthenticated) ||
-    (publicOnly && isAuthenticated) ||
+    (publicOnly && isAuthenticated && user?.isEmailConfirmed) ||
     (requireEmailConfirmed && user && !user.isEmailConfirmed) ||
     (allowedRoles && user && !user.role.some((r) => allowedRoles.includes(r)));
 
