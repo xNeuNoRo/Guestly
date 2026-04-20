@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,6 +25,7 @@ import {
 } from "@/hooks/users/useMutation";
 import {
   changeEmailSchema,
+  changeUnconfirmedEmailSchema,
   type ChangeEmailRequest,
 } from "@/schemas/users.schemas";
 
@@ -32,6 +33,11 @@ interface ChangeEmailWizardProps {
   isConfirmedMode?: boolean;
   onSuccess?: (newEmail: string) => void;
 }
+
+type ChangeEmailWizardFormData = {
+  newEmail: string;
+  password?: string;
+};
 
 export function ChangeEmailWizard({
   isConfirmedMode = true,
@@ -43,7 +49,6 @@ export function ChangeEmailWizard({
   const currentStep = Number(searchParams.get("wizardStep")) || 1;
   const newEmailValue = searchParams.get("newEmail") || "";
 
-  // Estado local SOLO para la dirección de la animación visual
   const [direction, setDirection] = useState(0);
 
   const maxSteps = isConfirmedMode ? 3 : 2;
@@ -52,15 +57,21 @@ export function ChangeEmailWizard({
   const { mutate: resendUnconfirmed, isPending: isChangingUnconfirmed } =
     useChangeUnconfirmedEmail();
 
-  const form = useForm<ChangeEmailRequest>({
-    resolver: zodResolver(changeEmailSchema),
+  const form = useForm<ChangeEmailWizardFormData>({
+    resolver: zodResolver(
+      isConfirmedMode ? changeEmailSchema : changeUnconfirmedEmailSchema,
+    ) as Resolver<ChangeEmailWizardFormData>,
     defaultValues: { newEmail: "", password: "" },
   });
 
-  // --- Helpers de Navegación sincronizados con la URL ---
   const nextStep = () => {
     setDirection(1);
     router.push(createUrl({ wizardStep: currentStep + 1 }), { scroll: false });
+  };
+
+  const handleSecurityNext = async () => {
+    const isValid = await form.trigger("password");
+    if (isValid) nextStep();
   };
 
   const prevStep = () => {
@@ -68,7 +79,7 @@ export function ChangeEmailWizard({
     router.push(createUrl({ wizardStep: currentStep - 1 }), { scroll: false });
   };
 
-  const onSubmit = (data: ChangeEmailRequest) => {
+  const onSubmit = (data: ChangeEmailWizardFormData) => {
     const commonOnSuccess = () => {
       setDirection(1);
       router.push(
@@ -79,7 +90,12 @@ export function ChangeEmailWizard({
     };
 
     if (isConfirmedMode) {
-      changeEmail(data, {
+      const payload: ChangeEmailRequest = {
+        newEmail: data.newEmail,
+        password: data.password ?? "",
+      };
+
+      changeEmail(payload, {
         onSuccess: commonOnSuccess,
         onError: () =>
           toast.error("Error", {
@@ -132,15 +148,15 @@ export function ChangeEmailWizard({
                 Necesitamos tu contraseña para autorizar el cambio.
               </p>
             </div>
-            <Form form={form} onSubmit={nextStep}>
+            {/* Cambiamos onSubmit para validar antes de saltar */}
+            <Form form={form} onSubmit={handleSecurityNext}>
               <InputField
                 name="password"
                 label="Contraseña actual"
                 type="password"
               />
               <Button
-                type="button"
-                onClick={nextStep}
+                type="submit"
                 className="w-full mt-4"
                 rightIcon={<IoArrowForwardOutline />}
               >
@@ -185,6 +201,7 @@ export function ChangeEmailWizard({
               <div className="flex gap-2">
                 {isConfirmedMode && (
                   <Button
+                    type="button"
                     variant="ghost"
                     onClick={prevStep}
                     leftIcon={<IoArrowBackOutline />}
