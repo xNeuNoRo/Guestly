@@ -32,8 +32,20 @@ export const reviewResponseSchema = z.object({
   propertyTitle: z.string(),
   rating: z.number(),
   comment: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date().nullable().optional(),
+  createdAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de creación inválida",
+    })
+    .transform((date) => new Date(date)),
+  updatedAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de actualización inválida",
+    })
+    .transform((date) => new Date(date))
+    .nullable()
+    .optional(),
   guestId: z.uuid(),
   guestFullName: z.string(),
 });

@@ -12,12 +12,12 @@ import { useQuery } from "@tanstack/react-query";
  * Solo se ejecuta si el usuario tiene una sesión activa validada por Zustand.
  */
 export function useMyProfile() {
-  const { isAuthenticated } = useAuth();
+  const { token } = useAuth();
 
   return useQuery({
     queryKey: userKeys.me(),
     queryFn: getMyProfile,
-    enabled: isAuthenticated, // Evita disparar la petición si no hay token
+    enabled: !!token, // Evita disparar la petición si no hay token
     staleTime: 1000 * 60 * 5, // 5 minutos de frescura
   });
 }

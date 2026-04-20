@@ -35,6 +35,9 @@ export function AuthGuard({
       const isHost = user?.role?.includes("Host");
       router.replace(isHost ? ROUTES.HOST.DASHBOARD : ROUTES.PUBLIC.HOME);
       return;
+    } else if (isAuthenticated && user && !user.isEmailConfirmed) {
+      router.replace(ROUTES.USER.VERIFY_EMAIL);
+      return;
     }
 
     // Rutas Privadas

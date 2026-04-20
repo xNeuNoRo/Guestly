@@ -18,8 +18,20 @@ export const notificationResponseSchema = z.object({
   message: z.string(),
   type: NotificationTypeSchema,
   isRead: z.boolean(),
-  createdAt: z.date(),
-  readAt: z.date().nullable().optional(),
+  createdAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de creación inválida",
+    })
+    .transform((date) => new Date(date)),
+  readAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de lectura inválida",
+    })
+    .transform((date) => new Date(date))
+    .nullable()
+    .optional(),
 });
 
 export type NotificationResponse = z.infer<typeof notificationResponseSchema>;

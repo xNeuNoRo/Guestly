@@ -41,7 +41,9 @@ export const changeUnconfirmedEmailSchema = z.object({
     error: "Formato de correo inválido",
   }),
 });
-export type ChangeUnconfirmedEmailRequest = z.infer<typeof changeUnconfirmedEmailSchema>;
+export type ChangeUnconfirmedEmailRequest = z.infer<
+  typeof changeUnconfirmedEmailSchema
+>;
 
 export const addRoleSchema = z.object({
   roleToAdd: UserRoleSchema,
@@ -58,7 +60,12 @@ export const userProfileResponseSchema = z.object({
     error: "Formato de correo inválido",
   }),
   role: z.array(UserRoleSchema),
-  createdAt: z.date(),
+  createdAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de creación inválida",
+    })
+    .transform((date) => new Date(date)),
   isEmailConfirmed: z.boolean(),
 });
 export type UserProfileResponse = z.infer<typeof userProfileResponseSchema>;
@@ -67,7 +74,12 @@ export const publicProfileResponseSchema = z.object({
   id: z.uuid(),
   firstName: z.string(),
   lastName: z.string(),
-  createdAt: z.date(),
+  createdAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de creación inválida",
+    })
+    .transform((date) => new Date(date)),
 });
 export type PublicProfileResponse = z.infer<typeof publicProfileResponseSchema>;
 
@@ -77,4 +89,6 @@ export const hostDashboardStatsResponseSchema = z.object({
   pendingReservations: z.number(),
   totalRevenue: z.number(),
 });
-export type HostDashboardStatsResponse = z.infer<typeof hostDashboardStatsResponseSchema>;
+export type HostDashboardStatsResponse = z.infer<
+  typeof hostDashboardStatsResponseSchema
+>;

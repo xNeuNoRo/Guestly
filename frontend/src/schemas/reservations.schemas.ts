@@ -75,10 +75,25 @@ export type PricePreviewResponse = z.infer<typeof pricePreviewResponseSchema>;
 export const propertyBlockResponseSchema = z.object({
   id: z.uuid(),
   propertyId: z.uuid(),
-  startDate: z.date(),
-  endDate: z.date(),
+  startDate: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de creación inválida",
+    })
+    .transform((date) => new Date(date)),
+  endDate: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de creación inválida",
+    })
+    .transform((date) => new Date(date)),
   reason: z.string().nullable().optional(),
-  createdAt: z.date(),
+  createdAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de creación inválida",
+    })
+    .transform((date) => new Date(date)),
 });
 export type PropertyBlockResponse = z.infer<typeof propertyBlockResponseSchema>;
 
@@ -92,15 +107,37 @@ export const reservationResponseSchema = z.object({
   guestName: z.string(),
   hostId: z.uuid(),
   hostName: z.string(),
-  checkInDate: z.date(),
-  checkOutDate: z.date(),
+  checkInDate: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de inicio inválida",
+    })
+    .transform((date) => new Date(date)),
+  checkOutDate: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de fin inválida",
+    })
+    .transform((date) => new Date(date)),
   pricePerNightAtBooking: z.number(),
   cleaningFeeAtBooking: z.number(),
   serviceFeeAtBooking: z.number(),
   taxesAtBooking: z.number(),
   totalPrice: z.number(),
   status: ReservationStatusSchema,
-  createdAt: z.date(),
-  updatedAt: z.date().nullable().optional(),
+  createdAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de creación inválida",
+    })
+    .transform((date) => new Date(date)),
+  updatedAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de actualización inválida",
+    })
+    .transform((date) => new Date(date))
+    .nullable()
+    .optional(),
 });
 export type ReservationResponse = z.infer<typeof reservationResponseSchema>;

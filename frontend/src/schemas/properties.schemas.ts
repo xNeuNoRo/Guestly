@@ -8,8 +8,18 @@ export const hostSummaryResponseSchema = z.object({
 });
 
 export const dateRangeResponseSchema = z.object({
-  startDate: z.date(),
-  endDate: z.date(),
+  startDate: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de inicio inválida",
+    })
+    .transform((date) => new Date(date)),
+  endDate: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de fin inválida",
+    })
+    .transform((date) => new Date(date)),
 });
 
 // --- Schemas de Respuesta (Responses) ---
@@ -24,8 +34,20 @@ export const propertyResponseSchema = z.object({
   capacity: z.number(),
   averageRating: z.number(),
   totalReviews: z.number(),
-  createdAt: z.date(),
-  updatedAt: z.date().nullable(),
+  createdAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de creación inválida",
+    })
+    .transform((date) => new Date(date)),
+  updatedAt: z
+    .string()
+    .refine((date) => !Number.isNaN(Date.parse(date)), {
+      error: "Fecha de actualización inválida",
+    })
+    .transform((date) => new Date(date))
+    .nullable()
+    .optional(),
   host: hostSummaryResponseSchema,
   imageUrls: z.array(z.string()),
 });
