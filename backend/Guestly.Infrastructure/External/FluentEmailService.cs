@@ -38,10 +38,17 @@ public class FluentEmailService : IEmailService
     {
         _ = Task.Run(async () =>
         {
-            await _smtpQueue.WaitAsync();
+            // Esperamos a que el semáforo esté disponible para enviar el correo electrónico,
+            // con un timeout para evitar bloqueos indefinidos.
+            bool acquired = await _smtpQueue.WaitAsync(TimeSpan.FromSeconds(15));
 
             try
             {
+                // Si ya se ha liberado el semaforo, esperamos un breve momento
+                // para evitar que múltiples correos se envíen exactamente al mismo tiempo,
+                if (acquired)
+                    await Task.Delay(500);
+
                 // Creamos un nuevo ámbito de servicio para resolver IFluentEmailFactory,
                 // lo que nos permite enviar correos electrónicos de manera segura y eficiente.
                 using var scope = _scopeFactory.CreateScope();
@@ -75,11 +82,16 @@ public class FluentEmailService : IEmailService
                     .Subject(subject)
                     .UsingTemplateFromFile(templatePath, model);
 
+                // Utilizamos el token de cancelación con timeout para evitar
+                // que el envío del correo se bloquee indefinidamente, aunque FluentEmail no soporte
+                // cancelación nativa, esto nos permite controlar el tiempo máximo de espera.
+                using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
                 // CancellationToken.None se utiliza aquí para evitar que el token
                 // de cancelación afecte el proceso de envío del correo electrónico,
                 // ya que FluentEmail no soporta cancelación nativa.
                 // Esto asegura que el intento de envío se complete incluso si el token original ha sido cancelado.
-                var response = await email.SendAsync(CancellationToken.None);
+                var response = await email.SendAsync(timeoutCts.Token);
 
                 if (!response.Successful)
                 {
@@ -104,8 +116,12 @@ public class FluentEmailService : IEmailService
             }
             finally
             {
-                // Liberamos el semáforo para permitir que el siguiente correo en la cola se envíe.
-                _smtpQueue.Release();
+                // Si ya paso el timeout del semaforo
+                if (acquired)
+                {
+                    // Liberamos el semáforo para permitir que el siguiente correo en la cola pueda ser enviado.
+                    _smtpQueue.Release();
+                }
             }
         });
 
