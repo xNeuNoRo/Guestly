@@ -18,6 +18,8 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 
 import { ReviewFormModal } from "@/components/features/reviews/ReviewFormModal";
 import { DeleteReviewModal } from "@/components/features/reviews/DeleteReviewModal";
+import { HostActionsSidebar } from "@/components/features/properties/HostActionsSidebar";
+import { useAuth } from "@/hooks/stores/useAuth";
 
 interface PropertyDetailPageProps {
   params: Promise<{ id: string }>;
@@ -35,6 +37,7 @@ export default function PropertyDetailPage({
 
   // Hook centralizado para obtener toda la info de la propiedad
   const { data: property, isLoading, isError } = useProperty(id);
+  const { user } = useAuth();
 
   // --- ESTADO DE CARGA (SKELETONS CON LAYOUT LATERAL) ---
   if (isLoading) {
@@ -69,6 +72,8 @@ export default function PropertyDetailPage({
     );
   }
 
+  const isHost = user?.id === property.host.hostId;
+
   return (
     <AuthGuard allowGuests={false}>
       <main className="container mx-auto px-4 py-8 space-y-8">
@@ -93,12 +98,17 @@ export default function PropertyDetailPage({
               <hr className="border-slate-100" />
             </div>
 
-            <PropertyReviewsSection propertyId={id} />
+            <PropertyReviewsSection propertyId={id} propertyHostId={property.host.hostId} />
           </div>
 
           {/* COLUMNA DERECHA: Widget de Reserva (Sidebar) */}
           <aside className="h-full relative">
-            <BookingForm propertyId={id} />
+            {/* Renderizado condicional basado en el rol de quien visualiza */}
+            {isHost ? (
+              <HostActionsSidebar propertyId={id} />
+            ) : (
+              <BookingForm propertyId={id} />
+            )}
           </aside>
         </div>
 
