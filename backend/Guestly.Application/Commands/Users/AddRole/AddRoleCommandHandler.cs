@@ -1,0 +1,113 @@
+using Guestly.Application.DTOs.Auth;
+using Guestly.Application.Interfaces.External;
+using Guestly.Application.Interfaces.Repositories;
+using Guestly.Application.Interfaces.Security;
+using Guestly.Application.Models.Emails;
+using Guestly.Domain.Enums;
+using Guestly.Domain.Exceptions;
+using Mapster;
+using MediatR;
+using Microsoft.Extensions.Configuration;
+
+namespace Guestly.Application.Commands.Users.AddRole;
+
+/// <summary>
+/// Manejador para el comando AddRoleCommand. Este manejador se encarga de procesar
+/// la lógica de negocio para agregar un rol a un usuario específico.
+/// </summary>
+public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, AuthResponse>
+{
+    private readonly IUserRepository _userRepository;
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
+
+    public AddRoleCommandHandler(
+        IUserRepository userRepository,
+        IJwtTokenGenerator jwtTokenGenerator,
+        IUnitOfWork unitOfWork,
+        IEmailService emailService,
+        IConfiguration configuration
+    )
+    {
+        _userRepository = userRepository;
+        _jwtTokenGenerator = jwtTokenGenerator;
+        _unitOfWork = unitOfWork;
+        _emailService = emailService;
+        _configuration = configuration;
+    }
+
+    /// <summary>
+    /// Maneja la lógica para agregar un rol a un usuario. Verifica que el usuario exista, agrega el rol
+    /// correspondiente y genera un nuevo token JWT para reflejar los cambios en los roles del usuario.
+    /// Si el usuario no existe o el rol no es válido, se lanzan excepciones apropiadas.
+    /// </summary>
+    public async Task<AuthResponse> Handle(
+        AddRoleCommand request,
+        CancellationToken cancellationToken
+    )
+    {
+        var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
+        if (user is null)
+        {
+            throw AppException.NotFound("Usuario no encontrado.", ErrorCodes.UserNotFound);
+        }
+
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            switch (request.RoleToAdd)
+            {
+                case UserRoles.Host:
+                    user.AddHostRole();
+                    break;
+                case UserRoles.Guest:
+                    user.AddGuestRole();
+                    break;
+                default:
+                    throw AppException.BadRequest("Rol no válido para esta operación.");
+            }
+
+            _userRepository.Update(user);
+
+            // UnitOfWork es inteligente y llamara a SaveChangesAsync()
+            // siempre, de esa siempre se persisten los cambios.
+            await _unitOfWork.CommitAsync(cancellationToken);
+
+            if (request.RoleToAdd == UserRoles.Host)
+            {
+                var baseUrl = _configuration["FrontendSettings:BaseUrl"] ?? "http://localhost:3000";
+                var dashboardLink = $"{baseUrl}/host/dashboard";
+                var emailModel = new WelcomeHostModel(user.FirstName, dashboardLink);
+
+                await _emailService.SendTemplateEmailAsync(
+                    user.Email,
+                    "¡Bienvenido a la comunidad de Anfitriones de Guestly!",
+                    EmailTemplate.WelcomeHost,
+                    emailModel,
+                    cancellationToken
+                );
+            }
+
+            var newToken = _jwtTokenGenerator.GenerateToken(user);
+            var response = user.Adapt<AuthResponse>();
+
+            return response with
+            {
+                Token = newToken,
+            };
+        }
+        catch (DomainException ex)
+        {
+            await _unitOfWork.RollbackAsync(cancellationToken);
+            throw AppException.BadRequest(ex.Message, "ROLE_ALREADY_ASSIGNED");
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+}
