@@ -136,11 +136,13 @@ export function useAddRole() {
         "¡Felicidades! Ahora tienes acceso a las funciones de Anfitrión.",
       );
 
+      const { token, ...userProfile } = data;
+
       // data incluye el nuevo JWT (token) y el perfil actualizado
-      setAuth(data.token, data);
+      setAuth(token, userProfile);
 
       // Actualizamos la caché también para mantener congruencia
-      queryClient.setQueryData(userKeys.me(), data);
+      queryClient.setQueryData(userKeys.me(), userProfile);
     },
     onError: (error: Error) => {
       toast.error(
