@@ -1,4 +1,6 @@
+using System.Data;
 using Guestly.Application.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Guestly.Infrastructure.Persistence;
@@ -20,14 +22,20 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     /// <summary>
     /// Inicia una nueva transacción en la base de datos si no hay una activa.
     /// </summary>
-    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task BeginTransactionAsync(
+        CancellationToken cancellationToken = default,
+        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted
+    )
     {
         if (_currentTransaction != null)
         {
             return;
         }
 
-        _currentTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        _currentTransaction = await _context.Database.BeginTransactionAsync(
+            isolationLevel,
+            cancellationToken
+        );
     }
 
     /// <summary>

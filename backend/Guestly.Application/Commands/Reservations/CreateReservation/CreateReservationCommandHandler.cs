@@ -1,3 +1,4 @@
+using System.Data;
 using Guestly.Application.DTOs.Reservations;
 using Guestly.Application.Interfaces.Repositories;
 using Guestly.Domain.Entities.Notifications;
@@ -56,7 +57,7 @@ public class CreateReservationCommandHandler
         CancellationToken cancellationToken
     )
     {
-        await _unitOfWork.BeginTransactionAsync(cancellationToken);
+        await _unitOfWork.BeginTransactionAsync(cancellationToken, IsolationLevel.Serializable);
 
         try
         {
