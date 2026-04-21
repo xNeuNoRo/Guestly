@@ -11,7 +11,6 @@ import {
   IoChatbubbleEllipsesOutline,
   IoWarningOutline,
 } from "react-icons/io5";
-import { toast } from "sonner";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -20,12 +19,12 @@ import { Button } from "@/components/shared/Button";
 import { Textarea } from "@/components/shared/Textarea";
 import { Skeleton } from "@/components/shared/Skeleton";
 import { Form } from "@/components/shared/form/Form";
-import { SelectField } from "@/components/shared/form/SelectField"; // Usamos tu Select
+import { SelectField } from "@/components/shared/form/SelectField";
 
 import { useQueryString } from "@/hooks/shared/useQueryString";
 import { useCreateReview, useUpdateReview } from "@/hooks/reviews/useMutation";
 import { useReview } from "@/hooks/reviews";
-import { useSearchReservations } from "@/hooks/reservations/useQueries"; // El hook mágico
+import { useSearchReservations } from "@/hooks/reservations/useQueries";
 import { useAppStore } from "@/stores/useAppStore";
 import {
   type CreateReviewRequest,
@@ -135,7 +134,6 @@ export function ReviewFormModal({
         },
         {
           onSuccess: () => {
-            toast.success("Reseña actualizada con éxito");
             closeModal();
           },
         },
@@ -143,7 +141,6 @@ export function ReviewFormModal({
     } else {
       createReview(data, {
         onSuccess: () => {
-          toast.success("¡Gracias por tu opinión!");
           closeModal();
         },
       });
@@ -190,6 +187,16 @@ export function ReviewFormModal({
 
     return (
       <Form form={form} onSubmit={onSubmit} className="space-y-8 py-4">
+        {/* Mostramos errores generales ocultos que bloquean el submit (ej. falta de reservationId) */}
+        {form.formState.errors.reservationId && !isEditing && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium flex items-center gap-2">
+            <IoWarningOutline size={18} />
+            <p>
+              Error: No se ha seleccionado una estancia válida para reseñar.
+            </p>
+          </div>
+        )}
+
         {/* Selector de Viaje (Solo visible si está creando y tiene más de 1 viaje en esta propiedad) */}
         {!isEditing &&
           !urlReservationId &&
@@ -240,6 +247,11 @@ export function ReviewFormModal({
               </div>
             )}
           />
+          {form.formState.errors.rating && (
+            <p className="text-xs text-red-500 font-medium">
+              {form.formState.errors.rating.message}
+            </p>
+          )}
         </div>
 
         {/* Comentario */}

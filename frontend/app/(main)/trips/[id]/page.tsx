@@ -4,7 +4,7 @@ import { use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { format, differenceInDays } from "date-fns";
-import { es, is } from "date-fns/locale";
+import { es } from "date-fns/locale";
 import {
   IoLocationOutline,
   IoChevronBack,
@@ -16,11 +16,12 @@ import { ReservationStatusBadge } from "@/components/features/reservations/Reser
 import { HostReservationActions } from "@/components/features/reservations/HostReservationActions";
 import { CancelReservationModal } from "@/components/features/reservations/CancelReservationModal";
 import { LeaveReviewButton } from "@/components/features/reviews/LeaveReviewButton";
-import { ReviewFormModal } from "@/components/features/reviews/ReviewFormModal"; // Inyectado
+import { ReviewFormModal } from "@/components/features/reviews/ReviewFormModal";
 import { Button } from "@/components/shared/Button";
 import { Skeleton } from "@/components/shared/Skeleton";
 import { formatCurrency } from "@/helpers/formatCurrency";
 import { useReservation } from "@/hooks/reservations/useQueries";
+import { useUserReviews } from "@/hooks/reviews";
 import { useQueryString } from "@/hooks/shared/useQueryString";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/stores/useAuth";
@@ -37,6 +38,16 @@ export default function ReservationDetailPage({
   const { createUrl } = useQueryString();
   const { data: reservation, isLoading, isError } = useReservation(id);
   const { user } = useAuth();
+
+  // Verificamos si el usuario actual es el Anfitrión o Huésped de esta reserva
+  const isHost = user?.id === reservation?.hostId;
+  const isGuest = user?.id === reservation?.guestId;
+
+  // Consultamos las reviews del usuario actual (solo si es el huésped y la reserva está completada)
+  const shouldCheckReviews = isGuest && reservation?.status === "Completed";
+  const { data: userReviews } = useUserReviews(
+    shouldCheckReviews ? user?.id : undefined,
+  );
 
   if (isLoading) return <ReservationDetailSkeleton />;
 
@@ -64,9 +75,12 @@ export default function ReservationDetailPage({
     });
   };
 
-  // Verificamos si el usuario actual es el Anfitrión de esta reserva
-  const isHost = user?.id === reservation.hostId;
-  const isGuest = user?.id === reservation.guestId;
+  // Verificamos si ya existe una review para esta propiedad hecha por este usuario.
+  // (Idealmente el backend cruzaría ReservationId, pero si no lo expone en el DTO de ReviewResponse,
+  // verificar por PropertyId es lo estándar para evitar reviews múltiples).
+  const hasAlreadyReviewed = userReviews?.some(
+    (review) => review.propertyId === reservation.propertyId,
+  );
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-5xl">
@@ -171,10 +185,10 @@ export default function ReservationDetailPage({
 
           {/* Acciones Contextuales y Estados Especiales */}
           <div className="flex flex-col gap-4">
-            {/* Lógica de Pendiente: Diferenciamos vista de Host y vista de Guest */}
+            {/* Lógica de Pendiente */}
             {reservation.status === "Pending" && (
               <div
-                className={`w-full flex flex-col items-center justify-between p-6 rounded-2xl border ${isHost ? "bg-indigo-50 border-indigo-100" : "bg-amber-50 border-amber-100"} gap-4`}
+                className={`w-full flex flex-col sm:flex-row sm:items-center justify-between p-6 rounded-2xl border ${isHost ? "bg-indigo-50 border-indigo-100" : "bg-amber-50 border-amber-100"} gap-4`}
               >
                 <div className="flex items-start gap-3">
                   {isHost ? (
@@ -206,27 +220,42 @@ export default function ReservationDetailPage({
                   </div>
                 </div>
 
-                {/* Solo mostramos los botones de acción si el usuario logueado es el HOST */}
                 {isHost && (
-                  <div className="shrink-0">
+                  <div className="shrink-0 w-full sm:w-auto">
                     <HostReservationActions
                       reservationId={reservation.id}
                       status={reservation.status}
                     />
                   </div>
                 )}
+
+                {isGuest && (
+                  <div className="shrink-0 w-full sm:w-auto">
+                    <Button
+                      variant="danger"
+                      className="w-full sm:w-auto"
+                      onClick={openCancelModal}
+                    >
+                      Cancelar Reserva
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
-            {isGuest && (
-              <div className="flex flex-wrap gap-4 mt-2">
-                {reservation.status === "Pending" && (
-                  <Button variant="danger" onClick={openCancelModal}>
-                    Cancelar Reserva
-                  </Button>
-                )}
-
-                {reservation.status === "Completed" && (
+            {/* Lógica de Calificación (Solo Huésped) */}
+            {isGuest && reservation.status === "Completed" && (
+              <div className="mt-2">
+                {hasAlreadyReviewed ? (
+                  <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl flex items-center gap-3">
+                    <div className="bg-emerald-100 p-2 rounded-full text-emerald-600">
+                      <IoInformationCircleOutline size={20} />
+                    </div>
+                    <p className="text-sm font-bold text-emerald-800">
+                      Ya calificaste esta estancia. ¡Gracias por tu opinión!
+                    </p>
+                  </div>
+                ) : (
                   <LeaveReviewButton
                     propertyId={reservation.propertyId}
                     reservationId={reservation.id}
@@ -289,10 +318,10 @@ function ReservationDetailSkeleton() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2 space-y-8">
           <Skeleton className="h-10 w-64 rounded-xl" />
-          <Skeleton className="h-[400px] w-full rounded-[2.5rem]" />
+          <Skeleton className="h-100 w-full rounded-[2.5rem]" />
           <Skeleton className="h-64 w-full rounded-4xl" />
         </div>
-        <Skeleton className="h-[450px] w-full rounded-4xl" />
+        <Skeleton className="h-112.5 w-full rounded-4xl" />
       </div>
     </div>
   );

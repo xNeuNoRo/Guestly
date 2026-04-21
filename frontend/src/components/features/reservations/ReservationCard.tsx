@@ -13,6 +13,7 @@ import { LeaveReviewButton } from "@/components/features/reviews/LeaveReviewButt
 import type { ReservationResponse } from "@/schemas/reservations.schemas";
 import { ROUTES } from "@/constants/routes";
 import { JSX } from "react";
+import { Button } from "@headlessui/react";
 
 interface ReservationCardProps {
   reservation: ReservationResponse;
@@ -106,12 +107,11 @@ export function ReservationCard({
 
           {/* Gatillo de Reseña: Solo para Huéspedes en reservas Completadas */}
           {!isHostMode && reservation.status === "Completed" && (
-            <div onClick={(e) => e.preventDefault()}>
-              <LeaveReviewButton
-                propertyId={reservation.propertyId}
-                reservationId={reservation.id}
-              />
-            </div>
+            <Link href={ROUTES.PUBLIC.PROPERTY_DETAIL(reservation.propertyId)}>
+              <div className="text-sm font-medium bg-primary-600 text-white hover:bg-primary-800 px-4 py-2 rounded-full transition-colors">
+                Ir a la propiedad
+              </div>
+            </Link>
           )}
         </div>
       </div>
