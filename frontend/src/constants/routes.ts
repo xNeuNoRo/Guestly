@@ -22,7 +22,7 @@ export const ROUTES = {
   // Usuario común (GUEST / General)
   USER: {
     SETTINGS: "/settings", // Engloba UpdateProfile, ChangePassword, ChangeEmail
-    RESERVATIONS: "/reservations", // Tus propias reservas
+    RESERVATIONS: "/trips", // Tus propias reservas
     NOTIFICATIONS: "/notifications",
     VERIFY_EMAIL: "/auth/verify-email",
   },
