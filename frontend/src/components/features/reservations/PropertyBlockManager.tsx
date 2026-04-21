@@ -36,17 +36,12 @@ interface PropertyBlockManagerProps {
   propertyId: string;
 }
 
-/**
- * @description Organismo para que el Anfitrión gestione los bloqueos manuales.
- * Purgados los estados locales para usar persistencia por URL.
- */
 export function PropertyBlockManager({
   propertyId,
 }: Readonly<PropertyBlockManagerProps>) {
   const router = useRouter();
   const { createUrl, searchParams } = useQueryString();
 
-  // --- Fuente de Verdad: URL ---
   const deletingId = searchParams.get("deletingBlock");
   const urlStart = searchParams.get("blockStart");
   const urlEnd = searchParams.get("blockEnd");
@@ -58,40 +53,63 @@ export function PropertyBlockManager({
   const { mutate: deleteBlock, isPending: isDeleting } =
     useDeletePropertyBlock();
 
+  // defaultValues estáticos para evitar re-inicializaciones por URL
   const form = useForm<CreatePropertyBlockRequest>({
     resolver: zodResolver(createPropertyBlockSchema),
     defaultValues: {
       propertyId,
       reason: "",
-      startDate: urlStart ? parseISO(urlStart) : undefined,
-      endDate: urlEnd ? parseISO(urlEnd) : undefined,
+      startDate: undefined,
+      endDate: undefined,
     },
   });
 
+  // Extraemos el estado de éxito del envío
+  const { isSubmitSuccessful } = form.formState;
   const startDate = form.watch("startDate");
   const endDate = form.watch("endDate");
 
-  // Sincronización bidireccional entre Formulario y URL
   useEffect(() => {
-    form.reset({
-      propertyId,
-      reason: form.getValues("reason"), // Mantenemos la razón actual del form
-      startDate: urlStart ? parseISO(urlStart) : undefined,
-      endDate: urlEnd ? parseISO(urlEnd) : undefined,
-    });
-  }, [urlStart, urlEnd, form, propertyId]);
+    if (isSubmitSuccessful) {
+      form.resetField("propertyId", { defaultValue: propertyId });
+      form.resetField("reason", { defaultValue: "" });
+      form.resetField("startDate", { defaultValue: undefined });
+      form.resetField("endDate", { defaultValue: undefined });
+    }
+  }, [isSubmitSuccessful, propertyId, form]);
+
+  // Sincronización URL -> Formulario (Cuidando de no pisar el reason)
+  useEffect(() => {
+    const currentStart = form.getValues("startDate");
+    const currentEnd = form.getValues("endDate");
+
+    if (urlStart) {
+      const newStart = parseISO(urlStart);
+      if (currentStart?.getTime() !== newStart.getTime()) {
+        form.setValue("startDate", newStart, { shouldValidate: true });
+      }
+    } else if (currentStart) {
+      form.setValue("startDate", undefined as unknown as Date);
+    }
+
+    if (urlEnd) {
+      const newEnd = parseISO(urlEnd);
+      if (currentEnd?.getTime() !== newEnd.getTime()) {
+        form.setValue("endDate", newEnd, { shouldValidate: true });
+      }
+    } else if (currentEnd) {
+      form.setValue("endDate", undefined as unknown as Date);
+    }
+  }, [urlStart, urlEnd, form]);
 
   const disabledDays = useMemo<Matcher[]>(() => {
     const disabled: Matcher[] = [{ before: startOfDay(new Date()) }];
-
-    if (blocks && blocks.length > 0) {
-      blocks.forEach((block) => {
-        disabled.push({
-          from: startOfDay(new Date(block.startDate)),
-          to: startOfDay(new Date(block.endDate)),
-        });
+    blocks?.forEach((block) => {
+      disabled.push({
+        from: startOfDay(new Date(block.startDate)),
+        to: startOfDay(new Date(block.endDate)),
       });
-    }
+    });
     return disabled;
   }, [blocks]);
 
@@ -100,54 +118,46 @@ export function PropertyBlockManager({
       { propertyId, request: { ...data, propertyId } },
       {
         onSuccess: () => {
-          form.reset({ propertyId, reason: "" });
-          // Limpiamos la URL tras el éxito
+          // Primero limpiamos la URL.
+          // Al cambiar isSubmitSuccessful a true, el useEffect superior hará el reset limpio.
           router.push(createUrl({ blockStart: null, blockEnd: null }), {
             scroll: false,
           });
+          toast.success("Fechas bloqueadas correctamente");
         },
       },
     );
   };
 
   const handleDelete = (blockId: string) => {
-    // Persistimos el estado de "borrando" en la URL
     router.push(createUrl({ deletingBlock: blockId }), { scroll: false });
-
     deleteBlock(
       { id: blockId, propertyId },
       {
-        onSuccess: () => {
-          router.push(createUrl({ deletingBlock: null }), { scroll: false });
-        },
-        onError: () => {
-          router.push(createUrl({ deletingBlock: null }), { scroll: false });
-        },
+        onSuccess: () =>
+          router.push(createUrl({ deletingBlock: null }), { scroll: false }),
+        onError: () =>
+          router.push(createUrl({ deletingBlock: null }), { scroll: false }),
       },
     );
   };
 
+  // --- Renderizado de bloques ---
   const blocksContent = (() => {
     if (isLoadingBlocks) {
       return (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <Skeleton
-              key={i}
-              variant="rectangular"
-              className="w-full h-20 rounded-xl"
-            />
+            <Skeleton key={i} className="w-full h-20 rounded-xl" />
           ))}
         </div>
       );
     }
 
-    if (!blocks || blocks.length === 0) {
+    if (!blocks?.length) {
       return (
-        <div className="text-center py-10 px-4 border-2 border-dashed border-slate-300 rounded-xl">
-          <p className="text-slate-500 font-medium">
-            No tienes fechas bloqueadas actualmente.
-          </p>
+        <div className="text-center py-10 px-4 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 font-medium">
+          No tienes fechas bloqueadas actualmente.
         </div>
       );
     }
@@ -175,7 +185,6 @@ export function PropertyBlockManager({
                   {block.reason || "Sin motivo especificado"}
                 </p>
               </div>
-
               <Button
                 variant="ghost"
                 size="sm"
@@ -184,9 +193,7 @@ export function PropertyBlockManager({
                 disabled={isDeleting && deletingId !== block.id}
                 className="text-slate-400 hover:text-red-600 hover:bg-red-50"
               >
-                {!isDeleting || deletingId !== block.id ? (
-                  <IoTrashOutline size={20} />
-                ) : null}
+                <IoTrashOutline size={20} />
               </Button>
             </div>
           );
@@ -209,14 +216,13 @@ export function PropertyBlockManager({
           <Controller
             name="startDate"
             control={form.control}
-            render={({ fieldState }) => (
+            render={() => (
               <div className="flex flex-col gap-2">
                 <div className="bg-slate-50 p-2 rounded-xl border border-slate-100 w-full">
                   <Calendar
                     mode="range"
                     selected={{ from: startDate, to: endDate }}
                     onSelect={(range: DateRange | undefined) => {
-                      // Actualizamos la URL inmediatamente para persistir la selección
                       router.push(
                         createUrl({
                           blockStart: range?.from
@@ -233,11 +239,6 @@ export function PropertyBlockManager({
                     numberOfMonths={1}
                   />
                 </div>
-                {fieldState.error && (
-                  <p className="text-sm font-medium text-red-600 px-1">
-                    Selecciona un rango de fechas válido.
-                  </p>
-                )}
               </div>
             )}
           />
@@ -248,7 +249,6 @@ export function PropertyBlockManager({
               label="Motivo (Opcional)"
               placeholder="Ej: Mantenimiento, Uso personal..."
             />
-
             <Button
               type="submit"
               className="w-full"
@@ -267,7 +267,6 @@ export function PropertyBlockManager({
           <IoCalendarOutline className="text-slate-500" />
           Bloqueos Activos
         </h3>
-
         {blocksContent}
       </div>
     </div>
