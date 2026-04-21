@@ -27,6 +27,22 @@ public class GetReviewsByUserQueryHandler
     )
     {
         var reviews = await _reviewRepository.GetByUserIdAsync(request.UserId, cancellationToken);
-        return reviews.Adapt<IEnumerable<ReviewResponse>>();
+
+        var responseList = new List<ReviewResponse>();
+        foreach (var review in reviews)
+        {
+            var response = review.Adapt<ReviewResponse>();
+            responseList.Add(
+                response with
+                {
+                    PropertyTitle = review.Property?.Title ?? "Propiedad no disponible",
+                    GuestFullName =
+                        review.Guest != null
+                            ? $"{review.Guest.FirstName} {review.Guest.LastName}"
+                            : "Huésped verificado",
+                }
+            );
+        }
+        return responseList;
     }
 }

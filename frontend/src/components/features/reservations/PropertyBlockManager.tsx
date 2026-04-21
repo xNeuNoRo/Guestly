@@ -137,7 +137,6 @@ export function PropertyBlockManager({
         {
           onSuccess: () => {
             resetUrlState();
-            toast.success("Bloqueo actualizado correctamente");
           },
         },
       );
@@ -148,7 +147,6 @@ export function PropertyBlockManager({
         {
           onSuccess: () => {
             resetUrlState();
-            toast.success("Fechas bloqueadas correctamente");
           },
         },
       );

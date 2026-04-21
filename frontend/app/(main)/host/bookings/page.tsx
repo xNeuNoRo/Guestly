@@ -48,7 +48,7 @@ export default function HostBookingsPage() {
   } else if (bookings?.length) {
     bookingsSection = bookings.map((booking) => (
       <div key={booking.id} className="flex flex-col gap-4">
-        <ReservationCard reservation={booking} />
+        <ReservationCard isHostMode={true} reservation={booking} />
 
         {booking.status === "Pending" && (
           <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">

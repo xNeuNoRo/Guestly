@@ -117,7 +117,7 @@ export function useUpdatePropertyBlock() {
       request: UpdatePropertyBlockRequest;
     }) => updatePropertyBlock(id, request),
     onSuccess: (data) => {
-      toast.success("Bloqueo actualizado.");
+      toast.success("Bloqueo actualizado correctamente.");
 
       queryClient.invalidateQueries({
         queryKey: reservationKeys.blocks(data.propertyId),

@@ -36,7 +36,7 @@ export function RecentHostBookings() {
   return (
     <div className="space-y-4">
       {recentBookings.map((booking) => (
-        <ReservationCard key={booking.id} reservation={booking} />
+        <ReservationCard key={booking.id} isHostMode={true} reservation={booking} />
       ))}
     </div>
   );
