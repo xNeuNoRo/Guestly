@@ -4,19 +4,20 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, ReactNode } from "react";
 import { useAuth } from "@/hooks/stores/useAuth";
 import { useIsMounted } from "@/hooks/shared/useIsMounted";
-import { useMyProfile } from "@/hooks/users/useQueries"; // <--- CRUCIAL: Importar el hook de perfil
+import { useMyProfile } from "@/hooks/users/useQueries";
 import { GuardConfig } from "@/types/auth";
 import { ROUTES } from "@/constants/routes";
 
-interface AuthGuardProps extends GuardConfig {
+interface AuthGuardProps extends Omit<GuardConfig, "requireEmailConfirmed"> {
   children: ReactNode;
   allowGuests?: boolean;
+  allowUnconfirmed?: boolean; // Por defecto es false
 }
 
 export function AuthGuard({
   children,
   allowedRoles,
-  requireEmailConfirmed = false,
+  allowUnconfirmed = false,
   publicOnly = false,
   allowGuests = false,
 }: Readonly<AuthGuardProps>) {
@@ -24,30 +25,16 @@ export function AuthGuard({
   const pathname = usePathname();
   const isMounted = useIsMounted();
   const { isAuthenticated, user, token } = useAuth();
-
-  // Sincronizamos con la petición de perfil que ya se está ejecutando en el AuthLoader.
-  // Usamos status para detectar el gap entre el fin de la carga y el inicio de la autenticación en el store.
   const { status } = useMyProfile();
 
-  /**
-   * ESTADO DE VERIFICACIÓN (Limbo)
-   * Si tenemos un token persistido pero Zustand aún dice que no estamos autenticados,
-   * y la query de perfil está en curso o ya terminó exitosamente pero el store no se ha enterado,
-   * significa que estamos re-validando la sesión.
-   * Debemos esperar antes de tomar cualquier decisión de redirección.
-   */
   const isVerifying = !!token && !isAuthenticated && status !== "error";
 
   useEffect(() => {
     // Si no ha montado o el sistema está verificando el token, bloqueamos cualquier redirección.
     if (!isMounted || isVerifying) return;
 
-    // --- LÓGICA DE REDIRECCIÓN (Solo se ejecuta si NO estamos verificando) ---
-
     // Rutas "Solo Públicas" (Login/Register)
     if (publicOnly && isAuthenticated) {
-      console.log("[AuthGuard: Rule Check] publicOnly && isAuthenticated");
-      // Si no lo ha confirmado, permitimos que se quede para que el Wizard muestre el Paso 2.
       if (user?.isEmailConfirmed) {
         const isHost = user?.role?.includes("Host");
         const target = isHost ? ROUTES.HOST.DASHBOARD : ROUTES.PUBLIC.HOME;
@@ -56,8 +43,13 @@ export function AuthGuard({
       return;
     }
 
-    // Bloqueo de usuarios no confirmados (Global)
-    if (isAuthenticated && user && !user.isEmailConfirmed) {
+    // Si está autenticado, no está confirmado y NO le dimos permiso explícito (allowUnconfirmed=true)
+    if (
+      isAuthenticated &&
+      user &&
+      !user.isEmailConfirmed &&
+      !allowUnconfirmed
+    ) {
       if (pathname !== ROUTES.USER.VERIFY_EMAIL) {
         router.replace(ROUTES.USER.VERIFY_EMAIL);
       }
@@ -86,7 +78,7 @@ export function AuthGuard({
     isAuthenticated,
     user,
     allowedRoles,
-    requireEmailConfirmed,
+    allowUnconfirmed,
     publicOnly,
     allowGuests,
     router,
@@ -101,9 +93,11 @@ export function AuthGuard({
 
   // Renderizado preventivo sincronizado con las redirecciones de arriba
   const shouldBlock =
-    // Bloqueamos en la app general si no está confirmado
-    (!publicOnly && isUnconfirmed && pathname !== ROUTES.USER.VERIFY_EMAIL) ||
-    // Bloqueamos rutas privadas si no hay sesión
+    // Bloqueamos globalmente si no está confirmado y no tiene permiso especial de allowUnconfirmed
+    (!publicOnly &&
+      isUnconfirmed &&
+      !allowUnconfirmed &&
+      pathname !== ROUTES.USER.VERIFY_EMAIL) ||
     (!publicOnly && !isAuthenticated && !allowGuests) ||
     // Bloqueamos rutas públicas SOLO si ya está confirmado
     (publicOnly && isAuthenticated && user?.isEmailConfirmed) ||

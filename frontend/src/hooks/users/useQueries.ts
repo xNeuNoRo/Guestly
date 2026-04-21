@@ -42,7 +42,7 @@ export function usePublicProfile(id?: string) {
  */
 export function useHostDashboardStats() {
   const { user } = useAuth();
-  const isHost = user?.role.includes("Host");
+  const isHost = user?.role.includes("Host") ?? false;
 
   return useQuery({
     queryKey: userKeys.hostDashboard(),

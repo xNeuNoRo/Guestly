@@ -13,8 +13,8 @@ export function handleApiError(err: unknown): never {
     const errorData = err.response.data?.error;
 
     // Si encontramos un mensaje de error específico,
-    // lo lanzamos como un nuevo error. Si no, l
-    // anzamos un error genérico con el mensaje de la respuesta o un mensaje por defecto.
+    // lo lanzamos como un nuevo error. Si no, lanzamos un error 
+    // genérico con el mensaje de la respuesta o un mensaje por defecto.
     if (errorData) {
       // Si la respuesta de error tiene un campo "details" con errores específicos,
       // intentamos extraer el primer mensaje de error de ese campo para proporcionar un mensaje más detallado al usuario.
