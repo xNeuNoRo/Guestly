@@ -69,7 +69,22 @@ export function HostReservationActions({
             scroll: false,
           });
         },
-        onError: () => {
+        onError: (error) => {
+          const isAccepted = newStatus === "Confirmed";
+          let description: string = "";
+
+          if (error) {
+            description = error.message;
+          } else if (isAccepted) {
+            description = "No se pudo aceptar la reserva. Inténtalo de nuevo.";
+          } else {
+            description = "No se pudo rechazar la reserva. Inténtalo de nuevo.";
+          }
+
+          toast.error(isAccepted ? "Error al aceptar" : "Error al rechazar", {
+            description,
+          });
+
           // Limpiamos la URL tras el error
           router.push(createUrl({ pendingAction: null, actionId: null }), {
             scroll: false,

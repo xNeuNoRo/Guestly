@@ -9,18 +9,21 @@ import {
   IoLocationOutline,
   IoChevronBack,
   IoInformationCircleOutline,
+  IoTimeOutline,
 } from "react-icons/io5";
 
 import { ReservationStatusBadge } from "@/components/features/reservations/ReservationStatusBadge";
 import { HostReservationActions } from "@/components/features/reservations/HostReservationActions";
 import { CancelReservationModal } from "@/components/features/reservations/CancelReservationModal";
 import { LeaveReviewButton } from "@/components/features/reviews/LeaveReviewButton";
+import { ReviewFormModal } from "@/components/features/reviews/ReviewFormModal"; // Inyectado
 import { Button } from "@/components/shared/Button";
 import { Skeleton } from "@/components/shared/Skeleton";
 import { formatCurrency } from "@/helpers/formatCurrency";
 import { useReservation } from "@/hooks/reservations/useQueries";
 import { useQueryString } from "@/hooks/shared/useQueryString";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/stores/useAuth";
 
 interface ReservationDetailPageProps {
   params: Promise<{ id: string }>;
@@ -33,6 +36,7 @@ export default function ReservationDetailPage({
   const router = useRouter();
   const { createUrl } = useQueryString();
   const { data: reservation, isLoading, isError } = useReservation(id);
+  const { user } = useAuth();
 
   if (isLoading) return <ReservationDetailSkeleton />;
 
@@ -59,6 +63,10 @@ export default function ReservationDetailPage({
       scroll: false,
     });
   };
+
+  // Verificamos si el usuario actual es el Anfitrión de esta reserva
+  const isHost = user?.id === reservation.hostId;
+  const isGuest = user?.id === reservation.guestId;
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-5xl">
@@ -144,31 +152,69 @@ export default function ReservationDetailPage({
             </div>
           </section>
 
-          {/* Acciones Contextuales */}
-          <div className="flex flex-wrap gap-4">
-            {reservation.status === "Confirmed" && (
-              <Button variant="danger" onClick={openCancelModal}>
-                Cancelar Reserva
-              </Button>
-            )}
-
-            {reservation.status === "Completed" && (
-              <LeaveReviewButton
-                propertyId={reservation.propertyId}
-                reservationId={reservation.id}
-              />
-            )}
-
+          {/* Acciones Contextuales y Estados Especiales */}
+          <div className="flex flex-col gap-4">
+            {/* Lógica de Pendiente: Diferenciamos vista de Host y vista de Guest */}
             {reservation.status === "Pending" && (
-              <div className="w-full flex items-center justify-between p-6 bg-amber-50 border border-amber-100 rounded-2xl">
-                <p className="text-amber-800 font-medium flex items-center gap-2">
-                  <IoInformationCircleOutline size={20} />
-                  El anfitrión debe confirmar esta solicitud.
-                </p>
-                <HostReservationActions
-                  reservationId={reservation.id}
-                  status={reservation.status}
-                />
+              <div
+                className={`w-full flex flex-col items-center justify-between p-6 rounded-2xl border ${isHost ? "bg-indigo-50 border-indigo-100" : "bg-amber-50 border-amber-100"} gap-4`}
+              >
+                <div className="flex items-start gap-3">
+                  {isHost ? (
+                    <IoTimeOutline
+                      size={24}
+                      className="text-indigo-600 mt-0.5 shrink-0"
+                    />
+                  ) : (
+                    <IoInformationCircleOutline
+                      size={24}
+                      className="text-amber-600 mt-0.5 shrink-0"
+                    />
+                  )}
+                  <div>
+                    <h4
+                      className={`font-bold ${isHost ? "text-indigo-900" : "text-amber-900"}`}
+                    >
+                      {isHost
+                        ? "Solicitud de reserva pendiente"
+                        : "Esperando confirmación"}
+                    </h4>
+                    <p
+                      className={`text-sm font-medium ${isHost ? "text-indigo-700" : "text-amber-800"}`}
+                    >
+                      {isHost
+                        ? `El huésped "${reservation.guestName}" desea alojarse en estas fechas. ¿Aceptas la solicitud?`
+                        : "El anfitrión tiene 24 horas para aceptar o rechazar esta solicitud."}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Solo mostramos los botones de acción si el usuario logueado es el HOST */}
+                {isHost && (
+                  <div className="shrink-0">
+                    <HostReservationActions
+                      reservationId={reservation.id}
+                      status={reservation.status}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {isGuest && (
+              <div className="flex flex-wrap gap-4 mt-2">
+                {reservation.status === "Pending" && (
+                  <Button variant="danger" onClick={openCancelModal}>
+                    Cancelar Reserva
+                  </Button>
+                )}
+
+                {reservation.status === "Completed" && (
+                  <LeaveReviewButton
+                    propertyId={reservation.propertyId}
+                    reservationId={reservation.id}
+                  />
+                )}
               </div>
             )}
           </div>
@@ -214,6 +260,7 @@ export default function ReservationDetailPage({
       </div>
 
       <CancelReservationModal />
+      <ReviewFormModal propertyId={reservation.propertyId} />
     </main>
   );
 }

@@ -67,11 +67,6 @@ export function useUpdateReservationStatus() {
         });
       }
     },
-    onError: (error: Error) => {
-      toast.error(
-        error.message || "No se pudo actualizar el estado de la reserva.",
-      );
-    },
   });
 }
 
