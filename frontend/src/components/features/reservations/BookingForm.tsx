@@ -53,7 +53,6 @@ export function BookingForm({ propertyId }: Readonly<BookingFormProps>) {
   const onSubmit = (data: CreateReservationRequest) => {
     createReservation(data, {
       onSuccess: () => {
-        toast.success("¡Reserva confirmada!");
         router.push(ROUTES.USER.RESERVATIONS);
       },
     });
