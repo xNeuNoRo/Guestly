@@ -121,7 +121,7 @@ export function PropertyReviewsSection({
           </h2>
         </div>
 
-        {isHost && (
+        {!isHost && (
           <Button
             onClick={handleCreateClick}
             variant="secondary"
