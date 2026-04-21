@@ -1,4 +1,4 @@
-import { useVirtualizer, VirtualItem, type VirtualizerOptions } from "@tanstack/react-virtual";
+import { useVirtualizer, type VirtualItem, type VirtualizerOptions } from "@tanstack/react-virtual";
 import { useCallback, useRef } from "react";
 
 interface UseVirtualListOptions<T, TScrollElement extends Element> {

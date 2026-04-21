@@ -43,7 +43,7 @@ public class AuthController : BaseApiController
 
         var result = await _mediator.Send(command);
 
-        // Devuelve un 201 Created con la información del nuevo usuario registrado
+        // Devuelve un 200 OK con la información del nuevo usuario registrado
         return Success(result);
     }
 
