@@ -23,7 +23,8 @@ public class ReviewRepository : IReviewRepository
     public async Task<Review?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context
-            .Reviews.Include(r => r.Guest)
+            .Reviews.Include(r => r.Property)
+            .Include(r => r.Guest)
             .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
     }
 
@@ -37,8 +38,8 @@ public class ReviewRepository : IReviewRepository
     )
     {
         return await _context
-            .Reviews.Include(r => r.Guest)
-            .Include(r => r.Property)
+            .Reviews.Include(r => r.Property)
+            .Include(r => r.Guest)
             .Where(r => r.GuestId == userId)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync(cancellationToken);
@@ -54,7 +55,8 @@ public class ReviewRepository : IReviewRepository
     )
     {
         return await _context
-            .Reviews.Where(r => r.PropertyId == propertyId)
+            .Reviews.Include(r => r.Guest)
+            .Where(r => r.PropertyId == propertyId)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync(cancellationToken);
     }

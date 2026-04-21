@@ -26,7 +26,9 @@ public class PropertyRepository : IPropertyRepository
         CancellationToken cancellationToken = default
     )
     {
-        return await _context.Properties.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+        return await _context
+            .Properties.Include(p => p.Reviews)
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
     /// <summary>
@@ -38,7 +40,9 @@ public class PropertyRepository : IPropertyRepository
     )
     {
         return await _context
-            .Properties.Where(p => p.HostId == hostId)
+            .Properties.Include(p => p.Host)
+            .Include(p => p.Reviews)
+            .Where(p => p.HostId == hostId)
             .ToListAsync(cancellationToken);
     }
 
@@ -57,7 +61,7 @@ public class PropertyRepository : IPropertyRepository
     )
     {
         // AsQueryable nos permite construir la consulta de forma dinámica sin ejecutarla hasta el final.
-        var query = _context.Properties.AsQueryable();
+        var query = _context.Properties.Include(p => p.Host).Include(p => p.Reviews).AsQueryable();
 
         // Filtro por ubicación (si se proporcionó)
         if (!string.IsNullOrWhiteSpace(location))
