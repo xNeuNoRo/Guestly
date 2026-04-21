@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/stores/useAuth";
 import { useClickOutside } from "@/hooks/shared/useClickOutside";
 import { useToggle } from "@/hooks/shared/useToggle";
 import type { ReviewResponse } from "@/schemas/reviews.schemas";
+import Link from "next/link";
 
 interface ReviewCardProps {
   review: ReviewResponse;
@@ -50,6 +51,8 @@ export function ReviewCard({
     }).format(new Date(review.createdAt));
   }, [review.createdAt]);
 
+  const userProfileLink = `/profile/${review.guestId}`;
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 15 }}
@@ -60,15 +63,19 @@ export function ReviewCard({
       {/* --- CABECERA: Identidad y Acciones --- */}
       <header className="flex items-start justify-between mb-5">
         <div className="flex items-center gap-4">
-          <Avatar
-            alt={review.guestFullName}
-            size="md"
-            className="ring-2 ring-primary-50 text-primary-700 font-bold bg-primary-100 shadow-sm"
-          />
+          <Link href={userProfileLink}>
+            <Avatar
+              alt={review.guestFullName}
+              size="md"
+              className="hover:scale-105 ring-2 ring-primary-50 text-primary-700 font-bold bg-primary-100 shadow-sm"
+            />
+          </Link>
           <div>
-            <h4 className="text-base font-bold text-slate-900 tracking-tight leading-none mb-1.5">
-              {review.guestFullName}
-            </h4>
+            <Link href={userProfileLink}>
+              <h4 className="text-base font-bold text-slate-900 tracking-tight leading-none mb-1.5 hover:underline underline-offset-4 decoration-primary-500">
+                {review.guestFullName}
+              </h4>
+            </Link>
             <time
               dateTime={new Date(review.createdAt).toISOString()}
               className="text-xs font-medium text-slate-400 uppercase tracking-wider"

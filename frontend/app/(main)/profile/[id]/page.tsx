@@ -39,7 +39,7 @@ export default function PublicProfilePage({
           </p>
         </div>
 
-        <UserReviewsSection />
+        <UserReviewsSection userId={id} />
       </section>
     </main>
   );

@@ -12,9 +12,11 @@ import { ReviewCard } from "./ReviewCard";
 import { usePropertyReviews } from "@/hooks/reviews";
 import { useQueryString } from "@/hooks/shared/useQueryString";
 import type { ReviewResponse } from "@/schemas/reviews.schemas";
+import { useAuth } from "@/hooks/stores/useAuth";
 
 interface PropertyReviewsSectionProps {
   propertyId: string;
+  propertyHostId?: string;
 }
 
 /**
@@ -24,10 +26,12 @@ interface PropertyReviewsSectionProps {
  */
 export function PropertyReviewsSection({
   propertyId,
+  propertyHostId,
 }: Readonly<PropertyReviewsSectionProps>) {
   // Arsenal: Delegamos el estado de los modales a la URL
   const router = useRouter();
   const { createUrl } = useQueryString();
+  const { user } = useAuth();
 
   // Fetching de datos usando el hook de React Query
   const {
@@ -63,6 +67,8 @@ export function PropertyReviewsSection({
       scroll: false,
     });
   };
+
+  const isHost = user?.id === propertyHostId;
 
   if (isLoading) {
     return (
@@ -115,14 +121,16 @@ export function PropertyReviewsSection({
           </h2>
         </div>
 
-        <Button
-          onClick={handleCreateClick}
-          variant="secondary"
-          className="rounded-xl font-semibold"
-          leftIcon={<IoAddCircleOutline size={20} />}
-        >
-          Escribir opinión
-        </Button>
+        {isHost && (
+          <Button
+            onClick={handleCreateClick}
+            variant="secondary"
+            className="rounded-xl font-semibold"
+            leftIcon={<IoAddCircleOutline size={20} />}
+          >
+            Escribir opinión
+          </Button>
+        )}
       </div>
 
       {/* ESTADO VACÍO */}
@@ -132,16 +140,34 @@ export function PropertyReviewsSection({
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-16 px-4 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200"
         >
-          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-            <IoChatboxOutline size={28} className="text-slate-300" />
-          </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-1">
-            Sé el primero en opinar
-          </h3>
-          <p className="text-slate-500 max-w-sm">
-            Si ya te hospedaste en este lugar, comparte tu experiencia para
-            ayudar a otros viajeros.
-          </p>
+          {isHost ? (
+            <>
+              <div className="w-16 h-16 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center shadow-sm mb-4">
+                <IoChatboxOutline size={28} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-1">
+                Aún no tienes reseñas
+              </h3>
+              <p className="text-slate-500 max-w-sm">
+                Cuando tus huéspedes dejen una opinión sobre esta propiedad, las
+                verás aquí. ¡Anima a tus huéspedes a compartir su experiencia
+                para construir tu reputación como anfitrión!
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
+                <IoChatboxOutline size={28} className="text-slate-300" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-1">
+                Sé el primero en opinar
+              </h3>
+              <p className="text-slate-500 max-w-sm">
+                Si ya te hospedaste en este lugar, comparte tu experiencia para
+                ayudar a otros viajeros.
+              </p>
+            </>
+          )}
         </motion.div>
       ) : (
         /* GRID DE RESEÑAS */
