@@ -14,7 +14,10 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
-import { useMarkAsRead, useMarkAsUnread } from "@/hooks/notifications/useMutation";
+import {
+  useMarkAsRead,
+  useMarkAsUnread,
+} from "@/hooks/notifications/useMutation";
 import type {
   NotificationResponse,
   NotificationType,
@@ -137,7 +140,7 @@ export function NotificationItem({
       </div>
 
       {/* --- ARSENAL: Toggle de lectura (Check para leer / Punto para desmarcar) --- */}
-      <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute hover:cursor-pointer bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -148,7 +151,9 @@ export function NotificationItem({
             }
           }}
           className="p-1.5 text-slate-300 hover:text-primary-500 hover:bg-white rounded-lg shadow-sm border border-transparent hover:border-slate-100 transition-all flex items-center justify-center"
-          title={notification.isRead ? "Marcar como no leído" : "Marcar como leído"}
+          title={
+            notification.isRead ? "Marcar como no leído" : "Marcar como leído"
+          }
         >
           {notification.isRead ? (
             <IoEllipse size={10} className="mx-1 text-slate-200" />

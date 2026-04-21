@@ -63,7 +63,7 @@ export function NotificationPopover({
           <button
             onClick={() => markAllAsRead()}
             disabled={isMarking}
-            className="text-[10px] font-bold text-primary-600 hover:text-primary-700 flex items-center gap-1 uppercase tracking-wider disabled:opacity-50 transition-colors"
+            className="text-[10px] font-bold text-primary-600 hover:cursor-pointer hover:text-primary-700 flex items-center gap-1 uppercase tracking-wider disabled:opacity-50 transition-colors"
           >
             <IoCheckmarkDoneOutline size={14} />
             Marcar todas
