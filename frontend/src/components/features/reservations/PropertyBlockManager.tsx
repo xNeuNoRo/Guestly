@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { format, startOfDay, parseISO } from "date-fns";
+import { format, startOfDay } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "sonner";
 import {
@@ -31,13 +31,34 @@ import { usePropertyBlocks } from "@/hooks/reservations/useQueries";
 import {
   useCreatePropertyBlock,
   useDeletePropertyBlock,
-  useUpdatePropertyBlock, // <-- Asumimos que tienes o agregarás este hook
+  useUpdatePropertyBlock,
 } from "@/hooks/reservations/useMutation";
 import { useQueryString } from "@/hooks/shared/useQueryString";
 
 interface PropertyBlockManagerProps {
   propertyId: string;
 }
+
+const getSafeLocalDate = (value?: string | Date | null): Date | undefined => {
+  if (!value) return undefined;
+
+  let dateString = "";
+
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) return undefined;
+    dateString = value.toISOString().split("T")[0];
+  } else if (typeof value === "string") {
+    dateString = value.split("T")[0];
+  } else {
+    return undefined;
+  }
+
+  const [year, month, day] = dateString.split("-").map(Number);
+  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day))
+    return undefined;
+
+  return new Date(year, month - 1, day);
+};
 
 export function PropertyBlockManager({
   propertyId,
@@ -46,7 +67,7 @@ export function PropertyBlockManager({
   const { createUrl, searchParams } = useQueryString();
 
   const deletingId = searchParams.get("deletingBlock");
-  const editingId = searchParams.get("editingBlock"); // <-- Nuevo estado en URL
+  const editingId = searchParams.get("editingBlock");
   const urlStart = searchParams.get("blockStart");
   const urlEnd = searchParams.get("blockEnd");
 
@@ -55,7 +76,7 @@ export function PropertyBlockManager({
   const { mutate: createBlock, isPending: isCreating } =
     useCreatePropertyBlock();
   const { mutate: updateBlock, isPending: isUpdating } =
-    useUpdatePropertyBlock(); // <-- Nueva mutación
+    useUpdatePropertyBlock();
   const { mutate: deleteBlock, isPending: isDeleting } =
     useDeletePropertyBlock();
 
@@ -69,25 +90,15 @@ export function PropertyBlockManager({
     },
   });
 
-  const { isSubmitSuccessful } = form.formState;
   const startDate = form.watch("startDate");
   const endDate = form.watch("endDate");
-
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      form.resetField("propertyId", { defaultValue: propertyId });
-      form.resetField("reason", { defaultValue: "" });
-      form.resetField("startDate", { defaultValue: undefined });
-      form.resetField("endDate", { defaultValue: undefined });
-    }
-  }, [isSubmitSuccessful, propertyId, form]);
 
   useEffect(() => {
     const currentStart = form.getValues("startDate");
     const currentEnd = form.getValues("endDate");
 
-    if (urlStart) {
-      const newStart = parseISO(urlStart);
+    const newStart = getSafeLocalDate(urlStart);
+    if (newStart) {
       if (currentStart?.getTime() !== newStart.getTime()) {
         form.setValue("startDate", newStart, { shouldValidate: true });
       }
@@ -95,8 +106,8 @@ export function PropertyBlockManager({
       form.setValue("startDate", undefined as unknown as Date);
     }
 
-    if (urlEnd) {
-      const newEnd = parseISO(urlEnd);
+    const newEnd = getSafeLocalDate(urlEnd);
+    if (newEnd) {
       if (currentEnd?.getTime() !== newEnd.getTime()) {
         form.setValue("endDate", newEnd, { shouldValidate: true });
       }
@@ -105,15 +116,18 @@ export function PropertyBlockManager({
     }
   }, [urlStart, urlEnd, form]);
 
-  // Si estamos editando un bloque, NO deshabilitamos sus propias fechas
   const disabledDays = useMemo<Matcher[]>(() => {
     const disabled: Matcher[] = [{ before: startOfDay(new Date()) }];
     blocks?.forEach((block) => {
       if (block.id !== editingId) {
-        disabled.push({
-          from: startOfDay(new Date(block.startDate)),
-          to: startOfDay(new Date(block.endDate)),
-        });
+        const start = getSafeLocalDate(block.startDate);
+        const end = getSafeLocalDate(block.endDate);
+        if (start && end) {
+          disabled.push({
+            from: startOfDay(start),
+            to: startOfDay(end),
+          });
+        }
       }
     });
     return disabled;
@@ -126,9 +140,24 @@ export function PropertyBlockManager({
     );
   };
 
+  const clearForm = () => {
+    // Forzar el vaciado explícito para que el DOM reaccione
+    form.setValue("reason", "");
+    form.setValue("startDate", undefined as unknown as Date);
+    form.setValue("endDate", undefined as unknown as Date);
+
+    form.reset({
+      propertyId,
+      reason: "",
+      startDate: undefined as unknown as Date,
+      endDate: undefined as unknown as Date,
+    });
+    resetUrlState();
+  };
+
   const onSubmit = (data: CreatePropertyBlockRequest) => {
+    console.log("Submitting form with data:", data);
     if (editingId) {
-      // Modo Edición
       updateBlock(
         {
           id: editingId,
@@ -136,17 +165,16 @@ export function PropertyBlockManager({
         },
         {
           onSuccess: () => {
-            resetUrlState();
+            clearForm();
           },
         },
       );
     } else {
-      // Modo Creación
       createBlock(
         { propertyId, request: { ...data, propertyId } },
         {
           onSuccess: () => {
-            resetUrlState();
+            clearForm();
           },
         },
       );
@@ -154,23 +182,24 @@ export function PropertyBlockManager({
   };
 
   const handleEdit = (block: PropertyBlockResponse) => {
-    // Inyectamos el texto en el input manualmente
+    // Inyectamos el valor explícitamente al editar
     form.setValue("reason", block.reason || "");
 
-    // Pasamos las fechas a la URL y activamos el modo edición
+    const start = getSafeLocalDate(block.startDate);
+    const end = getSafeLocalDate(block.endDate);
+
     router.push(
       createUrl({
         editingBlock: block.id,
-        blockStart: format(new Date(block.startDate), "yyyy-MM-dd"),
-        blockEnd: format(new Date(block.endDate), "yyyy-MM-dd"),
+        blockStart: start ? format(start, "yyyy-MM-dd") : null,
+        blockEnd: end ? format(end, "yyyy-MM-dd") : null,
       }),
       { scroll: false },
     );
   };
 
   const handleCancelEdit = () => {
-    form.resetField("reason", { defaultValue: "" });
-    resetUrlState();
+    clearForm();
   };
 
   const handleDelete = (blockId: string) => {
@@ -208,8 +237,10 @@ export function PropertyBlockManager({
     return (
       <div className="flex flex-col gap-3 max-h-125 overflow-y-auto pr-2">
         {blocks.map((block: PropertyBlockResponse) => {
-          const start = new Date(block.startDate);
-          const end = new Date(block.endDate);
+          const start = getSafeLocalDate(block.startDate);
+          const end = getSafeLocalDate(block.endDate);
+          if (!start || !end) return null;
+
           const dateString =
             start.getMonth() === end.getMonth()
               ? `${format(start, "d")} - ${format(end, "d 'de' MMMM", { locale: es })}`
@@ -309,10 +340,20 @@ export function PropertyBlockManager({
           />
 
           <div className="space-y-4">
-            <InputField
+            {/* Control explícito para blindar la actualización y envío del input */}
+            <Controller
               name="reason"
-              label="Motivo (Opcional)"
-              placeholder="Ej: Mantenimiento, Uso personal..."
+              control={form.control}
+              render={({ field }) => (
+                <InputField
+                  name={field.name}
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  label="Motivo (Opcional)"
+                  placeholder="Ej: Mantenimiento, Uso personal..."
+                />
+              )}
             />
 
             <div className="flex flex-col gap-2">
