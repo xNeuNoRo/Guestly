@@ -150,7 +150,7 @@ export function NotificationItem({
               markRead(notification.id);
             }
           }}
-          className="p-1.5 text-slate-300 hover:text-primary-500 hover:bg-white rounded-lg shadow-sm border border-transparent hover:border-slate-100 transition-all flex items-center justify-center"
+          className="p-1.5 text-slate-300 hover:text-primary-500 hover:cursor-pointer hover:bg-white rounded-lg shadow-sm border border-transparent hover:border-slate-100 transition-all flex items-center justify-center"
           title={
             notification.isRead ? "Marcar como no leído" : "Marcar como leído"
           }

@@ -1,3 +1,4 @@
+// frontend/src/components/features/notifications/NotificationPopover.tsx
 "use client";
 
 import Link from "next/link";
@@ -9,22 +10,26 @@ import { ROUTES } from "@/constants/routes";
 
 import { useUnreadNotifications } from "@/hooks/notifications/useQueries";
 import { useMarkAllAsRead } from "@/hooks/notifications/useMutation";
+import { useNotificationRouting } from "@/hooks/shared/useNotificationsRouting";
+import type { NotificationResponse } from "@/schemas/notifications.schemas";
 
 interface NotificationPopoverProps {
   onClose: () => void;
 }
 
-/**
- * @description Molécula que renderiza la vista rápida de notificaciones.
- * Diseñada para vivir dentro de un PopoverPanel de Headless UI.
- */
 export function NotificationPopover({
   onClose,
 }: Readonly<NotificationPopoverProps>) {
   const { data: unreadNotifications, isLoading } = useUnreadNotifications();
   const { mutate: markAllAsRead, isPending: isMarking } = useMarkAllAsRead();
+  const { routeToOrigin } = useNotificationRouting();
 
   const unreadCount = unreadNotifications?.length ?? 0;
+
+  const handleNotificationClick = (notification: NotificationResponse) => {
+    onClose(); // Cerramos el popover
+    routeToOrigin(notification); // Navegamos inteligentemente
+  };
 
   const notificationsContent = (() => {
     if (isLoading) {
@@ -40,7 +45,9 @@ export function NotificationPopover({
     if (unreadCount === 0) {
       return (
         <div className="py-12 text-center">
-          <p className="text-xs text-slate-400">No tienes mensajes pendientes</p>
+          <p className="text-xs font-medium text-slate-400">
+            No tienes mensajes pendientes
+          </p>
         </div>
       );
     }
@@ -49,7 +56,7 @@ export function NotificationPopover({
       <NotificationItem
         key={notification.id}
         notification={notification}
-        onClick={() => onClose()}
+        onClick={handleNotificationClick}
       />
     ));
   })();
