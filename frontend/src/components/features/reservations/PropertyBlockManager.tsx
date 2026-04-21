@@ -11,6 +11,8 @@ import {
   IoTrashOutline,
   IoCalendarOutline,
   IoLockClosedOutline,
+  IoPencilOutline,
+  IoCloseOutline,
 } from "react-icons/io5";
 import type { DateRange, Matcher } from "react-day-picker";
 
@@ -29,6 +31,7 @@ import { usePropertyBlocks } from "@/hooks/reservations/useQueries";
 import {
   useCreatePropertyBlock,
   useDeletePropertyBlock,
+  useUpdatePropertyBlock, // <-- Asumimos que tienes o agregarás este hook
 } from "@/hooks/reservations/useMutation";
 import { useQueryString } from "@/hooks/shared/useQueryString";
 
@@ -43,6 +46,7 @@ export function PropertyBlockManager({
   const { createUrl, searchParams } = useQueryString();
 
   const deletingId = searchParams.get("deletingBlock");
+  const editingId = searchParams.get("editingBlock"); // <-- Nuevo estado en URL
   const urlStart = searchParams.get("blockStart");
   const urlEnd = searchParams.get("blockEnd");
 
@@ -50,10 +54,11 @@ export function PropertyBlockManager({
     usePropertyBlocks(propertyId);
   const { mutate: createBlock, isPending: isCreating } =
     useCreatePropertyBlock();
+  const { mutate: updateBlock, isPending: isUpdating } =
+    useUpdatePropertyBlock(); // <-- Nueva mutación
   const { mutate: deleteBlock, isPending: isDeleting } =
     useDeletePropertyBlock();
 
-  // defaultValues estáticos para evitar re-inicializaciones por URL
   const form = useForm<CreatePropertyBlockRequest>({
     resolver: zodResolver(createPropertyBlockSchema),
     defaultValues: {
@@ -64,7 +69,6 @@ export function PropertyBlockManager({
     },
   });
 
-  // Extraemos el estado de éxito del envío
   const { isSubmitSuccessful } = form.formState;
   const startDate = form.watch("startDate");
   const endDate = form.watch("endDate");
@@ -78,7 +82,6 @@ export function PropertyBlockManager({
     }
   }, [isSubmitSuccessful, propertyId, form]);
 
-  // Sincronización URL -> Formulario (Cuidando de no pisar el reason)
   useEffect(() => {
     const currentStart = form.getValues("startDate");
     const currentEnd = form.getValues("endDate");
@@ -102,31 +105,74 @@ export function PropertyBlockManager({
     }
   }, [urlStart, urlEnd, form]);
 
+  // Si estamos editando un bloque, NO deshabilitamos sus propias fechas
   const disabledDays = useMemo<Matcher[]>(() => {
     const disabled: Matcher[] = [{ before: startOfDay(new Date()) }];
     blocks?.forEach((block) => {
-      disabled.push({
-        from: startOfDay(new Date(block.startDate)),
-        to: startOfDay(new Date(block.endDate)),
-      });
+      if (block.id !== editingId) {
+        disabled.push({
+          from: startOfDay(new Date(block.startDate)),
+          to: startOfDay(new Date(block.endDate)),
+        });
+      }
     });
     return disabled;
-  }, [blocks]);
+  }, [blocks, editingId]);
+
+  const resetUrlState = () => {
+    router.push(
+      createUrl({ blockStart: null, blockEnd: null, editingBlock: null }),
+      { scroll: false },
+    );
+  };
 
   const onSubmit = (data: CreatePropertyBlockRequest) => {
-    createBlock(
-      { propertyId, request: { ...data, propertyId } },
-      {
-        onSuccess: () => {
-          // Primero limpiamos la URL.
-          // Al cambiar isSubmitSuccessful a true, el useEffect superior hará el reset limpio.
-          router.push(createUrl({ blockStart: null, blockEnd: null }), {
-            scroll: false,
-          });
-          toast.success("Fechas bloqueadas correctamente");
+    if (editingId) {
+      // Modo Edición
+      updateBlock(
+        {
+          id: editingId,
+          request: data,
         },
-      },
+        {
+          onSuccess: () => {
+            resetUrlState();
+            toast.success("Bloqueo actualizado correctamente");
+          },
+        },
+      );
+    } else {
+      // Modo Creación
+      createBlock(
+        { propertyId, request: { ...data, propertyId } },
+        {
+          onSuccess: () => {
+            resetUrlState();
+            toast.success("Fechas bloqueadas correctamente");
+          },
+        },
+      );
+    }
+  };
+
+  const handleEdit = (block: PropertyBlockResponse) => {
+    // Inyectamos el texto en el input manualmente
+    form.setValue("reason", block.reason || "");
+
+    // Pasamos las fechas a la URL y activamos el modo edición
+    router.push(
+      createUrl({
+        editingBlock: block.id,
+        blockStart: format(new Date(block.startDate), "yyyy-MM-dd"),
+        blockEnd: format(new Date(block.endDate), "yyyy-MM-dd"),
+      }),
+      { scroll: false },
     );
+  };
+
+  const handleCancelEdit = () => {
+    form.resetField("reason", { defaultValue: "" });
+    resetUrlState();
   };
 
   const handleDelete = (blockId: string) => {
@@ -142,7 +188,6 @@ export function PropertyBlockManager({
     );
   };
 
-  // --- Renderizado de bloques ---
   const blocksContent = (() => {
     if (isLoadingBlocks) {
       return (
@@ -172,10 +217,16 @@ export function PropertyBlockManager({
               ? `${format(start, "d")} - ${format(end, "d 'de' MMMM", { locale: es })}`
               : `${format(start, "d 'de' MMM", { locale: es })} - ${format(end, "d 'de' MMM", { locale: es })}`;
 
+          const isBeingEdited = editingId === block.id;
+
           return (
             <div
               key={block.id}
-              className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-sm group hover:border-red-200 transition-colors"
+              className={`flex items-center justify-between p-4 bg-white border rounded-xl shadow-sm transition-colors ${
+                isBeingEdited
+                  ? "border-primary-500 ring-1 ring-primary-500"
+                  : "border-slate-200 hover:border-slate-300"
+              }`}
             >
               <div className="flex flex-col gap-1">
                 <p className="font-semibold text-slate-900 capitalize">
@@ -185,16 +236,30 @@ export function PropertyBlockManager({
                   {block.reason || "Sin motivo especificado"}
                 </p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDelete(block.id)}
-                isLoading={isDeleting && deletingId === block.id}
-                disabled={isDeleting && deletingId !== block.id}
-                className="text-slate-400 hover:text-red-600 hover:bg-red-50"
-              >
-                <IoTrashOutline size={20} />
-              </Button>
+
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleEdit(block)}
+                  disabled={isDeleting || isBeingEdited}
+                  className="text-slate-400 hover:text-primary-600 hover:bg-primary-50"
+                >
+                  <IoPencilOutline size={20} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDelete(block.id)}
+                  isLoading={isDeleting && deletingId === block.id}
+                  disabled={isDeleting || isBeingEdited}
+                  className="text-slate-400 hover:text-red-600 hover:bg-red-50"
+                >
+                  {!(isDeleting && deletingId === block.id) && (
+                    <IoTrashOutline size={20} />
+                  )}
+                </Button>
+              </div>
             </div>
           );
         })}
@@ -206,10 +271,12 @@ export function PropertyBlockManager({
     <div className="flex flex-col lg:flex-row gap-8 items-start">
       <div className="w-full lg:w-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-sm shrink-0">
         <h3 className="text-lg font-bold text-slate-900 mb-1">
-          Bloquear Fechas
+          {editingId ? "Editar Bloqueo" : "Bloquear Fechas"}
         </h3>
         <p className="text-sm text-slate-500 mb-6">
-          Selecciona un rango para evitar nuevas reservas.
+          {editingId
+            ? "Modifica las fechas o el motivo de este bloqueo."
+            : "Selecciona un rango para evitar nuevas reservas."}
         </p>
 
         <Form form={form} onSubmit={onSubmit} className="flex flex-col gap-6">
@@ -249,15 +316,33 @@ export function PropertyBlockManager({
               label="Motivo (Opcional)"
               placeholder="Ej: Mantenimiento, Uso personal..."
             />
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={!startDate || !endDate}
-              isLoading={isCreating}
-              leftIcon={<IoLockClosedOutline />}
-            >
-              Confirmar bloqueo
-            </Button>
+
+            <div className="flex flex-col gap-2">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={!startDate || !endDate}
+                isLoading={isCreating || isUpdating}
+                leftIcon={
+                  editingId ? <IoPencilOutline /> : <IoLockClosedOutline />
+                }
+              >
+                {editingId ? "Guardar cambios" : "Confirmar bloqueo"}
+              </Button>
+
+              {editingId && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleCancelEdit}
+                  disabled={isUpdating}
+                  leftIcon={<IoCloseOutline />}
+                >
+                  Cancelar edición
+                </Button>
+              )}
+            </div>
           </div>
         </Form>
       </div>
