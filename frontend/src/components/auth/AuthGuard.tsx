@@ -27,7 +27,7 @@ export function AuthGuard({
 
   // Sincronizamos con la petición de perfil que ya se está ejecutando en el AuthLoader.
   // Usamos status para detectar el gap entre el fin de la carga y el inicio de la autenticación en el store.
-  const { isLoading, isFetching, status } = useMyProfile();
+  const { status } = useMyProfile();
 
   /**
    * ESTADO DE VERIFICACIÓN (Limbo)
@@ -38,27 +38,7 @@ export function AuthGuard({
    */
   const isVerifying = !!token && !isAuthenticated && status !== "error";
 
-  console.log("[AuthGuard: Render]", {
-    pathname,
-    isMounted,
-    isAuthenticated,
-    hasToken: !!token,
-    queryStatus: status,
-    isLoading,
-    isFetching,
-    isVerifying,
-    publicOnly,
-    allowGuests,
-  });
-
   useEffect(() => {
-    console.log("[AuthGuard: Effect Start]", {
-      isMounted,
-      isVerifying,
-      isAuthenticated,
-      pathname,
-    });
-
     // Si no ha montado o el sistema está verificando el token, bloqueamos cualquier redirección.
     if (!isMounted || isVerifying) return;
 
