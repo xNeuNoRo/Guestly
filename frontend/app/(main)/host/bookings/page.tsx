@@ -52,7 +52,7 @@ export default function HostBookingsPage() {
         {booking.status === "Pending" && (
           <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
             <p className="text-sm font-bold text-slate-600 ml-2">
-              ¿Aceptar esta estancia?
+              Esta reserva está pendiente de tu confirmación.
             </p>
             <HostReservationActions
               status={booking.status}

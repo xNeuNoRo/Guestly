@@ -5,7 +5,12 @@ import {
   updatePropertyBlock,
   updateReservationStatus,
 } from "@/api/ReservationsAPI";
-import { propertyKeys, reservationKeys } from "@/lib/queryKeys";
+import {
+  notificationKeys,
+  propertyKeys,
+  reservationKeys,
+  userKeys,
+} from "@/lib/queryKeys";
 import type {
   CreatePropertyBlockRequest,
   UpdatePropertyBlockRequest,
@@ -54,18 +59,17 @@ export function useUpdateReservationStatus() {
       request: UpdateReservationStatusRequest;
     }) => updateReservationStatus(id, request),
     onSuccess: (data) => {
-      // Actualizamos directamente el detalle de la reserva en caché
       queryClient.setQueryData(reservationKeys.detail(data.id), data);
-
-      // Invalidamos las listas
-      queryClient.invalidateQueries({ queryKey: reservationKeys.search() });
-
-      // Si se cancela, debemos liberar las fechas invalidando la propiedad
-      if (data.status === "Cancelled") {
-        queryClient.invalidateQueries({
-          queryKey: propertyKeys.detail(data.propertyId),
-        });
-      }
+      queryClient.invalidateQueries({ queryKey: reservationKeys.all });
+      queryClient.invalidateQueries({
+        queryKey: propertyKeys.detail(data.propertyId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.hostDashboard(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: notificationKeys.all,
+      });
     },
   });
 }
