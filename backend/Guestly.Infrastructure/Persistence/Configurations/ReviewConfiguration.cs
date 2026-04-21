@@ -25,7 +25,7 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
 
         // Relaciones
         builder
-            .HasOne<Property>() // Una reseña pertenece a una propiedad
+            .HasOne(r => r.Property) // Una reseña pertenece a una propiedad
             .WithMany(p => p.Reviews) // Una propiedad puede tener muchas reseñas
             .HasForeignKey(r => r.PropertyId) // La FK es PropertyId
             .OnDelete(DeleteBehavior.Restrict); // Evitamos borrar una propiedad si tiene reseñas para preservar el historial
@@ -37,7 +37,7 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
             .OnDelete(DeleteBehavior.Restrict); // Evitamos borrar un huésped si tiene reseñas para preservar el historial
 
         builder
-            .HasOne<Reservation>() // Una reseña pertenece a una reserva
+            .HasOne(r => r.Reservation) // Una reseña pertenece a una reserva
             .WithMany()
             .HasForeignKey(r => r.ReservationId) // La FK es ReservationId
             .OnDelete(DeleteBehavior.Restrict); // Evitamos borrar una reserva si tiene reseñas para preservar el historial

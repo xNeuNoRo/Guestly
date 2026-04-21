@@ -7,7 +7,7 @@ import { IoChatboxOutline, IoHomeOutline } from "react-icons/io5";
 import { Skeleton } from "@/components/shared/Skeleton";
 import { ReviewCard } from "./ReviewCard";
 
-import { useUserReviews } from "@/hooks/reviews/useQueries";
+import { useUserReviews } from "@/hooks/reviews";
 import { useAuth } from "@/hooks/stores/useAuth";
 import { useQueryString } from "@/hooks/shared/useQueryString";
 import type { ReviewResponse } from "@/schemas/reviews.schemas";
