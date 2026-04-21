@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, ChangeEvent } from "react";
 import { useFormContext } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -19,16 +19,12 @@ interface PropertyImageManagerProps {
   existingImages?: string[];
 }
 
-/**
- * @description Gestor avanzado de imágenes.
- * Utiliza índices posicionales en la URL para persistir el borrado de forma ultra ligera.
- */
 export function PropertyImageManager({
   existingImages = [],
 }: Readonly<PropertyImageManagerProps>) {
   const router = useRouter();
   const { createUrl, searchParams } = useQueryString();
-  const { register, watch, setValue } = useFormContext();
+  const { watch, setValue } = useFormContext();
 
   // --- Fuente de Verdad: URL (Solo guardamos los ÍNDICES) ---
   const deletedIndices = useMemo(() => {
@@ -56,7 +52,32 @@ export function PropertyImageManager({
     return () => newPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
   }, [newPreviewUrls]);
 
-  // --- MÉTODOS DE GESTIÓN ---
+  // --- MÉTODOS DE GESTIÓN CORREGIDOS ---
+
+  /**
+   * Manejador de cambio manual para acumular archivos.
+   * Evita que el input limpie las fotos seleccionadas previamente.
+   */
+  const handleFilesChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (!selectedFiles || selectedFiles.length === 0) return;
+
+    const dataTransfer = new DataTransfer();
+
+    // Mantener los archivos que ya estaban en el formulario
+    if (newFiles) {
+      Array.from(newFiles).forEach((file) => dataTransfer.items.add(file));
+    }
+
+    // Agregar los nuevos archivos seleccionados
+    Array.from(selectedFiles).forEach((file) => dataTransfer.items.add(file));
+
+    // Actualizar el valor en React Hook Form
+    setValue("images", dataTransfer.files, { shouldValidate: true });
+
+    // Limpiar el valor del input para permitir seleccionar el mismo archivo si se desea
+    e.target.value = "";
+  };
 
   const removeNewFile = (indexToRemove: number) => {
     if (!newFiles) return;
@@ -73,7 +94,6 @@ export function PropertyImageManager({
       ? deletedIndices.filter((i) => i !== index)
       : [...deletedIndices, index];
 
-    // Actualizamos la URL con los índices (Mucho más corto que las URLs)
     router.push(
       createUrl({
         deleted:
@@ -96,7 +116,7 @@ export function PropertyImageManager({
               Añade fotos nuevas
             </p>
             <p className="text-sm text-slate-500">
-              Arrastra o haz clic para subir
+              Arrastra o haz clic para subir múltiples fotos
             </p>
           </div>
         </div>
@@ -105,7 +125,7 @@ export function PropertyImageManager({
           multiple
           accept="image/*"
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          {...register("images")}
+          onChange={handleFilesChange}
         />
       </div>
 
