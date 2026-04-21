@@ -16,6 +16,9 @@ import { Skeleton } from "@/components/shared/Skeleton";
 import { useProperty } from "@/hooks/properties/useQueries";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 
+import { ReviewFormModal } from "@/components/features/reviews/ReviewFormModal";
+import { DeleteReviewModal } from "@/components/features/reviews/DeleteReviewModal";
+
 interface PropertyDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -46,7 +49,7 @@ export default function PropertyDetailPage({
             <Skeleton className="h-60 w-full rounded-xl" />
           </div>
           {/* Skeleton del BookingForm que imita el Sidebar */}
-          <Skeleton className="hidden lg:block h-[450px] w-full rounded-[2rem] sticky top-32" />
+          <Skeleton className="hidden lg:block h-[450px] w-full rounded-4xl sticky top-32" />
         </div>
       </div>
     );
@@ -98,6 +101,9 @@ export default function PropertyDetailPage({
             <BookingForm propertyId={id} />
           </aside>
         </div>
+
+        <ReviewFormModal propertyId={id} />
+        <DeleteReviewModal propertyId={id} />
       </main>
     </AuthGuard>
   );

@@ -140,7 +140,7 @@ export function ReviewFormModal({
                       key={star}
                       type="button"
                       onClick={() => field.onChange(star)}
-                      className={`transition-all hover:scale-125 ${
+                      className={`transition-all hover:cursor-pointer hover:scale-125 ${
                         star <= field.value
                           ? "text-amber-400"
                           : "text-slate-200"
