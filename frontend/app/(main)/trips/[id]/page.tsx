@@ -1,0 +1,235 @@
+"use client";
+
+import { use } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { format, differenceInDays } from "date-fns";
+import { es } from "date-fns/locale";
+import {
+  IoLocationOutline,
+  IoChevronBack,
+  IoInformationCircleOutline,
+} from "react-icons/io5";
+
+import { ReservationStatusBadge } from "@/components/features/reservations/ReservationStatusBadge";
+import { HostReservationActions } from "@/components/features/reservations/HostReservationActions";
+import { CancelReservationModal } from "@/components/features/reservations/CancelReservationModal";
+import { LeaveReviewButton } from "@/components/features/reviews/LeaveReviewButton";
+import { Button } from "@/components/shared/Button";
+import { Skeleton } from "@/components/shared/Skeleton";
+import { formatCurrency } from "@/helpers/formatCurrency";
+import { useReservation } from "@/hooks/reservations/useQueries";
+import { useQueryString } from "@/hooks/shared/useQueryString";
+import { useRouter } from "next/navigation";
+
+interface ReservationDetailPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default function ReservationDetailPage({
+  params,
+}: Readonly<ReservationDetailPageProps>) {
+  const { id } = use(params);
+  const router = useRouter();
+  const { createUrl } = useQueryString();
+  const { data: reservation, isLoading, isError } = useReservation(id);
+
+  if (isLoading) return <ReservationDetailSkeleton />;
+
+  if (isError || !reservation) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <h1 className="text-2xl font-bold text-slate-900">
+          Reserva no encontrada
+        </h1>
+        <Button onClick={() => router.back()} variant="ghost" className="mt-4">
+          Volver
+        </Button>
+      </div>
+    );
+  }
+
+  const nights = differenceInDays(
+    reservation.checkOutDate,
+    reservation.checkInDate,
+  );
+
+  const openCancelModal = () => {
+    router.push(createUrl({ modal: "cancel-reservation", reservationId: id }), {
+      scroll: false,
+    });
+  };
+
+  return (
+    <main className="container mx-auto px-4 py-8 max-w-5xl">
+      {/* Header de Navegación */}
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900 mb-6 transition-colors"
+      >
+        <IoChevronBack size={18} />
+        Volver a mis viajes
+      </button>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        {/* COLUMNA IZQUIERDA: Info de la Estancia */}
+        <div className="lg:col-span-2 space-y-8">
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+                Detalles del viaje
+              </h1>
+              <ReservationStatusBadge status={reservation.status} />
+            </div>
+
+            <div className="relative w-full aspect-video rounded-[2.5rem] overflow-hidden border border-slate-200 shadow-sm">
+              <Image
+                src={reservation.propertyThumbnailUrl}
+                alt={reservation.propertyTitle}
+                fill
+                className="object-cover"
+              />
+            </div>
+          </section>
+
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-8 rounded-4xl border border-slate-200 shadow-sm">
+            <div className="space-y-1">
+              <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                Alojamiento
+              </p>
+              <h3 className="text-xl font-bold text-slate-900">
+                {reservation.propertyTitle}
+              </h3>
+              <p className="flex items-center gap-1 text-slate-500 font-medium">
+                <IoLocationOutline /> {reservation.propertyLocation}
+              </p>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                Anfitrión
+              </p>
+              <h3 className="text-xl font-bold text-slate-900">
+                {reservation.hostName}
+              </h3>
+              <Link
+                href={`/profile/${reservation.hostId}`}
+                className="text-primary-600 font-bold text-sm hover:underline"
+              >
+                Ver perfil del anfitrión
+              </Link>
+            </div>
+
+            <div className="md:col-span-2 pt-6 border-t border-slate-100 grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                  Llegada
+                </p>
+                <p className="font-bold text-slate-900">
+                  {format(reservation.checkInDate, "EEEE, d 'de' MMMM", {
+                    locale: es,
+                  })}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                  Salida
+                </p>
+                <p className="font-bold text-slate-900">
+                  {format(reservation.checkOutDate, "EEEE, d 'de' MMMM", {
+                    locale: es,
+                  })}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Acciones Contextuales */}
+          <div className="flex flex-wrap gap-4">
+            {reservation.status === "Confirmed" && (
+              <Button variant="danger" onClick={openCancelModal}>
+                Cancelar Reserva
+              </Button>
+            )}
+
+            {reservation.status === "Completed" && (
+              <LeaveReviewButton
+                propertyId={reservation.propertyId}
+                reservationId={reservation.id}
+              />
+            )}
+
+            {reservation.status === "Pending" && (
+              <div className="w-full flex items-center justify-between p-6 bg-amber-50 border border-amber-100 rounded-2xl">
+                <p className="text-amber-800 font-medium flex items-center gap-2">
+                  <IoInformationCircleOutline size={20} />
+                  El anfitrión debe confirmar esta solicitud.
+                </p>
+                <HostReservationActions
+                  reservationId={reservation.id}
+                  status={reservation.status}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* COLUMNA DERECHA: Desglose de Pago */}
+        <aside className="space-y-6">
+          <div className="bg-white p-8 rounded-4xl border border-slate-200 shadow-sm sticky top-28 space-y-6">
+            <h2 className="text-xl font-black text-slate-900">
+              Información del pago
+            </h2>
+
+            <div className="space-y-3">
+              <div className="flex justify-between text-slate-600 font-medium">
+                <span>
+                  {formatCurrency(reservation.pricePerNightAtBooking)} x{" "}
+                  {nights} noches
+                </span>
+                <span>
+                  {formatCurrency(reservation.pricePerNightAtBooking * nights)}
+                </span>
+              </div>
+              <div className="flex justify-between text-slate-600 font-medium">
+                <span>Tarifa de limpieza</span>
+                <span>{formatCurrency(reservation.cleaningFeeAtBooking)}</span>
+              </div>
+              <div className="flex justify-between text-slate-600 font-medium">
+                <span>Comisión de servicio</span>
+                <span>{formatCurrency(reservation.serviceFeeAtBooking)}</span>
+              </div>
+              <div className="flex justify-between text-slate-600 font-medium">
+                <span>Impuestos</span>
+                <span>{formatCurrency(reservation.taxesAtBooking)}</span>
+              </div>
+
+              <div className="pt-4 border-t border-slate-200 flex justify-between text-xl font-black text-slate-900">
+                <span>Total</span>
+                <span>{formatCurrency(reservation.totalPrice)}</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <CancelReservationModal />
+    </main>
+  );
+}
+
+function ReservationDetailSkeleton() {
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-5xl space-y-8 animate-pulse">
+      <Skeleton className="h-6 w-32 rounded-lg" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="lg:col-span-2 space-y-8">
+          <Skeleton className="h-10 w-64 rounded-xl" />
+          <Skeleton className="h-[400px] w-full rounded-[2.5rem]" />
+          <Skeleton className="h-64 w-full rounded-4xl" />
+        </div>
+        <Skeleton className="h-[450px] w-full rounded-4xl" />
+      </div>
+    </div>
+  );
+}

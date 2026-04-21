@@ -149,9 +149,9 @@ export function useDeletePropertyBlock() {
     mutationFn: ({ id, propertyId }: { id: string; propertyId: string }) =>
       deletePropertyBlock(id),
     onSuccess: (_, variables) => {
-      toast.success(
-        "Bloqueo eliminado. Las fechas vuelven a estar disponibles.",
-      );
+      toast.success("Bloqueo eliminado", {
+        description: "Las fechas bloqueadas vuelven a estar disponibles.",
+      });
 
       // Usamos el propertyId inyectado para limpiar exactamente las queries necesarias
       queryClient.invalidateQueries({

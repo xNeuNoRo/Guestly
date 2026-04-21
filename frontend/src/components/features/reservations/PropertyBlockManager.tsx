@@ -100,15 +100,11 @@ export function PropertyBlockManager({
       { propertyId, request: { ...data, propertyId } },
       {
         onSuccess: () => {
-          toast.success("Fechas bloqueadas");
           form.reset({ propertyId, reason: "" });
           // Limpiamos la URL tras el éxito
           router.push(createUrl({ blockStart: null, blockEnd: null }), {
             scroll: false,
           });
-        },
-        onError: () => {
-          toast.error("Error al bloquear fechas");
         },
       },
     );
@@ -122,11 +118,9 @@ export function PropertyBlockManager({
       { id: blockId, propertyId },
       {
         onSuccess: () => {
-          toast.success("Bloqueo eliminado");
           router.push(createUrl({ deletingBlock: null }), { scroll: false });
         },
         onError: () => {
-          toast.error("Error al eliminar");
           router.push(createUrl({ deletingBlock: null }), { scroll: false });
         },
       },
@@ -217,7 +211,7 @@ export function PropertyBlockManager({
             control={form.control}
             render={({ fieldState }) => (
               <div className="flex flex-col gap-2">
-                <div className="bg-slate-50 p-2 rounded-xl border border-slate-100 w-fit">
+                <div className="bg-slate-50 p-2 rounded-xl border border-slate-100 w-full">
                   <Calendar
                     mode="range"
                     selected={{ from: startDate, to: endDate }}
