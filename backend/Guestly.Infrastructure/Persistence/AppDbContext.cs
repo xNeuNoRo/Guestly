@@ -43,7 +43,7 @@ public class AppDbContext : DbContext
                     entry.Entity.CreatedAt = _dateTimeProvider.UtcNow;
                     entry.Entity.UpdatedAt = _dateTimeProvider.UtcNow; // También asignamos UpdatedAt para nuevas entidades
                     break;
-                // Si la entidad ha sido modificada (Modified), 
+                // Si la entidad ha sido modificada (Modified),
                 // asignamos la fecha de actualización (UpdatedAt) con la fecha y hora actual en UTC
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = _dateTimeProvider.UtcNow;
@@ -60,5 +60,29 @@ public class AppDbContext : DbContext
         // En lugar de andar creando 1 por 1 cada configuración, buscamos todas
         // las clases que implementen IEntityTypeConfiguration<T> y las aplique automáticamente
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+        // Configuración global para convertir todas las propiedades DateTime a UTC
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            // Buscamos todas las propiedades de tipo DateTime o DateTime? en cada entidad
+            var properties = entityType
+                .GetProperties()
+                .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?));
+
+            // Para cada propiedad encontrada, le asignamos un ValueConverter
+            // que se encargará de convertir las fechas a UTC al guardarlas y de marcar las fechas como UTC al leerlas
+            foreach (var property in properties)
+            {
+                property.SetValueConverter(
+                    new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<
+                        DateTime,
+                        DateTime
+                    >(
+                        v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(), // Al guardar: Forzar a UTC
+                        v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Al leer: Marcar como UTC
+                    )
+                );
+            }
+        }
     }
 }
