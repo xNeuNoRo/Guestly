@@ -110,6 +110,19 @@ public class ExceptionMiddleware
                 statusCode
             );
         }
+        else if (exception is DomainException domEx)
+        {
+            // Las reglas de dominio rotas se traducen nativamente a un Bad Request (400)
+            statusCode = (int)HttpStatusCode.BadRequest;
+            message = domEx.Message;
+            errorCode = domEx.Code;
+
+            logger.LogWarning(
+                "Violación de regla de dominio: {Message} (Code: {Code})",
+                message,
+                errorCode
+            );
+        }
         else if (exception is ValidationException valEx)
         {
             // Si es una excepción de validación lanzada por FluentValidation en el Behavior
