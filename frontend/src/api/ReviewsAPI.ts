@@ -68,6 +68,21 @@ export const getReviewById = async (id: string): Promise<ReviewResponse> => {
 };
 
 /**
+ * @description Obtiene la reseña asociada a una reserva específica (si existe).
+ * @param reservationId - ID de la reserva.
+ */
+export const getReviewByReservation = async (
+  reservationId: string,
+): Promise<ReviewResponse> => {
+  try {
+    const { data } = await api.get(`/reviews/reservations/${reservationId}`);
+    return validateApiRes(data, reviewResponseSchema);
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+/**
  * @description Obtiene todas las reseñas de una propiedad específica.
  * @param propertyId - ID de la propiedad.
  * @returns Lista de reseñas asociadas a la propiedad.

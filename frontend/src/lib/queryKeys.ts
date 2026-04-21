@@ -51,6 +51,8 @@ export const reservationKeys = {
 export const reviewKeys = {
   all: ["reviews"] as const,
   detail: (id: string) => [...reviewKeys.all, "detail", id] as const,
+  byReservation: (reservationId: string) =>
+    [...reviewKeys.all, "reservation", reservationId] as const,
   byProperty: (propertyId: string) =>
     [...reviewKeys.all, "property", propertyId] as const,
   byUser: (userId: string) => [...reviewKeys.all, "user", userId] as const,

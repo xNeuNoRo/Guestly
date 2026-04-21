@@ -1,5 +1,6 @@
 import {
   getReviewById,
+  getReviewByReservation,
   getReviewsByProperty,
   getReviewsByUser,
 } from "@/api/ReviewsAPI";
@@ -17,6 +18,21 @@ export function useReview(id?: string) {
     queryKey: reviewKeys.detail(validId),
     queryFn: () => getReviewById(validId),
     enabled: !!id, // Solo se ejecuta si el ID existe
+  });
+}
+
+/**
+ * @description Hook para obtener la reseña asociada a una reserva específica (si existe).
+ * @param reservationId - El ID de la reserva para la cual se desea obtener la reseña.
+ * @returns Un objeto de React Query con la reseña asociada a la reserva, o undefined si no existe.
+ */
+export function useReviewByReservation(reservationId?: string) {
+  const validReservationId = reservationId ?? "";
+
+  return useQuery({
+    queryKey: reviewKeys.byReservation(validReservationId),
+    queryFn: () => getReviewByReservation(validReservationId),
+    enabled: !!reservationId, // Solo se ejecuta si el ID de reserva existe
   });
 }
 
