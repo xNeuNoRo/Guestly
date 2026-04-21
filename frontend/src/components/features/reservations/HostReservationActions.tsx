@@ -95,7 +95,7 @@ export function HostReservationActions({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto p-4 bg-slate-50 border border-slate-200 rounded-xl">
+    <div className="flex flex-col gap-3 w-full sm:w-auto p-4 bg-slate-50 border border-slate-200 rounded-xl">
       <div className="flex-1">
         <p className="text-sm font-semibold text-slate-900">Acción requerida</p>
         <p className="text-sm text-slate-500">

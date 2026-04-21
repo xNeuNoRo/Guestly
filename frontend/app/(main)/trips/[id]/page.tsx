@@ -21,10 +21,11 @@ import { Button } from "@/components/shared/Button";
 import { Skeleton } from "@/components/shared/Skeleton";
 import { formatCurrency } from "@/helpers/formatCurrency";
 import { useReservation } from "@/hooks/reservations/useQueries";
-import { useUserReviews } from "@/hooks/reviews";
+import { useReviewByReservation } from "@/hooks/reviews";
 import { useQueryString } from "@/hooks/shared/useQueryString";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/stores/useAuth";
+import { ROUTES } from "@/constants/routes";
 
 interface ReservationDetailPageProps {
   params: Promise<{ id: string }>;
@@ -43,11 +44,14 @@ export default function ReservationDetailPage({
   const isHost = user?.id === reservation?.hostId;
   const isGuest = user?.id === reservation?.guestId;
 
-  // Consultamos las reviews del usuario actual (solo si es el huésped y la reserva está completada)
+  // Consultamos si el huésped ya dejó una reseña para esta reserva (solo si es huésped y la reserva está completada)
   const shouldCheckReviews = isGuest && reservation?.status === "Completed";
-  const { data: userReviews } = useUserReviews(
-    shouldCheckReviews ? user?.id : undefined,
-  );
+  const { data: existingReview, isLoading: isCheckingReview } =
+    useReviewByReservation(shouldCheckReviews ? reservation?.id : undefined);
+
+  const tripsPage = isHost
+    ? ROUTES.HOST.RESERVATIONS
+    : ROUTES.USER.RESERVATIONS;
 
   if (isLoading) return <ReservationDetailSkeleton />;
 
@@ -57,7 +61,7 @@ export default function ReservationDetailPage({
         <h1 className="text-2xl font-bold text-slate-900">
           Reserva no encontrada
         </h1>
-        <Button onClick={() => router.back()} variant="ghost" className="mt-4">
+        <Button onClick={() => router.push(tripsPage)} variant="ghost" className="mt-4">
           Volver
         </Button>
       </div>
@@ -75,18 +79,40 @@ export default function ReservationDetailPage({
     });
   };
 
-  // Verificamos si ya existe una review para esta propiedad hecha por este usuario.
-  // (Idealmente el backend cruzaría ReservationId, pero si no lo expone en el DTO de ReviewResponse,
-  // verificar por PropertyId es lo estándar para evitar reviews múltiples).
-  const hasAlreadyReviewed = userReviews?.some(
-    (review) => review.propertyId === reservation.propertyId,
-  );
+  // Si el huésped ya tiene una review para esta reserva, no mostramos el botón de dejar reseña sino un mensaje de agradecimiento
+  const hasAlreadyReviewed = !!existingReview;
+
+  let completedGuestReviewContent = null;
+
+  if (isCheckingReview) {
+    completedGuestReviewContent = (
+      <Skeleton className="h-14 w-full sm:w-48 rounded-xl" />
+    );
+  } else if (hasAlreadyReviewed) {
+    completedGuestReviewContent = (
+      <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl flex items-center gap-3">
+        <div className="bg-emerald-100 p-2 rounded-full text-emerald-600">
+          <IoInformationCircleOutline size={20} />
+        </div>
+        <p className="text-sm font-bold text-emerald-800">
+          Ya calificaste esta estancia. ¡Gracias por tu opinión!
+        </p>
+      </div>
+    );
+  } else {
+    completedGuestReviewContent = (
+      <LeaveReviewButton
+        propertyId={reservation.propertyId}
+        reservationId={reservation.id}
+      />
+    );
+  }
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-5xl">
       {/* Header de Navegación */}
       <button
-        onClick={() => router.back()}
+        onClick={() => router.push(tripsPage)}
         className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:cursor-pointer hover:text-slate-900 mb-6 transition-colors"
       >
         <IoChevronBack size={18} />
@@ -245,23 +271,7 @@ export default function ReservationDetailPage({
 
             {/* Lógica de Calificación (Solo Huésped) */}
             {isGuest && reservation.status === "Completed" && (
-              <div className="mt-2">
-                {hasAlreadyReviewed ? (
-                  <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl flex items-center gap-3">
-                    <div className="bg-emerald-100 p-2 rounded-full text-emerald-600">
-                      <IoInformationCircleOutline size={20} />
-                    </div>
-                    <p className="text-sm font-bold text-emerald-800">
-                      Ya calificaste esta estancia. ¡Gracias por tu opinión!
-                    </p>
-                  </div>
-                ) : (
-                  <LeaveReviewButton
-                    propertyId={reservation.propertyId}
-                    reservationId={reservation.id}
-                  />
-                )}
-              </div>
+              <div className="mt-2">{completedGuestReviewContent}</div>
             )}
           </div>
         </div>

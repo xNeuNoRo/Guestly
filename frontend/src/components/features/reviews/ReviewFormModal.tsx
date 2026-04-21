@@ -24,6 +24,7 @@ import { SelectField } from "@/components/shared/form/SelectField";
 import { useQueryString } from "@/hooks/shared/useQueryString";
 import { useCreateReview, useUpdateReview } from "@/hooks/reviews/useMutation";
 import { useReview } from "@/hooks/reviews";
+import { useReviewByReservation } from "@/hooks/reviews/useQueries";
 import { useSearchReservations } from "@/hooks/reservations/useQueries";
 import { useAppStore } from "@/stores/useAppStore";
 import {
@@ -92,7 +93,11 @@ export function ReviewFormModal({
     },
   });
 
-  // Hidratación para Edición
+  const selectedReservationId = form.watch("reservationId");
+
+  const { data: existingReviewForSelection, isLoading: isCheckingSelection } =
+    useReviewByReservation(isEditing ? undefined : selectedReservationId);
+
   useEffect(() => {
     if (existingReview && isEditing) {
       form.reset({
@@ -197,7 +202,13 @@ export function ReviewFormModal({
           </div>
         )}
 
-        {/* Selector de Viaje (Solo visible si está creando y tiene más de 1 viaje en esta propiedad) */}
+        {!isEditing && existingReviewForSelection && (
+          <div className="bg-amber-50 text-amber-600 p-3 rounded-lg text-sm font-medium flex items-center gap-2">
+            <IoWarningOutline size={18} />
+            <p>Ya has publicado una reseña para esta estancia.</p>
+          </div>
+        )}
+
         {!isEditing &&
           !urlReservationId &&
           eligibleTrips &&
@@ -283,7 +294,8 @@ export function ReviewFormModal({
           </Button>
           <Button
             type="submit"
-            isLoading={isCreating || isUpdating}
+            isLoading={isCreating || isUpdating || isCheckingSelection}
+            disabled={!isEditing && !!existingReviewForSelection}
             className="flex-1 rounded-xl shadow-lg shadow-primary-500/20"
           >
             {isEditing ? "Guardar cambios" : "Publicar reseña"}

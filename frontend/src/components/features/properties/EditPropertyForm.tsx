@@ -222,7 +222,7 @@ export function EditPropertyForm({
           <Button
             type="button"
             variant="ghost"
-            onClick={() => router.back()}
+            onClick={() => router.push(ROUTES.PUBLIC.PROPERTY_DETAIL(property.id))}
             leftIcon={<IoArrowBackOutline />}
           >
             Cancelar

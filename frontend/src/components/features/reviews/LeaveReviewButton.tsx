@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { IoStarOutline } from "react-icons/io5";
+import { IoStarOutline, IoPencilOutline } from "react-icons/io5";
 
 import { Button } from "@/components/shared/Button";
 import { useQueryString } from "@/hooks/shared/useQueryString";
+import { useReviewByReservation } from "@/hooks/reviews/useQueries";
 
 interface LeaveReviewButtonProps {
   propertyId: string;
@@ -24,14 +25,24 @@ export function LeaveReviewButton({
   const router = useRouter();
   const { createUrl } = useQueryString();
 
-  const handleClick = () => {
-    const url = createUrl({
-      action: "create-review",
-      propertyId,
-      reservationId,
-    });
+  const { data: existingReview, isLoading } =
+    useReviewByReservation(reservationId);
 
-    router.push(url, { scroll: false });
+  const handleClick = () => {
+    if (existingReview) {
+      const url = createUrl({
+        action: "edit-review",
+        reviewId: existingReview.id,
+      });
+      router.push(url, { scroll: false });
+    } else {
+      const url = createUrl({
+        action: "create-review",
+        propertyId,
+        reservationId,
+      });
+      router.push(url, { scroll: false });
+    }
   };
 
   return (
@@ -39,10 +50,17 @@ export function LeaveReviewButton({
       onClick={handleClick}
       variant="secondary"
       size="sm"
+      isLoading={isLoading}
       className={`rounded-xl font-bold shadow-sm hover:shadow-md transition-all ${className}`}
-      leftIcon={<IoStarOutline size={18} />}
+      leftIcon={
+        existingReview ? (
+          <IoPencilOutline size={18} />
+        ) : (
+          <IoStarOutline size={18} />
+        )
+      }
     >
-      Calificar estancia
+      {existingReview ? "Editar reseña" : "Calificar estancia"}
     </Button>
   );
 }
