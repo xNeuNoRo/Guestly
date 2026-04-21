@@ -1,3 +1,4 @@
+import { getSafeLocalDate } from "@/helpers/getSafeLocalDate";
 import { z } from "zod";
 
 // --- Sub-schemas ---
@@ -13,13 +14,13 @@ export const dateRangeResponseSchema = z.object({
     .refine((date) => !Number.isNaN(Date.parse(date)), {
       message: "Fecha de inicio inválida",
     })
-    .transform((date) => new Date(date)),
+    .transform((date) => getSafeLocalDate(date)),
   endDate: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
       message: "Fecha de fin inválida",
     })
-    .transform((date) => new Date(date)),
+    .transform((date) => getSafeLocalDate(date)),
 });
 
 // --- Schemas de Respuesta (Responses) ---

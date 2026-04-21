@@ -1,3 +1,4 @@
+import { getSafeLocalDate } from "@/helpers/getSafeLocalDate";
 import { z } from "zod";
 
 // --- Enums ---
@@ -80,13 +81,13 @@ export const propertyBlockResponseSchema = z.object({
     .refine((date) => !Number.isNaN(Date.parse(date)), {
       message: "Fecha de creación inválida",
     })
-    .transform((date) => new Date(date)),
+    .transform((date) => getSafeLocalDate(date)),
   endDate: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
       message: "Fecha de fin inválida",
     })
-    .transform((date) => new Date(date)),
+    .transform((date) => getSafeLocalDate(date)),
   reason: z.string().nullable().optional(),
   createdAt: z
     .string()
@@ -112,13 +113,13 @@ export const reservationResponseSchema = z.object({
     .refine((date) => !Number.isNaN(Date.parse(date)), {
       message: "Fecha de inicio inválida",
     })
-    .transform((date) => new Date(date)),
+    .transform((date) => getSafeLocalDate(date)),
   checkOutDate: z
     .string()
     .refine((date) => !Number.isNaN(Date.parse(date)), {
       message: "Fecha de fin inválida",
     })
-    .transform((date) => new Date(date)),
+    .transform((date) => getSafeLocalDate(date)),
   pricePerNightAtBooking: z.number(),
   cleaningFeeAtBooking: z.number(),
   serviceFeeAtBooking: z.number(),
