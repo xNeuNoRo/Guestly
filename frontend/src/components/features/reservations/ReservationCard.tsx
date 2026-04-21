@@ -8,7 +8,6 @@ import { IoCalendarOutline, IoLocationOutline } from "react-icons/io5";
 
 import { formatCurrency } from "@/helpers/formatCurrency";
 import { ReservationStatusBadge } from "./ReservationStatusBadge";
-import { LeaveReviewButton } from "@/components/features/reviews/LeaveReviewButton";
 
 import type { ReservationResponse } from "@/schemas/reservations.schemas";
 import { ROUTES } from "@/constants/routes";

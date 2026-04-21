@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryString } from "./useQueryString"; // Tu hook de URL
 import { useDebounce } from "./useDebounce"; // Tu hook de Debounce
@@ -23,37 +23,25 @@ export function useUrlSearch({
   const router = useRouter();
   const { createUrl, searchParams } = useQueryString();
 
-  // Obtener el valor inicial desde la URL
-  const initialValue = searchParams.get(paramName) || "";
-
-  // Estado local para el valor del input de búsqueda
-  const [keyword, setKeyword] = useState(initialValue);
-
-  // Guardamos el último valor de la URL procesado para detectar cambios externos (ej. botón atrás)
-  const [prevUrlValue, setPrevUrlValue] = useState(initialValue);
+  // Fuente única de verdad: el valor actual en la URL
+  const keyword = searchParams.get(paramName) || "";
 
   // Valor debounced para usar en las Queries de la API
   const debouncedKeyword = useDebounce(keyword, delay);
 
-  // Sincronización del URL al Local State
-  // Útil para cuando el usuario usa botones de Atrás/Adelante o limpia filtros.
-  // Se realiza durante el render (patrón recomendado) para evitar "cascading renders" y cumplir con las reglas de React.
-  const urlValue = searchParams.get(paramName) || "";
-  if (urlValue !== prevUrlValue) {
-    setPrevUrlValue(urlValue);
-    setKeyword(urlValue);
-  }
+  // Actualiza la URL al cambiar el input
+  const setKeyword = useCallback(
+    (nextKeyword: string) => {
+      const currentUrlValue = searchParams.get(paramName) || "";
 
-  // Sincronización del Local State al URL con debounce
-  useEffect(() => {
-    const currentUrlValue = searchParams.get(paramName) || "";
+      // Evitamos navegar si el valor ya es el mismo
+      if (nextKeyword === currentUrlValue) return;
 
-    // Evitamos navegar si el valor ya es el mismo (previene bucles y DEP0169)
-    if (debouncedKeyword === currentUrlValue) return;
-
-    const url = createUrl({ [paramName]: debouncedKeyword || null });
-    router.replace(url, { scroll: false });
-  }, [debouncedKeyword, paramName, createUrl, router, searchParams]);
+      const url = createUrl({ [paramName]: nextKeyword || null });
+      router.replace(url, { scroll: false });
+    },
+    [createUrl, paramName, router, searchParams],
+  );
 
   return {
     keyword, // Se pasa al "value" del input

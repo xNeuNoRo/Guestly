@@ -70,7 +70,7 @@ export default function ReservationDetailPage({
   );
 
   const openCancelModal = () => {
-    router.push(createUrl({ modal: "cancel-reservation", reservationId: id }), {
+    router.push(createUrl({ modal: "cancel-reservation", cancelId: id }), {
       scroll: false,
     });
   };

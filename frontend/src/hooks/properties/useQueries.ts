@@ -64,7 +64,7 @@ export function usePropertyAvailability(
  */
 export function useHostProperties() {
   const { isAuthenticated, user } = useAuth();
-  const isHost = user?.role.includes("Host");
+  const isHost = user?.role.includes("Host") ?? false;
 
   return useQuery({
     queryKey: propertyKeys.byHost(),

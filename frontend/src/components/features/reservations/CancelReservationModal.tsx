@@ -19,7 +19,7 @@ export function CancelReservationModal() {
 
   // --- Fuente de Verdad: URL ---
   const isOpen = searchParams.get("modal") === "cancel-reservation";
-  const reservationId = searchParams.get("reservationId");
+  const reservationId = searchParams.get("cancelId");
 
   const { mutate: updateStatus, isPending } = useUpdateReservationStatus();
 

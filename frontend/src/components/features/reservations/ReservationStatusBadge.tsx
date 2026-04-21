@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import {
   IoCheckmarkCircleOutline,
   IoTimeOutline,
@@ -30,7 +30,7 @@ export function ReservationStatusBadge({
   // Mapeo exhaustivo de los estados a sus propiedades visuales
   const getBadgeConfig = (
     status: ReservationStatus,
-  ): { label: string; variant: BadgeVariant; icon: React.ReactNode } => {
+  ): { label: string; variant: BadgeVariant; icon: ReactNode } => {
     switch (status) {
       case "Pending":
         return {
