@@ -18,6 +18,7 @@ export function PricePreviewWidget({
 }: Readonly<PricePreviewWidgetProps>) {
   const {
     data: preview,
+    error,
     isLoading,
     isError,
   } = usePricePreview(propertyId, startDate, endDate);
@@ -66,7 +67,8 @@ export function PricePreviewWidget({
           size={18}
         />
         <p className="text-sm text-red-700">
-          Hubo un problema calculando el precio. Intenta con otras fechas.
+          {error?.message ||
+            "Hubo un problema calculando el precio. Intenta con otras fechas."}
         </p>
       </div>
     );
