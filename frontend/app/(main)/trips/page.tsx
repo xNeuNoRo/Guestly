@@ -62,7 +62,7 @@ export default function MyTripsPage() {
   }
 
   return (
-    <AuthGuard>
+    <AuthGuard allowedRoles={["Guest"]}>
       <main className="container mx-auto px-4 py-10 max-w-5xl space-y-10">
         <header>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">

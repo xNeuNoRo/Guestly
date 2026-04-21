@@ -34,6 +34,7 @@ export function UserMenu() {
 
   if (!user) return null;
 
+  const isGuest = user.role?.includes("Guest");
   const isHost = user.role?.includes("Host");
   const fullName = `${user.firstName} ${user.lastName}`;
 
@@ -90,22 +91,24 @@ export function UserMenu() {
               )}
             </MenuItem>
 
-            <MenuItem>
-              {({ focus }) => (
-                <Link
-                  href={ROUTES.USER.RESERVATIONS}
-                  className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${
-                    focus ? "bg-slate-50 text-primary-600" : "text-slate-700"
-                  }`}
-                >
-                  <IoAirplaneOutline
-                    size={18}
-                    className={focus ? "text-primary-500" : "text-slate-400"}
-                  />
-                  Mis Viajes
-                </Link>
-              )}
-            </MenuItem>
+            {isGuest && (
+              <MenuItem>
+                {({ focus }) => (
+                  <Link
+                    href={ROUTES.USER.RESERVATIONS}
+                    className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${
+                      focus ? "bg-slate-50 text-primary-600" : "text-slate-700"
+                    }`}
+                  >
+                    <IoAirplaneOutline
+                      size={18}
+                      className={focus ? "text-primary-500" : "text-slate-400"}
+                    />
+                    Mis Viajes
+                  </Link>
+                )}
+              </MenuItem>
+            )}
 
             {isHost && (
               <>
