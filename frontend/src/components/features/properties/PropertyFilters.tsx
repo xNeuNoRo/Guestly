@@ -53,8 +53,6 @@ export function PropertyFilters({
 
     setActiveFiltersCount(count);
 
-    // keepDirty y keepTouched evitan que react-hook-form borre lo que
-    // el usuario está escribiendo si el componente se re-renderiza por otra razón.
     form.reset(
       {
         location: searchParams.get("location") || "",
@@ -78,7 +76,6 @@ export function PropertyFilters({
       capacity: data.capacity?.toString() ?? null,
       minPrice: data.minPrice?.toString() ?? null,
       maxPrice: data.maxPrice?.toString() ?? null,
-      // Mantenemos las fechas que ya existan en la URL
       startDate: searchParams.get("startDate"),
       endDate: searchParams.get("endDate"),
     });
@@ -90,12 +87,15 @@ export function PropertyFilters({
   const clearFilters = () => {
     form.reset({
       location: "",
-      capacity: undefined,
-      minPrice: undefined,
-      maxPrice: undefined,
+      capacity: undefined as unknown as number,
+      minPrice: undefined as unknown as number,
+      maxPrice: undefined as unknown as number,
     });
 
-    // Limpiamos la URL pero mantenemos la página
+    form.setValue("capacity", undefined as unknown as number);
+    form.setValue("minPrice", undefined as unknown as number);
+    form.setValue("maxPrice", undefined as unknown as number);
+
     router.push(
       createUrl({
         location: null,
