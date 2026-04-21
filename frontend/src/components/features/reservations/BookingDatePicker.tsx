@@ -2,13 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { type DateRange, type Matcher } from "react-day-picker";
-import {
-  addMonths,
-  format,
-  startOfDay,
-  isWithinInterval,
-  parseISO,
-} from "date-fns";
+import { addMonths, format, startOfDay, isWithinInterval } from "date-fns";
 import { useRouter } from "next/navigation";
 import { IoAlertCircleOutline } from "react-icons/io5";
 
@@ -16,6 +10,28 @@ import { Calendar } from "@/components/shared/Calendar";
 import { Skeleton } from "@/components/shared/Skeleton";
 import { usePropertyAvailability } from "@/hooks/properties";
 import { useQueryString } from "@/hooks/shared/useQueryString";
+
+// Función utilitaria para evitar el desfase de zona horaria (UTC -> Local)
+const getSafeLocalDate = (value?: string | Date | null): Date | undefined => {
+  if (!value) return undefined;
+
+  let dateString = "";
+
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) return undefined;
+    dateString = value.toISOString().split("T")[0];
+  } else if (typeof value === "string") {
+    dateString = value.split("T")[0];
+  } else {
+    return undefined;
+  }
+
+  const [year, month, day] = dateString.split("-").map(Number);
+  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day))
+    return undefined;
+
+  return new Date(year, month - 1, day);
+};
 
 export interface BookingDatePickerProps {
   propertyId: string;
@@ -36,10 +52,11 @@ export function BookingDatePicker({
   const bookingError = searchParams.get("bookingError");
 
   const selectedRange: DateRange | undefined = useMemo(() => {
-    if (!startDateParam) return undefined;
+    const fromDate = getSafeLocalDate(startDateParam);
+    if (!fromDate) return undefined;
     return {
-      from: parseISO(startDateParam),
-      to: endDateParam ? parseISO(endDateParam) : undefined,
+      from: fromDate,
+      to: endDateParam ? getSafeLocalDate(endDateParam) : undefined,
     };
   }, [startDateParam, endDateParam]);
 
@@ -65,10 +82,12 @@ export function BookingDatePicker({
 
     if (blockedDates && blockedDates.length > 0) {
       blockedDates.forEach((block) => {
-        if (block.startDate && block.endDate) {
+        const start = getSafeLocalDate(block.startDate);
+        const end = getSafeLocalDate(block.endDate);
+        if (start && end) {
           disabled.push({
-            from: startOfDay(new Date(block.startDate)),
-            to: startOfDay(new Date(block.endDate)),
+            from: startOfDay(start),
+            to: startOfDay(end),
           });
         }
       });
@@ -82,8 +101,12 @@ export function BookingDatePicker({
     const blockedRanges =
       blockedDates?.filter((b) => b.startDate && b.endDate) || [];
     for (const block of blockedRanges) {
-      const blockStart = startOfDay(new Date(block.startDate));
-      const blockEnd = startOfDay(new Date(block.endDate));
+      const start = getSafeLocalDate(block.startDate);
+      const end = getSafeLocalDate(block.endDate);
+      if (!start || !end) continue;
+
+      const blockStart = startOfDay(start);
+      const blockEnd = startOfDay(end);
       if (
         isWithinInterval(blockStart, { start: range.from, end: range.to }) ||
         isWithinInterval(blockEnd, { start: range.from, end: range.to })
