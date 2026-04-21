@@ -17,6 +17,7 @@ import {
   IoPersonOutline,
   IoBusinessOutline,
   IoStatsChartOutline,
+  IoAirplaneOutline,
 } from "react-icons/io5";
 
 import { Avatar } from "@/components/shared/Avatar";
@@ -97,7 +98,7 @@ export function UserMenu() {
                     focus ? "bg-slate-50 text-primary-600" : "text-slate-700"
                   }`}
                 >
-                  <IoCalendarOutline
+                  <IoAirplaneOutline
                     size={18}
                     className={focus ? "text-primary-500" : "text-slate-400"}
                   />
@@ -125,6 +126,26 @@ export function UserMenu() {
                         }
                       />
                       Mis Propiedades
+                    </Link>
+                  )}
+                </MenuItem>
+                <MenuItem>
+                  {({ focus }) => (
+                    <Link
+                      href={ROUTES.HOST.RESERVATIONS}
+                      className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${
+                        focus
+                          ? "bg-primary-50 text-primary-700"
+                          : "text-slate-700"
+                      }`}
+                    >
+                      <IoCalendarOutline
+                        size={18}
+                        className={
+                          focus ? "text-primary-600" : "text-slate-400"
+                        }
+                      />
+                      Reservas Recibidas
                     </Link>
                   )}
                 </MenuItem>
