@@ -33,7 +33,9 @@ export const ROUTES = {
   HOST: {
     DASHBOARD: "/host",
     PROPERTIES: "/host/properties",
-    NEW_PROPERTY: "/host/properties/new",
+    NEW_PROPERTY: "/host/properties/create",
+    EDIT_PROPERTY: (id: string) => `/host/properties/${id}/edit`,
+    BLOCKMANAGEMENT: (id: string ) => `/host/properties/${id}/calendar`, // Gestión de bloqueos para disponibilidad
     RESERVATIONS: "/host/bookings", // Reservas de las propiedades del host
     RESERVATIONBYID: (id: string) => `/trips/${id}`, // Detalle de una reserva específica (tanto para huéspedes como anfitriones)
   },
