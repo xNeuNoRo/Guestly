@@ -219,7 +219,7 @@ export function ReviewFormModal({
                 label="¿Qué estancia deseas reseñar?"
                 options={eligibleTrips.map((trip) => ({
                   value: trip.id,
-                  label: `${format(new Date(trip.checkInDate), "MMM yyyy", { locale: es })} - ${trip.propertyTitle}`,
+                  label: `${trip.checkInDate ? format(new Date(trip.checkInDate), "MMM yyyy", { locale: es }) : "Fecha no disponible"} - ${trip.propertyTitle}`,
                 }))}
               />
             </div>
