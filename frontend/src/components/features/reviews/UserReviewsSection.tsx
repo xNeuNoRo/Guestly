@@ -11,6 +11,7 @@ import { useUserReviews } from "@/hooks/reviews";
 import { useAuth } from "@/hooks/stores/useAuth";
 import { useQueryString } from "@/hooks/shared/useQueryString";
 import type { ReviewResponse } from "@/schemas/reviews.schemas";
+import Link from "next/link";
 
 interface UserReviewsSectionProps {
   userId?: string;
@@ -116,7 +117,7 @@ export function UserReviewsSection({
               transition: { staggerChildren: 0.1 },
             },
           }}
-          className="grid grid-cols-1 gap-4"
+          className="grid grid-cols-1 gap-6"
         >
           {reviews.map((review) => (
             <motion.div
@@ -126,16 +127,15 @@ export function UserReviewsSection({
                 show: { opacity: 1, x: 0 },
               }}
             >
-              {/* Reutilizamos la ReviewCard atómica pero añadimos contexto de propiedad */}
-              <div className="group relative">
-                <div className="absolute top-6 left-20 z-10 pointer-events-none">
-                  <div className="flex items-center gap-1.5 px-2 py-1 bg-white/80 backdrop-blur-sm border border-slate-100 rounded-lg shadow-sm">
-                    <IoHomeOutline size={12} className="text-primary-500" />
-                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tight">
+              <div className="flex flex-col">
+                <Link href={`/properties/${review.propertyId}`}>
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-t-xl shadow-sm w-fit ml-6 -mb-3 relative z-10 transition-colors hover:bg-slate-900">
+                    <IoHomeOutline size={14} className="text-primary-400" />
+                    <span className="text-[11px] font-bold text-white uppercase tracking-wider">
                       {review.propertyTitle}
                     </span>
                   </div>
-                </div>
+                </Link>
                 <ReviewCard
                   review={review}
                   onEdit={isOwnProfile ? handleEditClick : undefined}
