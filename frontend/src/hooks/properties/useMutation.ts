@@ -24,7 +24,7 @@ export function useCreateProperty() {
       toast.success("¡Propiedad publicada exitosamente!");
       // Invalidamos las queries del anfitrión y el buscador general para refrescar la data
       queryClient.invalidateQueries({ queryKey: propertyKeys.byHost() });
-      queryClient.invalidateQueries({ queryKey: propertyKeys.search() });
+      queryClient.invalidateQueries({ queryKey: propertyKeys.searchBase() });
     },
     onError: (error: Error) => {
       toast.error(error.message || "No se pudo crear la propiedad.");
@@ -58,7 +58,7 @@ export function useUpdateProperty() {
 
       // Invalidamos las listas para mantener la consistencia
       queryClient.invalidateQueries({ queryKey: propertyKeys.byHost() });
-      queryClient.invalidateQueries({ queryKey: propertyKeys.search() });
+      queryClient.invalidateQueries({ queryKey: propertyKeys.searchBase() });
     },
     onError: (error: Error) => {
       toast.error("Error al actualizar", {
@@ -88,7 +88,7 @@ export function useDeleteProperty() {
 
       // Limpiamos la caché global de esa propiedad y el buscador general
       queryClient.removeQueries({ queryKey: propertyKeys.detail(deletedId) });
-      queryClient.invalidateQueries({ queryKey: propertyKeys.search() });
+      queryClient.invalidateQueries({ queryKey: propertyKeys.searchBase() });
     },
     onError: (error: Error) => {
       toast.error("Error al eliminar", {

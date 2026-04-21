@@ -31,7 +31,7 @@ export function useCreateReservation() {
       toast.success("¡Reserva creada con éxito!");
 
       // Invalidamos las búsquedas de reservas para que aparezca en la lista del huésped
-      queryClient.invalidateQueries({ queryKey: reservationKeys.search() });
+      queryClient.invalidateQueries({ queryKey: reservationKeys.searchBase() });
 
       // Invalidamos la disponibilidad de la propiedad para bloquear esas fechas a otros
       queryClient.invalidateQueries({

@@ -16,6 +16,7 @@ export const userKeys = {
 // --- Query keys para Propiedades ---
 export const propertyKeys = {
   all: ["properties"] as const,
+  searchBase: () => [...propertyKeys.all, "search"] as const, // Base para búsquedas sin params, útil para invalidar todas las búsquedas
   // Pasamos los params para que React Query cachee resultados diferentes según la búsqueda
   search: (params?: PropertySearchRequest) =>
     [...propertyKeys.all, "search", params] as const,
@@ -29,6 +30,7 @@ export const propertyKeys = {
 // --- Query keys para Reservas y Bloqueos ---
 export const reservationKeys = {
   all: ["reservations"] as const,
+  searchBase: () => [...reservationKeys.all, "search"] as const, // Base para búsquedas sin params, útil para invalidar todas las búsquedas
   search: (params?: ReservationSearchRequest) =>
     [...reservationKeys.all, "search", params] as const,
   detail: (id: string) => [...reservationKeys.all, "detail", id] as const,
