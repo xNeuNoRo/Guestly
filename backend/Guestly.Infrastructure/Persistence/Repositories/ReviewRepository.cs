@@ -22,7 +22,24 @@ public class ReviewRepository : IReviewRepository
     /// </summary>
     public async Task<Review?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+        return await _context
+            .Reviews.Include(r => r.Property)
+            .Include(r => r.Guest)
+            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+    }
+
+    /// <summary>
+    /// Obtiene una reseña asociada a una reserva específica. Retorna null si no se encuentra.
+    /// </summary>
+    public async Task<Review?> GetByReservationIdAsync(
+        Guid reservationId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await _context
+            .Reviews.Include(r => r.Property)
+            .Include(r => r.Guest)
+            .FirstOrDefaultAsync(r => r.ReservationId == reservationId, cancellationToken);
     }
 
     /// <summary>
@@ -35,7 +52,9 @@ public class ReviewRepository : IReviewRepository
     )
     {
         return await _context
-            .Reviews.Where(r => r.GuestId == userId)
+            .Reviews.Include(r => r.Property)
+            .Include(r => r.Guest)
+            .Where(r => r.GuestId == userId)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync(cancellationToken);
     }
@@ -50,7 +69,8 @@ public class ReviewRepository : IReviewRepository
     )
     {
         return await _context
-            .Reviews.Where(r => r.PropertyId == propertyId)
+            .Reviews.Include(r => r.Guest)
+            .Where(r => r.PropertyId == propertyId)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync(cancellationToken);
     }

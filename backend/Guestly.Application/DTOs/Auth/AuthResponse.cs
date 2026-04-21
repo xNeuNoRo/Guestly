@@ -31,7 +31,7 @@ public record AuthResponse()
     /// <summary>
     /// El rol del usuario autenticado.
     /// </summary>
-    public required UserRoles Role { get; init; }
+    public required List<UserRoles> Role { get; init; }
 
     /// <summary>
     /// El token de acceso JWT (Access Token) utilizado para autorizar las peticiones del usuario autenticado.

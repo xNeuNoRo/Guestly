@@ -6,6 +6,11 @@ public interface IReviewRepository
 {
     Task<Review?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
+    Task<Review?> GetByReservationIdAsync(
+        Guid reservationId,
+        CancellationToken cancellationToken = default
+    );
+
     Task<IEnumerable<Review>> GetByUserIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default

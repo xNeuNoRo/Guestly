@@ -18,6 +18,9 @@ public class FluentEmailService : IEmailService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<FluentEmailService> _logger;
 
+    // Patron semaforo para controlar el acceso concurrente al envío de correos electrónicos, evitando saturar el servidor SMTP
+    private static readonly SemaphoreSlim _smtpQueue = new SemaphoreSlim(1, 1);
+
     public FluentEmailService(IServiceScopeFactory scopeFactory, ILogger<FluentEmailService> logger)
     {
         _scopeFactory = scopeFactory;
@@ -35,8 +38,27 @@ public class FluentEmailService : IEmailService
     {
         _ = Task.Run(async () =>
         {
+            // Esperamos a que el semáforo esté disponible para enviar el correo electrónico,
+            // con un timeout ampliado para soportar ráfagas y evitar bloqueos indefinidos.
+            bool acquired = await _smtpQueue.WaitAsync(TimeSpan.FromSeconds(60));
+
+            // Si no logramos entrar al semáforo en el tiempo límite, debemos abortar
+            // para no romper la concurrencia del cliente SMTP.
+            if (!acquired)
+            {
+                _logger.LogError(
+                    "Tiempo de espera agotado en la cola SMTP. No se pudo enviar el correo a {Email}.",
+                    toEmail
+                );
+                return false;
+            }
+
             try
             {
+                // Esperamos un breve momento
+                // para evitar que múltiples correos se envíen exactamente al mismo tiempo,
+                await Task.Delay(500);
+
                 // Creamos un nuevo ámbito de servicio para resolver IFluentEmailFactory,
                 // lo que nos permite enviar correos electrónicos de manera segura y eficiente.
                 using var scope = _scopeFactory.CreateScope();
@@ -70,11 +92,16 @@ public class FluentEmailService : IEmailService
                     .Subject(subject)
                     .UsingTemplateFromFile(templatePath, model);
 
+                // Utilizamos el token de cancelación con timeout para evitar
+                // que el envío del correo se bloquee indefinidamente, aunque FluentEmail no soporte
+                // cancelación nativa, esto nos permite controlar el tiempo máximo de espera.
+                using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
                 // CancellationToken.None se utiliza aquí para evitar que el token
                 // de cancelación afecte el proceso de envío del correo electrónico,
                 // ya que FluentEmail no soporta cancelación nativa.
                 // Esto asegura que el intento de envío se complete incluso si el token original ha sido cancelado.
-                var response = await email.SendAsync(CancellationToken.None);
+                var response = await email.SendAsync(timeoutCts.Token);
 
                 if (!response.Successful)
                 {
@@ -96,6 +123,11 @@ public class FluentEmailService : IEmailService
                     toEmail
                 );
                 return false;
+            }
+            finally
+            {
+                // Liberamos el semáforo para permitir que el siguiente correo en la cola pueda ser enviado.
+                _smtpQueue.Release();
             }
         });
 

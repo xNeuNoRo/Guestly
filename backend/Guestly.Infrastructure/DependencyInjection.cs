@@ -9,6 +9,7 @@ using Guestly.Infrastructure.Persistence;
 using Guestly.Infrastructure.Persistence.Repositories;
 using Guestly.Infrastructure.Providers;
 using Guestly.Infrastructure.Security;
+using Guestly.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,6 +56,10 @@ public static class DependencyInjection
         // Configuración de FluentEmail para los correos electrónicos transaccionales
         ConfigureFluentEmail(services, configuration);
         services.AddScoped<IEmailService, FluentEmailService>();
+
+        // Registramos el servicio de actualización de estados de reservas,
+        // que se ejecutará en segundo plano para mantener los estados de las reservas actualizados automáticamente
+        services.AddHostedService<ReservationStatusUpdaterService>();
 
         return services;
     }

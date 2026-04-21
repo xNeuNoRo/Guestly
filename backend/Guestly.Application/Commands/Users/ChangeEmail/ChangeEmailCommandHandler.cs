@@ -136,7 +136,7 @@ public class ChangeEmailCommandHandler : IRequestHandler<ChangeEmailCommand, boo
 
             var baseUrl = _configuration["FrontendSettings:BaseUrl"] ?? "http://localhost:3000";
             var confirmationLink =
-                $"{baseUrl}/auth/confirm-email?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(tokenString)}";
+                $"{baseUrl}/auth/confirm-email-change?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(tokenString)}";
 
             var emailModel = new EmailChangeConfirmationModel(
                 user.FirstName,

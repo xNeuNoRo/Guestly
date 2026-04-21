@@ -43,8 +43,8 @@ public class AuthController : BaseApiController
 
         var result = await _mediator.Send(command);
 
-        // Devuelve un 201 Created con la información del nuevo usuario registrado
-        return Created("api/v1/users/me", result);
+        // Devuelve un 200 OK con la información del nuevo usuario registrado
+        return Success(result);
     }
 
     /// <summary>
@@ -76,9 +76,11 @@ public class AuthController : BaseApiController
     /// Reenvía el correo de confirmación en caso de que el original haya expirado o no llegara.
     /// </summary>
     [HttpPost("resend-confirmation")]
-    public async Task<IActionResult> ResendConfirmation([FromBody] ResendConfirmationEmailRequest request)
+    public async Task<IActionResult> ResendConfirmation(
+        [FromBody] ResendConfirmationEmailRequest request
+    )
     {
-        var command = new ResendConfirmationEmailCommand(request.Email);
+        var command = new ResendConfirmationEmailCommand(request.Email, request.Flow);
         await _mediator.Send(command);
         return Success();
     }

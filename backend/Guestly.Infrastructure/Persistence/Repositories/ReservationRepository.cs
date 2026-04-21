@@ -72,7 +72,7 @@ public class ReservationRepository : IReservationRepository
     }
 
     /// <summary>
-    /// Búsqueda dinámica de reservas (ej. para el panel de control del anfitrión o historial del huésped, 
+    /// Búsqueda dinámica de reservas (ej. para el panel de control del anfitrión o historial del huésped,
     /// por ahora idk donde lo usare en el frontend).
     /// </summary>
     public async Task<IEnumerable<Reservation>> SearchAsync(
@@ -85,7 +85,11 @@ public class ReservationRepository : IReservationRepository
         CancellationToken cancellationToken = default
     )
     {
-        var query = _context.Reservations.AsQueryable();
+        var query = _context
+            .Reservations.Include(r => r.Property)
+                .ThenInclude(p => p!.Host) // Traemos al anfitrión anidado dentro de la propiedad
+            .Include(r => r.Guest)
+            .AsQueryable();
 
         if (propertyId.HasValue)
         {

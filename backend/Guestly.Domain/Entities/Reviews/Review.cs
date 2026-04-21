@@ -1,4 +1,6 @@
 using Guestly.Domain.Entities.Base;
+using Guestly.Domain.Entities.Properties;
+using Guestly.Domain.Entities.Reservations;
 using Guestly.Domain.Exceptions;
 
 namespace Guestly.Domain.Entities.Reviews;
@@ -11,9 +13,19 @@ public class Review : BaseEntity
     public Guid PropertyId { get; private set; }
 
     /// <summary>
+    /// Referencia a la propiedad que se está reseñando
+    /// </summary>
+    public virtual Property? Property { get; }
+
+    /// <summary>
     /// Identificador de la reserva asociada a la reseña, que es un campo obligatorio y no puede ser nulo.
     /// </summary>
     public Guid ReservationId { get; private set; }
+
+    /// <summary>
+    /// Referencia a la reserva asociada a la reseña
+    /// </summary>
+    public virtual Reservation? Reservation { get; }
 
     /// <summary>
     /// Identificador del huésped que hizo la reseña, que es un campo obligatorio y no puede ser nulo.

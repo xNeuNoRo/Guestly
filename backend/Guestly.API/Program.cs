@@ -94,8 +94,8 @@ builder
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             // Configuramos la audiencia válida del token, que debe coincidir con el valor definido en el archivo de configuración (appsettings)
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
-            // Configuramos la clave de firma que se utilizará para validar la firma del token JWT, 
-            // utilizando una clave simétrica generada a partir de una cadena secreta definida en 
+            // Configuramos la clave de firma que se utilizará para validar la firma del token JWT,
+            // utilizando una clave simétrica generada a partir de una cadena secreta definida en
             // el archivo de configuración (appsettings)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!)

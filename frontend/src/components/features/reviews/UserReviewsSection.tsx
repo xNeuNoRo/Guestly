@@ -1,0 +1,142 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { IoChatboxOutline, IoHomeOutline } from "react-icons/io5";
+
+import { Skeleton } from "@/components/shared/Skeleton";
+import { ReviewCard } from "./ReviewCard";
+
+import { useUserReviews } from "@/hooks/reviews";
+import { useAuth } from "@/hooks/stores/useAuth";
+import { useQueryString } from "@/hooks/shared/useQueryString";
+import type { ReviewResponse } from "@/schemas/reviews.schemas";
+import Link from "next/link";
+
+interface UserReviewsSectionProps {
+  userId?: string;
+}
+
+/**
+ * @description Listado centralizado de reseñas escritas por el usuario autenticado.
+ * Orquesta la edición y eliminación mediante SearchParams.
+ */
+export function UserReviewsSection({
+  userId,
+}: Readonly<UserReviewsSectionProps>) {
+  const router = useRouter();
+  const { user } = useAuth();
+  const { createUrl } = useQueryString();
+
+  const targetUserId = userId ?? user?.id;
+  const isOwnProfile = !userId || userId === user?.id;
+
+  const {
+    data: reviews,
+    isLoading,
+    isError,
+    error,
+  } = useUserReviews(targetUserId);
+
+  const handleEditClick = (review: ReviewResponse) => {
+    router.push(createUrl({ action: "edit-review", reviewId: review.id }), {
+      scroll: false,
+    });
+  };
+
+  const handleDeleteClick = (reviewId: string) => {
+    router.push(createUrl({ action: "delete-review", reviewId }), {
+      scroll: false,
+    });
+  };
+
+  // --- ESTADO DE CARGA ---
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-40 w-full rounded-3xl" />
+        ))}
+      </div>
+    );
+  }
+
+  // --- MANEJO DE ERRORES ---
+  if (isError) {
+    return (
+      <div className="p-8 bg-red-50 border border-red-100 rounded-3xl text-center text-red-600 font-medium">
+        {error?.message || "No pudimos cargar tus reseñas en este momento."}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {isOwnProfile && (
+        <header className="flex items-center gap-3 mb-8">
+          <div className="p-3 bg-primary-50 text-primary-600 rounded-2xl">
+            <IoChatboxOutline size={24} />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+              Mis Reseñas
+            </h2>
+            <p className="text-sm text-slate-500">
+              Gestiona las opiniones que has compartido con la comunidad.
+            </p>
+          </div>
+        </header>
+      )}
+
+      {/* ESTADO VACÍO */}
+      {!reviews || reviews.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="py-20 text-center bg-slate-50 rounded-[2.5rem] border border-dashed border-slate-200"
+        >
+          <IoChatboxOutline size={48} className="mx-auto text-slate-200 mb-4" />
+          <h3 className="text-lg font-bold text-slate-900 mb-1">
+            Aún no hay reseñas
+          </h3>
+          <p className="text-slate-500 max-w-xs mx-auto">
+            {isOwnProfile
+              ? "Tus opiniones aparecerán aquí después de que completes tus estancias y califiques las propiedades."
+              : "Este usuario aún no ha compartido opiniones con la comunidad."}
+          </p>
+        </motion.div>
+      ) : (
+        /* LISTADO DE RESEÑAS CON ANIMACIÓN STAGGERED */
+        <motion.div
+          initial="hidden"
+          animate="show"
+          variants={{
+            hidden: { opacity: 0 },
+            show: {
+              opacity: 1,
+              transition: { staggerChildren: 0.1 },
+            },
+          }}
+          className="grid grid-cols-1 gap-6"
+        >
+          {reviews.map((review) => (
+            <motion.div
+              key={review.id}
+              variants={{
+                hidden: { opacity: 0, x: -10 },
+                show: { opacity: 1, x: 0 },
+              }}
+            >
+              <ReviewCard
+                review={review}
+                onEdit={isOwnProfile ? handleEditClick : undefined}
+                onDelete={isOwnProfile ? handleDeleteClick : undefined}
+                showReviewActions={false}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+    </div>
+  );
+}
