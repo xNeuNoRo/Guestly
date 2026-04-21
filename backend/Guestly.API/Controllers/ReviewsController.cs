@@ -6,6 +6,7 @@ using Guestly.Application.Commands.Reviews.UpdateReview;
 using Guestly.Application.DTOs.Reviews;
 using Guestly.Application.Queries.Reviews.GetById;
 using Guestly.Application.Queries.Reviews.GetByProperty;
+using Guestly.Application.Queries.Reviews.GetByReservation;
 using Guestly.Application.Queries.Reviews.GetByUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -81,6 +82,17 @@ public class ReviewsController : BaseApiController
     public async Task<IActionResult> GetById(Guid id)
     {
         var query = new GetReviewByIdQuery(id);
+        var result = await _mediator.Send(query);
+        return Success(result);
+    }
+
+    /// <summary>
+    /// Obtiene una reseña específica por su ID de reserva.
+    /// </summary>
+    [HttpGet("reservations/{reservationId:guid}")]
+    public async Task<IActionResult> GetByReservation(Guid reservationId)
+    {
+        var query = new GetReviewByReservationQuery(reservationId);
         var result = await _mediator.Send(query);
         return Success(result);
     }

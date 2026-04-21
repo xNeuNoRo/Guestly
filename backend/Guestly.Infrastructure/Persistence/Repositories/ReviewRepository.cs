@@ -29,6 +29,20 @@ public class ReviewRepository : IReviewRepository
     }
 
     /// <summary>
+    /// Obtiene una reseña asociada a una reserva específica. Retorna null si no se encuentra.
+    /// </summary>
+    public async Task<Review?> GetByReservationIdAsync(
+        Guid reservationId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await _context
+            .Reviews.Include(r => r.Property)
+            .Include(r => r.Guest)
+            .FirstOrDefaultAsync(r => r.ReservationId == reservationId, cancellationToken);
+    }
+
+    /// <summary>
     /// Obtiene todas las reseñas escritas por un usuario (huésped) específico.
     /// Ordenadas desde la más reciente hasta la más antigua.
     /// </summary>
