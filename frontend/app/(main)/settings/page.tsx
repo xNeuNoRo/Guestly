@@ -43,7 +43,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <AuthGuard requireEmailConfirmed>
+    <AuthGuard allowUnconfirmed={false}>
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <header className="mb-10">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">

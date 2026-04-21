@@ -43,7 +43,7 @@ export function VerifyEmailPage() {
   const isModalOpen = searchParams.get("modal") === "fix-email";
 
   return (
-    <AuthGuard requireEmailConfirmed={false}>
+    <AuthGuard allowUnconfirmed={true}>
       <div className="container mx-auto flex min-h-[80vh] items-center justify-center px-4">
         <div className="w-full max-w-md bg-white rounded-[2.5rem] border border-slate-200 shadow-xl p-8 md:p-12 text-center">
           <div className="w-24 h-24 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-8">
