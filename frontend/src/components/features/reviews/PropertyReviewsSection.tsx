@@ -178,6 +178,7 @@ export function PropertyReviewsSection({
               review={review}
               onEdit={handleEditClick}
               onDelete={handleDeleteClick}
+              showPropertyContext={false}
             />
           ))}
         </div>

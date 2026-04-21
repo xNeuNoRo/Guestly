@@ -127,21 +127,12 @@ export function UserReviewsSection({
                 show: { opacity: 1, x: 0 },
               }}
             >
-              <div className="flex flex-col">
-                <Link href={`/properties/${review.propertyId}`}>
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-t-xl shadow-sm w-fit ml-6 -mb-3 relative z-10 transition-colors hover:bg-slate-900">
-                    <IoHomeOutline size={14} className="text-primary-400" />
-                    <span className="text-[11px] font-bold text-white uppercase tracking-wider">
-                      {review.propertyTitle}
-                    </span>
-                  </div>
-                </Link>
-                <ReviewCard
-                  review={review}
-                  onEdit={isOwnProfile ? handleEditClick : undefined}
-                  onDelete={isOwnProfile ? handleDeleteClick : undefined}
-                />
-              </div>
+              <ReviewCard
+                review={review}
+                onEdit={isOwnProfile ? handleEditClick : undefined}
+                onDelete={isOwnProfile ? handleDeleteClick : undefined}
+                showReviewActions={false}
+              />
             </motion.div>
           ))}
         </motion.div>
