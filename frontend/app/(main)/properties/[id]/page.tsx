@@ -70,7 +70,7 @@ export default function PropertyDetailPage({
   }
 
   return (
-    <AuthGuard allowGuests>
+    <AuthGuard allowGuests={false}>
       <main className="container mx-auto px-4 py-8 space-y-8">
         {/* CABECERA: Título, ubicación y acciones */}
         <PropertyHeader property={property} />

@@ -1,4 +1,3 @@
-// frontend/app/(main)/host/bookings/page.tsx
 "use client";
 
 import { JSX, useMemo } from "react";

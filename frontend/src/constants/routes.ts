@@ -23,6 +23,7 @@ export const ROUTES = {
   USER: {
     SETTINGS: "/settings", // Engloba UpdateProfile, ChangePassword, ChangeEmail
     RESERVATIONS: "/trips", // Tus propias reservas
+    RESERVATIONBYID: (id: string) => `/trips/${id}`, // Detalle de una reserva específica (tanto para huéspedes como anfitriones)
     NOTIFICATIONS: "/notifications",
     VERIFY_EMAIL: "/auth/verify-email",
   },
@@ -33,6 +34,7 @@ export const ROUTES = {
     PROPERTIES: "/host/properties",
     NEW_PROPERTY: "/host/properties/new",
     RESERVATIONS: "/host/bookings", // Reservas de las propiedades del host
+    RESERVATIONBYID: (id: string) => `/trips/${id}`, // Detalle de una reserva específica (tanto para huéspedes como anfitriones)
   },
 
   // Error/Seguridad

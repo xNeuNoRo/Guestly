@@ -39,8 +39,8 @@ export function ReservationCard({
     : reservation.propertyTitle;
 
   const destinationRoute = isHostMode
-    ? `${ROUTES.HOST.RESERVATIONS}/${reservation.id}`
-    : `${ROUTES.USER.RESERVATIONS}/${reservation.id}`;
+    ? ROUTES.HOST.RESERVATIONBYID(reservation.id)
+    : ROUTES.USER.RESERVATIONBYID(reservation.id);
 
   let subtitle: JSX.Element | null = null;
   if (isHostMode) {
@@ -107,9 +107,9 @@ export function ReservationCard({
           {/* Gatillo de Reseña: Solo para Huéspedes en reservas Completadas */}
           {!isHostMode && reservation.status === "Completed" && (
             <div onClick={(e) => e.preventDefault()}>
-              <LeaveReviewButton 
-                propertyId={reservation.propertyId} 
-                reservationId={reservation.id} 
+              <LeaveReviewButton
+                propertyId={reservation.propertyId}
+                reservationId={reservation.id}
               />
             </div>
           )}

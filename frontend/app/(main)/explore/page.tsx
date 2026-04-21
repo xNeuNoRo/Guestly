@@ -11,6 +11,7 @@ import { useSearchProperties } from "@/hooks/properties/useQueries";
 import { Modal } from "@/components/shared/Modal";
 import { PropertySearchRequest } from "@/schemas/properties.schemas";
 import { parseISO } from "date-fns/parseISO";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
 export default function ExplorePage() {
   const searchParams = useSearchParams();
@@ -37,7 +38,11 @@ export default function ExplorePage() {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   // Hook conectado a la URL
-  const { data: properties, isLoading, isError } = useSearchProperties(searchFilters);
+  const {
+    data: properties,
+    isLoading,
+    isError,
+  } = useSearchProperties(searchFilters);
 
   const propertiesContent = (() => {
     if (isLoading) {
@@ -74,62 +79,66 @@ export default function ExplorePage() {
   })();
 
   return (
-    <main className="container mx-auto px-4 py-8 min-h-screen">
-      {/* Header de la página */}
-      <div className="flex items-end justify-between mb-8 pb-4 border-b border-slate-100">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">
-            {locationQuery ? `Alojamientos en "${locationQuery}"` : "Explorar"}
-          </h1>
-          <p className="text-slate-500 mt-1 font-medium">
-            {properties
-              ? `${properties.length} propiedades encontradas`
-              : "Buscando..."}
-          </p>
+    <AuthGuard allowGuests={false}>
+      <main className="container mx-auto px-4 py-8 min-h-screen">
+        {/* Header de la página */}
+        <div className="flex items-end justify-between mb-8 pb-4 border-b border-slate-100">
+          <div>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+              {locationQuery
+                ? `Alojamientos en "${locationQuery}"`
+                : "Explorar"}
+            </h1>
+            <p className="text-slate-500 mt-1 font-medium">
+              {properties
+                ? `${properties.length} propiedades encontradas`
+                : "Buscando..."}
+            </p>
+          </div>
+
+          {/* Botón Filtros Móvil */}
+          <button
+            className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full shadow-sm font-bold text-sm text-slate-700 active:scale-95 transition-transform"
+            onClick={() => setIsMobileFiltersOpen(true)}
+          >
+            <IoFilterOutline size={18} />
+            Filtros
+          </button>
         </div>
 
-        {/* Botón Filtros Móvil */}
-        <button
-          className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full shadow-sm font-bold text-sm text-slate-700 active:scale-95 transition-transform"
-          onClick={() => setIsMobileFiltersOpen(true)}
+        <div className="flex flex-col lg:flex-row gap-10 items-start">
+          {/* Sidebar de Filtros (Desktop) */}
+          <aside className="hidden lg:block w-80 shrink-0 sticky top-28">
+            <PropertyFilters />
+          </aside>
+
+          {/* Grid de Resultados */}
+          <section className="flex-1 w-full">
+            {isError ? (
+              <div className="py-16 text-center bg-red-50 rounded-[2.5rem] border border-red-100 text-red-600 font-bold shadow-sm">
+                No pudimos cargar las propiedades. Verifica tu conexión.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10">
+                {propertiesContent}
+              </div>
+            )}
+          </section>
+        </div>
+
+        {/* Modal de Filtros (Móvil) */}
+        <Modal
+          open={isMobileFiltersOpen}
+          close={() => setIsMobileFiltersOpen(false)}
+          title="Filtros"
         >
-          <IoFilterOutline size={18} />
-          Filtros
-        </button>
-      </div>
-
-      <div className="flex flex-col lg:flex-row gap-10 items-start">
-        {/* Sidebar de Filtros (Desktop) */}
-        <aside className="hidden lg:block w-80 shrink-0 sticky top-28">
-          <PropertyFilters />
-        </aside>
-
-        {/* Grid de Resultados */}
-        <section className="flex-1 w-full">
-          {isError ? (
-            <div className="py-16 text-center bg-red-50 rounded-[2.5rem] border border-red-100 text-red-600 font-bold shadow-sm">
-              No pudimos cargar las propiedades. Verifica tu conexión.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10">
-              {propertiesContent}
-            </div>
-          )}
-        </section>
-      </div>
-
-      {/* Modal de Filtros (Móvil) */}
-      <Modal
-        open={isMobileFiltersOpen}
-        close={() => setIsMobileFiltersOpen(false)}
-        title="Filtros"
-      >
-        <div className="p-1 h-full">
-          <PropertyFilters
-            onCloseMobile={() => setIsMobileFiltersOpen(false)}
-          />
-        </div>
-      </Modal>
-    </main>
+          <div className="p-1 h-full">
+            <PropertyFilters
+              onCloseMobile={() => setIsMobileFiltersOpen(false)}
+            />
+          </div>
+        </Modal>
+      </main>
+    </AuthGuard>
   );
 }
