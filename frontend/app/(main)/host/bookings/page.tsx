@@ -22,7 +22,7 @@ export default function HostBookingsPage() {
   const filters = useMemo((): ReservationSearchRequest => {
     // Para Host, lo lógico es que por defecto vea "Pending"
     const status =
-      (searchParams.get("status") as ReservationStatus) || "Pending";
+      (searchParams.get("status") as ReservationStatus);
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
 
