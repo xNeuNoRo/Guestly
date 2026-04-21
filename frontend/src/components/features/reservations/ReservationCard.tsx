@@ -14,6 +14,7 @@ import type { ReservationResponse } from "@/schemas/reservations.schemas";
 import { ROUTES } from "@/constants/routes";
 import { JSX } from "react";
 import { Button } from "@headlessui/react";
+import { useRouter } from "next/navigation";
 
 interface ReservationCardProps {
   reservation: ReservationResponse;
@@ -24,6 +25,7 @@ export function ReservationCard({
   reservation,
   isHostMode = false,
 }: Readonly<ReservationCardProps>) {
+  const router = useRouter();
   const checkIn = new Date(reservation.checkInDate);
   const checkOut = new Date(reservation.checkOutDate);
 
@@ -59,6 +61,11 @@ export function ReservationCard({
       </p>
     );
   }
+
+  const handlePropertyClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevents the outer <Link> from navigating
+    router.push(ROUTES.PUBLIC.PROPERTY_DETAIL(reservation.propertyId));
+  };
 
   return (
     <Link
@@ -106,12 +113,13 @@ export function ReservationCard({
           </div>
 
           {/* Gatillo de Reseña: Solo para Huéspedes en reservas Completadas */}
-          {!isHostMode && reservation.status === "Completed" && (
-            <Link href={ROUTES.PUBLIC.PROPERTY_DETAIL(reservation.propertyId)}>
-              <div className="text-sm font-medium bg-primary-600 text-white hover:bg-primary-800 px-4 py-2 rounded-full transition-colors">
-                Ir a la propiedad
-              </div>
-            </Link>
+          {!isHostMode && (
+            <Button
+              onClick={handlePropertyClick}
+              className="text-sm font-medium bg-primary-600 text-white hover:cursor-pointer hover:scale-105 hover:bg-primary-800 px-4 py-2 rounded-full transition-all duration-200"
+            >
+              Ir a la propiedad
+            </Button>
           )}
         </div>
       </div>
