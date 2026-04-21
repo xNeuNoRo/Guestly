@@ -3,13 +3,12 @@
 import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { IoSearchOutline } from "react-icons/io5";
 import clsx from "clsx";
 import { format, parseISO } from "date-fns";
 
 import { Form } from "@/components/shared/form/Form";
-import { InputField } from "@/components/shared/form/InputField";
 import { Button } from "@/components/shared/Button";
 import { Input } from "@/components/shared/Input";
 
@@ -31,7 +30,8 @@ export function PropertySearchBar({
 }: Readonly<PropertySearchBarProps>) {
   const router = useRouter();
   const pathname = usePathname();
-  const { createUrl, searchParams } = useQueryString();
+  const searchParams = useSearchParams();
+  const { createUrl } = useQueryString();
 
   const parseDateParam = (param: string | null): Date | undefined => {
     if (!param) return undefined;
@@ -51,6 +51,7 @@ export function PropertySearchBar({
     },
   });
 
+  // Sincronización controlada: solo resetea si los searchParams cambian externamente
   useEffect(() => {
     form.reset({
       location: searchParams.get("location") || undefined,
@@ -69,17 +70,18 @@ export function PropertySearchBar({
     const endStr = data.endDate ? format(data.endDate, "yyyy-MM-dd") : null;
 
     const urlWithParams = createUrl({
-      location: data.location || null,
-      capacity: data.capacity ? data.capacity.toString() : null,
+      location: data.location?.trim() ? data.location.trim() : null,
+      capacity:
+        data.capacity && data.capacity > 0 ? data.capacity.toString() : null,
       startDate: startStr,
       endDate: endStr,
     });
 
-    if (pathname === ROUTES.PUBLIC.HOME) {
+    if (pathname === ROUTES.USER.EXPLORE) {
       router.push(urlWithParams, { scroll: false });
     } else {
       const [, query] = urlWithParams.split("?");
-      router.push(`${ROUTES.PUBLIC.HOME}?${query || ""}`);
+      router.push(`${ROUTES.USER.EXPLORE}?${query || ""}`);
     }
   };
 
@@ -94,30 +96,45 @@ export function PropertySearchBar({
           className,
         )}
       >
-        {/* Input de Destino */}
         <div className="flex-1 min-w-0 h-full flex items-center">
-          <InputField
+          <Controller
             name="location"
-            placeholder="¿A dónde vas?"
-            className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full text-sm font-medium w-full truncate text-slate-900 placeholder:text-slate-500"
+            control={form.control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                value={field.value || ""}
+                placeholder="¿A dónde vas?"
+                className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full text-sm font-medium w-full truncate text-slate-900 placeholder:text-slate-500"
+              />
+            )}
           />
         </div>
 
         <div className="w-px bg-slate-200 h-6 mx-2 shrink-0" />
 
-        {/* Input de Huéspedes */}
         <div className="w-25 h-full flex items-center shrink-0">
-          <InputField
+          <Controller
             name="capacity"
-            type="number"
-            min={1}
-            placeholder="Hués."
-            rules={{ valueAsNumber: true }}
-            className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full text-sm font-medium w-full text-center text-slate-900 placeholder:text-slate-500"
+            control={form.control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="number"
+                min={1}
+                value={field.value || ""}
+                onChange={(e) =>
+                  field.onChange(
+                    e.target.value ? Number(e.target.value) : undefined,
+                  )
+                }
+                placeholder="Hués."
+                className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full text-sm font-medium w-full text-center text-slate-900 placeholder:text-slate-500"
+              />
+            )}
           />
         </div>
 
-        {/* Botón Submit */}
         <Button
           type="submit"
           className="!rounded-full h-10 w-10 shrink-0 flex items-center justify-center p-0 ml-1"
@@ -140,10 +157,17 @@ export function PropertySearchBar({
       )}
     >
       <div className="flex-[1.5] w-full px-8 py-2 md:py-0 hover:bg-slate-50 transition-colors cursor-text focus-within:bg-slate-50 rounded-l-full flex items-center h-full">
-        <InputField
+        <Controller
           name="location"
-          placeholder="¿A dónde vas?"
-          className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium placeholder:text-slate-500 text-lg"
+          control={form.control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              value={field.value || ""}
+              placeholder="¿A dónde vas?"
+              className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium placeholder:text-slate-500 text-lg"
+            />
+          )}
         />
       </div>
 
@@ -191,13 +215,24 @@ export function PropertySearchBar({
 
       <div className="flex-1 flex w-full items-center justify-between px-6 py-2 md:py-0 hover:bg-slate-50 transition-colors focus-within:bg-slate-50 rounded-r-full h-full gap-4">
         <div className="flex-1 w-16">
-          <InputField
+          <Controller
             name="capacity"
-            type="number"
-            min={1}
-            placeholder="Huéspedes"
-            rules={{ valueAsNumber: true }}
-            className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium text-slate-900 placeholder:text-slate-500 text-lg"
+            control={form.control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="number"
+                min={1}
+                value={field.value || ""}
+                onChange={(e) =>
+                  field.onChange(
+                    e.target.value ? Number(e.target.value) : undefined,
+                  )
+                }
+                placeholder="Huéspedes"
+                className="border-none bg-transparent shadow-none focus:ring-0 px-0 h-full font-medium text-slate-900 placeholder:text-slate-500 text-lg w-full"
+              />
+            )}
           />
         </div>
 

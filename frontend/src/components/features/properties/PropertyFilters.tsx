@@ -1,9 +1,8 @@
-// frontend/src/components/features/properties/PropertyFilters.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IoFilterOutline, IoCloseOutline } from "react-icons/io5";
 
@@ -30,7 +29,6 @@ export function PropertyFilters({
   const form = useForm<PropertySearchRequest>({
     resolver: zodResolver(propertySearchSchema),
     defaultValues: {
-      // ARSENAL LOGIC: String vacío "" en vez de undefined para que RHF controle bien el input
       location: searchParams.get("location") || "",
       capacity: searchParams.get("capacity")
         ? Number(searchParams.get("capacity"))
@@ -55,24 +53,26 @@ export function PropertyFilters({
 
     setActiveFiltersCount(count);
 
-    form.reset({
-      // ARSENAL LOGIC: Mismo ajuste aquí
-      location: searchParams.get("location") || "",
-      capacity: searchParams.get("capacity")
-        ? Number(searchParams.get("capacity"))
-        : undefined,
-      minPrice: searchParams.get("minPrice")
-        ? Number(searchParams.get("minPrice"))
-        : undefined,
-      maxPrice: searchParams.get("maxPrice")
-        ? Number(searchParams.get("maxPrice"))
-        : undefined,
-    });
+    // keepDirty y keepTouched evitan que react-hook-form borre lo que
+    // el usuario está escribiendo si el componente se re-renderiza por otra razón.
+    form.reset(
+      {
+        location: searchParams.get("location") || "",
+        capacity: searchParams.get("capacity")
+          ? Number(searchParams.get("capacity"))
+          : undefined,
+        minPrice: searchParams.get("minPrice")
+          ? Number(searchParams.get("minPrice"))
+          : undefined,
+        maxPrice: searchParams.get("maxPrice")
+          ? Number(searchParams.get("maxPrice"))
+          : undefined,
+      },
+      { keepDirty: true, keepTouched: true },
+    );
   }, [searchParams, form]);
 
   const onSubmit = (data: PropertySearchRequest) => {
-    // ARSENAL LOGIC: Como ya usamos setValueAs en los inputs, los NaNs ya no existen (son undefined).
-    // Usamos ?? null para asegurarnos de que si alguien pone '0' en el minPrice, no se evalúe como false y se borre.
     const urlWithParams = createUrl({
       location: data.location?.trim() || null,
       capacity: data.capacity?.toString() ?? null,
@@ -89,7 +89,7 @@ export function PropertyFilters({
 
   const clearFilters = () => {
     form.reset({
-      location: "", // ARSENAL LOGIC: Limpiamos con string vacío
+      location: "",
       capacity: undefined,
       minPrice: undefined,
       maxPrice: undefined,
@@ -146,20 +146,39 @@ export function PropertyFilters({
           <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
             Viaje
           </h3>
-          <InputField
+          <Controller
             name="location"
-            label="Ubicación"
-            placeholder="Ej: Punta Cana"
+            control={form.control}
+            render={({ field }) => (
+              <InputField
+                name={field.name}
+                value={field.value || ""}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                label="Ubicación"
+                placeholder="Ej: Punta Cana"
+              />
+            )}
           />
-          <InputField
+          <Controller
             name="capacity"
-            label="Huéspedes"
-            type="number"
-            min={1}
-            placeholder="Cualquier cantidad"
-            rules={{
-              setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
-            }}
+            control={form.control}
+            render={({ field }) => (
+              <InputField
+                name={field.name}
+                value={field.value ?? ""}
+                onChange={(e) =>
+                  field.onChange(
+                    e.target.value ? Number(e.target.value) : undefined,
+                  )
+                }
+                onBlur={field.onBlur}
+                label="Huéspedes"
+                type="number"
+                min={1}
+                placeholder="Cualquier cantidad"
+              />
+            )}
           />
         </section>
 
@@ -169,25 +188,45 @@ export function PropertyFilters({
             Precio por noche
           </h3>
           <div className="grid grid-cols-2 gap-4">
-            <InputField
+            <Controller
               name="minPrice"
-              label="Mínimo ($)"
-              type="number"
-              min={0}
-              placeholder="0"
-              rules={{
-                setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
-              }}
+              control={form.control}
+              render={({ field }) => (
+                <InputField
+                  name={field.name}
+                  value={field.value ?? ""}
+                  onChange={(e) =>
+                    field.onChange(
+                      e.target.value ? Number(e.target.value) : undefined,
+                    )
+                  }
+                  onBlur={field.onBlur}
+                  label="Mínimo ($)"
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                />
+              )}
             />
-            <InputField
+            <Controller
               name="maxPrice"
-              label="Máximo ($)"
-              type="number"
-              min={0}
-              placeholder="Sin límite"
-              rules={{
-                setValueAs: (v) => (v === "" ? undefined : parseInt(v, 10)),
-              }}
+              control={form.control}
+              render={({ field }) => (
+                <InputField
+                  name={field.name}
+                  value={field.value ?? ""}
+                  onChange={(e) =>
+                    field.onChange(
+                      e.target.value ? Number(e.target.value) : undefined,
+                    )
+                  }
+                  onBlur={field.onBlur}
+                  label="Máximo ($)"
+                  type="number"
+                  min={0}
+                  placeholder="Sin límite"
+                />
+              )}
             />
           </div>
           {form.watch("minPrice") !== undefined &&

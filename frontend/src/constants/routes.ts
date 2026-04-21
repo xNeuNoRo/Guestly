@@ -21,6 +21,7 @@ export const ROUTES = {
 
   // Usuario común (GUEST / General)
   USER: {
+    EXPLORE: "/explore",
     SETTINGS: "/settings", // Engloba UpdateProfile, ChangePassword, ChangeEmail
     RESERVATIONS: "/trips", // Tus propias reservas
     RESERVATIONBYID: (id: string) => `/trips/${id}`, // Detalle de una reserva específica (tanto para huéspedes como anfitriones)
