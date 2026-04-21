@@ -1,7 +1,7 @@
 // frontend/app/(main)/host/bookings/page.tsx
 "use client";
 
-import { useMemo } from "react";
+import { JSX, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { IoCalendarOutline } from "react-icons/io5";
 import { parseISO } from "date-fns"; // ARSENAL: Importación corregida
@@ -29,7 +29,6 @@ export default function HostBookingsPage() {
 
     return {
       status,
-      // Usamos trim() y validación básica para evitar strings vacíos
       startDate: startDate ? parseISO(startDate) : undefined,
       endDate: endDate ? parseISO(endDate) : undefined,
     };
@@ -41,6 +40,39 @@ export default function HostBookingsPage() {
     isLoading,
     isRefetching,
   } = useSearchReservations(filters);
+
+  let bookingsSection: JSX.Element | JSX.Element[];
+
+  if (isLoading) {
+    bookingsSection = <p className="text-slate-400">Cargando reservas...</p>;
+  } else if (bookings?.length) {
+    bookingsSection = bookings.map((booking) => (
+      <div key={booking.id} className="flex flex-col gap-4">
+        <ReservationCard reservation={booking} />
+
+        {booking.status === "Pending" && (
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <p className="text-sm font-bold text-slate-600 ml-2">
+              ¿Aceptar esta estancia?
+            </p>
+            <HostReservationActions
+              status={booking.status}
+              reservationId={booking.id}
+            />
+          </div>
+        )}
+      </div>
+    ));
+  } else {
+    bookingsSection = (
+      <div className="py-20 text-center bg-slate-50 rounded-[3rem] border border-dashed border-slate-200">
+        <IoCalendarOutline size={48} className="mx-auto text-slate-300 mb-4" />
+        <p className="text-slate-500 font-bold">
+          No tienes solicitudes en este estado.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <AuthGuard allowedRoles={["Host"]}>
@@ -64,40 +96,7 @@ export default function HostBookingsPage() {
 
         <ReservationFiltersBar />
 
-        <div className="space-y-8">
-          {isLoading ? (
-            // Agrega aquí tus Skeletons si quieres
-            <p className="text-slate-400">Cargando reservas...</p>
-          ) : bookings?.length ? (
-            bookings.map((booking) => (
-              <div key={booking.id} className="flex flex-col gap-4">
-                <ReservationCard reservation={booking} />
-
-                {booking.status === "Pending" && (
-                  <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <p className="text-sm font-bold text-slate-600 ml-2">
-                      ¿Aceptar esta estancia?
-                    </p>
-                    <HostReservationActions
-                      status={booking.status}
-                      reservationId={booking.id}
-                    />
-                  </div>
-                )}
-              </div>
-            ))
-          ) : (
-            <div className="py-20 text-center bg-slate-50 rounded-[3rem] border border-dashed border-slate-200">
-              <IoCalendarOutline
-                size={48}
-                className="mx-auto text-slate-300 mb-4"
-              />
-              <p className="text-slate-500 font-bold">
-                No tienes solicitudes en este estado.
-              </p>
-            </div>
-          )}
-        </div>
+        <div className="space-y-8">{bookingsSection}</div>
       </main>
     </AuthGuard>
   );

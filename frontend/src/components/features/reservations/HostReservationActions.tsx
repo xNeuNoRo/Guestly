@@ -70,7 +70,6 @@ export function HostReservationActions({
           });
         },
         onError: () => {
-          toast.error("Error al procesar la solicitud");
           // Limpiamos la URL tras el error
           router.push(createUrl({ pendingAction: null, actionId: null }), {
             scroll: false,

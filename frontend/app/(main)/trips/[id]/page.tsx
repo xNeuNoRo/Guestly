@@ -65,7 +65,7 @@ export default function ReservationDetailPage({
       {/* Header de Navegación */}
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900 mb-6 transition-colors"
+        className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:cursor-pointer hover:text-slate-900 mb-6 transition-colors"
       >
         <IoChevronBack size={18} />
         Volver a mis viajes

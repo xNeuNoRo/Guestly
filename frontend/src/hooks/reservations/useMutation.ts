@@ -54,8 +54,6 @@ export function useUpdateReservationStatus() {
       request: UpdateReservationStatusRequest;
     }) => updateReservationStatus(id, request),
     onSuccess: (data) => {
-      toast.success(`La reserva ha sido marcada como ${data.status}.`);
-
       // Actualizamos directamente el detalle de la reserva en caché
       queryClient.setQueryData(reservationKeys.detail(data.id), data);
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ROUTES } from "@/constants/routes";
 import { Button } from "@/components/shared/Button";
 import { HostStatsDashboard } from "@/components/features/users/HostStatsDashboard";
+import { RecentHostBookings } from "@/components/features/reservations/RecentHostBookings";
 import { IoAddOutline, IoChevronForwardOutline } from "react-icons/io5";
 
 export const metadata = {
@@ -34,14 +35,14 @@ export default function HostPage() {
         </Link>
       </header>
 
-      {/* Sección de Métricas (Tu componente Smart) */}
+      {/* Sección de Métricas */}
       <section>
         <HostStatsDashboard />
       </section>
 
       {/* Secciones Secundarias (Activity & Properties) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Placeholder para Reservas Próximas */}
+        {/* Reservas Próximas */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-slate-900">
@@ -55,11 +56,8 @@ export default function HostPage() {
             </Link>
           </div>
 
-          <div className="bg-white rounded-[2.5rem] border border-slate-200 border-dashed p-12 text-center">
-            <p className="text-slate-400 font-medium">
-              Aquí aparecerán tus próximas reservas confirmadas.
-            </p>
-          </div>
+          {/* ARSENAL: Inyectamos el Client Component aquí */}
+          <RecentHostBookings />
         </div>
 
         {/* Atajos Rápidos / Tips */}

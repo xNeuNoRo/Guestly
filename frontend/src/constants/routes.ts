@@ -32,7 +32,7 @@ export const ROUTES = {
     DASHBOARD: "/host",
     PROPERTIES: "/host/properties",
     NEW_PROPERTY: "/host/properties/new",
-    RESERVATIONS: "/host/reservations", // Reservas de las propiedades del host
+    RESERVATIONS: "/host/bookings", // Reservas de las propiedades del host
   },
 
   // Error/Seguridad

@@ -16,13 +16,14 @@ import type {
   ReservationStatus,
 } from "@/schemas/reservations.schemas";
 import { parseISO } from "date-fns/parseISO";
+import { useAuth } from "@/hooks/stores/useAuth";
 
 export default function MyTripsPage() {
   const searchParams = useSearchParams();
+  const { user } = useAuth();
 
   const filters = useMemo((): ReservationSearchRequest => {
-    const status =
-      (searchParams.get("status") as ReservationStatus) || "Confirmed";
+    const status = searchParams.get("status") as ReservationStatus;
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
 
@@ -38,7 +39,7 @@ export default function MyTripsPage() {
     data: reservations,
     isLoading,
     isRefetching,
-  } = useSearchReservations(filters);
+  } = useSearchReservations({ ...filters, guestId: user?.id });
 
   let tripsContent: ReactNode;
 
