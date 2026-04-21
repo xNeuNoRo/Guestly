@@ -8,7 +8,7 @@ using MediatR;
 namespace Guestly.Application.Queries.Reviews.GetByUser;
 
 /// <summary>
-/// Manejador para obtener las reseñas realizadas por un usuario específico. Retorna una lista de reviews
+/// Manejador de la consulta para obtener la reseña asociada a una reserva específica, identificado por su ReservationId.
 /// </summary>
 public class GetReviewByReservationQueryHandler
     : IRequestHandler<GetReviewByReservationQuery, ReviewResponse>
@@ -21,7 +21,7 @@ public class GetReviewByReservationQueryHandler
     }
 
     /// <summary>
-    /// Maneja la consulta para obtener las reseñas realizadas por un usuario específico. Retorna una lista de reviews
+    /// Maneja la consulta para obtener la reseña asociada a una reserva específica. 
     /// </summary>
     public async Task<ReviewResponse> Handle(
         GetReviewByReservationQuery request,

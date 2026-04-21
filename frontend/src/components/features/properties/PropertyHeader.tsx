@@ -17,11 +17,23 @@ export interface PropertyHeaderProps {
  * ofrece acciones específicas como compartir.
  */
 export function PropertyHeader({ property }: Readonly<PropertyHeaderProps>) {
-  const handleShare = () => {
-    navigator.clipboard.writeText(globalThis.location.href);
-    toast.success("Enlace copiado", {
-      description: "Se ha copiado la URL de la propiedad al portapapeles.",
-    });
+  const handleShare = async () => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(globalThis.location.href);
+        toast.success("Enlace copiado", {
+          description: "Se ha copiado la URL de la propiedad al portapapeles.",
+        });
+      } else {
+        throw new Error("El navegador no soporta el portapapeles.");
+      }
+    } catch (error) {
+      console.error("Error al copiar al portapapeles:", error);
+      toast.error("Error al copiar", {
+        description:
+          "No pudimos copiar el enlace automáticamente. Intenta copiarlo desde la barra de direcciones.",
+      });
+    }
   };
 
   const hasReviews = property.totalReviews > 0;

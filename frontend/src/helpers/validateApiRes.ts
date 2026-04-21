@@ -16,7 +16,6 @@ export function validateApiRes<S extends z.ZodTypeAny>(
 
   // Si la validación falla, lanzamos un error genérico
   if (!result.success) {
-    console.log("Error de validación de API:", result.error);
     throw new Error("Error al comunicarse con el servidor");
   }
 
