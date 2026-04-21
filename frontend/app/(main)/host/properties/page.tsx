@@ -7,6 +7,7 @@ import {
   IoCreateOutline,
   IoTrashOutline,
   IoHomeOutline,
+  IoCalendarClearOutline,
 } from "react-icons/io5";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -95,6 +96,11 @@ export default function MyPropertiesPage() {
           <Link href={`${ROUTES.HOST.PROPERTIES}/${property.id}/edit`}>
             <button className="p-2.5 bg-white text-slate-700 rounded-xl shadow-xl hover:cursor-pointer hover:text-primary-600 transition-colors border border-slate-100">
               <IoCreateOutline size={20} />
+            </button>
+          </Link>
+          <Link href={`${ROUTES.HOST.PROPERTIES}/${property.id}/calendar`}>
+            <button className="p-2.5 bg-white text-slate-700 rounded-xl shadow-xl hover:cursor-pointer hover:text-primary-600 transition-colors border border-slate-100">
+              <IoCalendarClearOutline size={20} />
             </button>
           </Link>
           <button

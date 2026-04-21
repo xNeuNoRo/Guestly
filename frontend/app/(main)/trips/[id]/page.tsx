@@ -4,7 +4,7 @@ import { use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { format, differenceInDays } from "date-fns";
-import { es } from "date-fns/locale";
+import { es, is } from "date-fns/locale";
 import {
   IoLocationOutline,
   IoChevronBack,
@@ -76,7 +76,7 @@ export default function ReservationDetailPage({
         className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:cursor-pointer hover:text-slate-900 mb-6 transition-colors"
       >
         <IoChevronBack size={18} />
-        Volver a mis viajes
+        {isHost ? "Volver a mis reservas recibidas" : "Volver a mis viajes"}
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -85,7 +85,7 @@ export default function ReservationDetailPage({
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <h1 className="text-3xl font-black text-slate-900 tracking-tight">
-                Detalles del viaje
+                {isGuest ? "Detalles del viaje" : "Detalles de la reserva"}
               </h1>
               <ReservationStatusBadge status={reservation.status} />
             </div>
@@ -113,20 +113,37 @@ export default function ReservationDetailPage({
               </p>
             </div>
 
-            <div className="space-y-1">
-              <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                Anfitrión
-              </p>
-              <h3 className="text-xl font-bold text-slate-900">
-                {reservation.hostName}
-              </h3>
-              <Link
-                href={`/profile/${reservation.hostId}`}
-                className="text-primary-600 font-bold text-sm hover:underline"
-              >
-                Ver perfil del anfitrión
-              </Link>
-            </div>
+            {isGuest ? (
+              <div className="space-y-1">
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                  Anfitrión
+                </p>
+                <h3 className="text-xl font-bold text-slate-900">
+                  {reservation.hostName}
+                </h3>
+                <Link
+                  href={`/profile/${reservation.hostId}`}
+                  className="text-primary-600 font-bold text-sm hover:underline"
+                >
+                  Ver perfil del anfitrión
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                  Huésped
+                </p>
+                <h3 className="text-xl font-bold text-slate-900">
+                  {reservation.guestName}
+                </h3>
+                <Link
+                  href={`/profile/${reservation.guestId}`}
+                  className="text-primary-600 font-bold text-sm hover:underline"
+                >
+                  Ver perfil del huésped
+                </Link>
+              </div>
+            )}
 
             <div className="md:col-span-2 pt-6 border-t border-slate-100 grid grid-cols-2 gap-4">
               <div className="space-y-1">

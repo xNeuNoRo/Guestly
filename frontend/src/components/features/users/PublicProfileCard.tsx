@@ -91,7 +91,7 @@ export function PublicProfileCard({
         {/* Información Principal (Estrictamente Schema) */}
         <div className="flex-1 text-center md:text-left">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 leading-tight mb-2 tracking-tight">
-            Hola, soy {profile.firstName} {profile.lastName}
+            {profile.firstName} {profile.lastName}
           </h2>
 
           <div className="flex items-center justify-center md:justify-start gap-2 text-slate-500 font-medium mb-4">
