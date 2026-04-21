@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, ChangeEvent } from "react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -19,12 +19,16 @@ interface PropertyImageManagerProps {
   existingImages?: string[];
 }
 
+/**
+ * @description Gestor avanzado de imágenes.
+ * Utiliza índices posicionales en la URL para persistir el borrado de forma ultra ligera.
+ */
 export function PropertyImageManager({
   existingImages = [],
 }: Readonly<PropertyImageManagerProps>) {
   const router = useRouter();
   const { createUrl, searchParams } = useQueryString();
-  const { watch, setValue } = useFormContext();
+  const { control, setValue } = useFormContext();
 
   // --- Fuente de Verdad: URL (Solo guardamos los ÍNDICES) ---
   const deletedIndices = useMemo(() => {
@@ -42,7 +46,9 @@ export function PropertyImageManager({
   }, [deletedIndices, existingImages, setValue]);
 
   // Previsualización de archivos locales (Nuevas fotos)
-  const newFiles = watch("images") as FileList | undefined;
+  const newFiles = useWatch({ control, name: "images" }) as
+    | FileList
+    | undefined;
   const newPreviewUrls = useMemo(() => {
     if (!newFiles || newFiles.length === 0) return [];
     return Array.from(newFiles).map((file) => URL.createObjectURL(file));
@@ -182,7 +188,13 @@ export function PropertyImageManager({
             key={`new-${url}`}
             className="relative aspect-square rounded-xl overflow-hidden border-2 border-emerald-400 group"
           >
-            <Image src={url} alt="Nueva" fill className="object-cover" />
+            <Image
+              src={url}
+              alt="Nueva"
+              fill
+              className="object-cover"
+              unoptimized
+            />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <Button
                 type="button"
