@@ -112,7 +112,7 @@ export function ReviewCard({
         </div>
 
         {/* --- MENÚ CONTEXTUAL (Modo Autor) --- */}
-        {isAuthor && (
+        {isAuthor && showReviewActions && (
           <div className="relative z-10" ref={menuRef}>
             <button
               onClick={toggle}
@@ -127,43 +127,41 @@ export function ReviewCard({
               <IoEllipsisVertical size={20} />
             </button>
 
-            {showReviewActions && (
-              <AnimatePresence>
-                {value && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    className="absolute right-0 mt-3 w-48 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden origin-top-right"
-                  >
-                    <div className="p-1.5 flex flex-col gap-1">
-                      <button
-                        onClick={() => {
-                          setFalse();
-                          onEdit?.(review);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 hover:cursor-pointer hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors text-left"
-                      >
-                        <IoCreateOutline size={18} className="text-slate-400" />
-                        Editar reseña
-                      </button>
+            <AnimatePresence>
+              {value && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  className="absolute right-0 mt-3 w-48 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden origin-top-right"
+                >
+                  <div className="p-1.5 flex flex-col gap-1">
+                    <button
+                      onClick={() => {
+                        setFalse();
+                        onEdit?.(review);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 hover:cursor-pointer hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors text-left"
+                    >
+                      <IoCreateOutline size={18} className="text-slate-400" />
+                      Editar reseña
+                    </button>
 
-                      <button
-                        onClick={() => {
-                          setFalse();
-                          onDelete?.(review.id);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 hover:cursor-pointer hover:bg-red-50 rounded-xl transition-colors text-left"
-                      >
-                        <IoTrashOutline size={18} className="text-red-400" />
-                        Eliminar reseña
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            )}
+                    <button
+                      onClick={() => {
+                        setFalse();
+                        onDelete?.(review.id);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 hover:cursor-pointer hover:bg-red-50 rounded-xl transition-colors text-left"
+                    >
+                      <IoTrashOutline size={18} className="text-red-400" />
+                      Eliminar reseña
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
       </header>
